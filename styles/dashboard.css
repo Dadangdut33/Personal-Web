@@ -1,0 +1,54 @@
+/* outer */
+.dashboard.login-logo {
+	width: 100px;
+	pointer-events: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+.dashboard.nav-wrap {
+	display: flex;
+	flex-direction: row;
+}
+
+.dashboard.content-wrap {
+	padding: 1.25rem 2.5rem 2rem;
+	/* full width */
+	width: 100%;
+}
+
+#logout-nav div svg.icon-tabler-logout {
+	margin-left: 4.75px;
+}
+
+#logout-popout button svg.icon-tabler-logout {
+	margin-left: 1.5px;
+}
+
+/* components use */
+.dash-flex {
+	display: flex;
+	flex-direction: row;
+}
+
+.dash-flex-column {
+	display: flex;
+	flex-direction: column;
+}
+
+.dash-relative {
+	position: relative;
+}
+
+#dash-add-new {
+	margin-top: 0.7rem;
+}
+
+#dash-add-new div span {
+	margin-right: 3px;
+}
+
+#dash-add-new div span.mantine-Button-label {
+	margin-top: 3px;
+}

@@ -1,0 +1,13 @@
+.md-wrapper {
+	width: 90%;
+}
+
+.md-wrapper.full-width {
+	width: 100%;
+}
+
+.wmde-markdown {
+	background-color: inherit !important;
+	color: inherit !important;
+	font-family: inherit !important;
+}
