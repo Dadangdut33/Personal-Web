@@ -26,7 +26,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
 						fontFamily: ["Raleway", "sans-serif"],
 						lineHeight: "1.2", // default web line height
 						colors: {
-							dark: ["#FFFFFF", "#A6A7AB", "#909296", "#5C5F66", "#373A40", "#2C2E33", "#303446", "#23283e", "#141517", "#101113"],
+							dark: ["#FFFFFF", "#A6A7AB", "#909296", "#5C5F66", "#373A40", "#2c3048", "#303446", "#23283e", "#141517", "#101113"],
 						},
 					}}
 					withGlobalStyles

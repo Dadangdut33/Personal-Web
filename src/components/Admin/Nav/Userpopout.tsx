@@ -42,22 +42,9 @@ export const UserPopout: NextPage<navProps> = (props) => {
 
 					<Menu.Divider />
 
-					<>
-						<Link href={`/${props.pathname?.split("/")[1]}/blog?author=${props.user?.username}&tab=1`}>
-							<a>
-								<Menu.Item icon={<IconNotebook size={14} stroke={1.5} color={theme.colors.red[6]} />}>Your Blog Posts</Menu.Item>
-							</a>
-						</Link>
-						<Link href={`/${props.pathname?.split("/")[1]}/event?author=${props.user?.username}&tab=1`}>
-							<a>
-								<Menu.Item icon={<IconCalendarEvent size={14} stroke={1.5} color={theme.colors.yellow[6]} />}>Your Event Posts</Menu.Item>
-							</a>
-						</Link>
-					</>
-
-					<Link href={`/${props.pathname?.split("/")[1]}/comment?author=${props.user?.username}&tab=1`}>
+					<Link href={`/${props.pathname?.split("/")[1]}/blog?author=${props.user?.username}&tab=1`}>
 						<a>
-							<Menu.Item icon={<IconMessages size={14} stroke={1.5} color={theme.colors.blue[6]} />}>Your comments</Menu.Item>
+							<Menu.Item icon={<IconNotebook size={14} stroke={1.5} color={theme.colors.red[6]} />}>Your Blog Posts</Menu.Item>
 						</a>
 					</Link>
 
