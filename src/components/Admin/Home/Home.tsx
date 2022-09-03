@@ -34,7 +34,7 @@ const useStyles = createStyles((theme) => ({
 
 export const DashboardHome: NextPage<IDashboardProps> = (props) => {
 	const { classes } = useStyles();
-	const [statsData, setStatsData] = useState<IstatsExtended[]>([emptyStats, emptyStats, emptyStats, emptyStats, emptyStats, emptyStats, emptyStats]);
+	const [statsData, setStatsData] = useState<IstatsExtended[]>([emptyStats, emptyStats, emptyStats, emptyStats]);
 
 	// ---------------------------------------------------------------------------------------------
 	const fetchShortlinkClicks = async (index: number) => {

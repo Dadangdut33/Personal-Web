@@ -3,7 +3,7 @@ import Head from "next/head";
 import { Wrapper } from "../../../../src/components/Admin/Nav/Wrapper";
 import { BlogRevision } from "../../../../src/components/Admin/Blog";
 import { IDashboardProps } from "../../../../src/interfaces/props/Dashboard";
-import { SERVER_V1, validateEditor } from "../../../../src/helper";
+import { SERVER_V1 } from "../../../../src/helper";
 
 const post_revision: NextPage<IDashboardProps> = (props) => {
 	return (
@@ -12,7 +12,7 @@ const post_revision: NextPage<IDashboardProps> = (props) => {
 				<meta charSet="UTF-8" />
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-				<title>View Post Revision | Dadangdut33</title>
+				<title>View Post Revision | Dadangdut33 Personal Web</title>
 			</Head>
 			<Wrapper {...props}>
 				<BlogRevision {...props} />
@@ -36,7 +36,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 	// validate role
 	const parsed = await checkLoggedIn.json();
-	if (!validateEditor(parsed.data)) return { notFound: true };
 
 	// get blog data
 	const fetchBlog = await fetch(`${SERVER_V1}/blog/${context.params!._id}`, {

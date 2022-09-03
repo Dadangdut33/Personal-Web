@@ -3,7 +3,7 @@ import Head from "next/head";
 import { Wrapper } from "../../../src/components/Admin/Nav/Wrapper";
 import { IdAndCount } from "../../../src/components/Admin/Reusable/IdAndCount";
 import { IDashboardProps } from "../../../src/interfaces/props/Dashboard";
-import { SERVER_V1, validateEditor } from "../../../src/helper";
+import { SERVER_V1 } from "../../../src/helper";
 
 const tags: NextPage<IDashboardProps> = (props) => {
 	return (
@@ -12,7 +12,7 @@ const tags: NextPage<IDashboardProps> = (props) => {
 				<meta charSet="UTF-8" />
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-				<title>Blog Tags Dashboard | Dadangdut33</title>
+				<title>Blog Tags Dashboard | Dadangdut33 Personal Web</title>
 			</Head>
 			<Wrapper {...props}>
 				<IdAndCount {...props} parent="blog" parentSearch="tags" fetchLink="/blog/tags" title="Blog Tags" />
@@ -36,7 +36,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 	// validate role
 	const parsed = await checkLoggedIn.json();
-	if (!validateEditor(parsed.data)) return { notFound: true };
 
 	return {
 		props: {

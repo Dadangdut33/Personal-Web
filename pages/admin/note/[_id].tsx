@@ -3,7 +3,7 @@ import Head from "next/head";
 import { Wrapper } from "../../../src/components/Admin/Nav/Wrapper";
 import { NoteForm } from "../../../src/components/Admin/Note";
 import { IDashboardProps } from "../../../src/interfaces/props/Dashboard";
-import { SERVER_V1, validateStaff } from "../../../src/helper";
+import { SERVER_V1 } from "../../../src/helper";
 
 const edit: NextPage<IDashboardProps> = (props) => {
 	return (
@@ -12,7 +12,7 @@ const edit: NextPage<IDashboardProps> = (props) => {
 				<meta charSet="UTF-8" />
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-				<title>Note View/Edit | Dadangdut33</title>
+				<title>Note View/Edit | Dadangdut33 Personal Web</title>
 			</Head>
 			<Wrapper {...props}>
 				<NoteForm {...props} />
@@ -36,7 +36,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 	// validate role
 	const parsed = await checkLoggedIn.json();
-	if (!validateStaff(parsed.data)) return { notFound: true };
 
 	// get note data
 	const fetchNote = await fetch(`${SERVER_V1}/note/${context.params!._id}`, {

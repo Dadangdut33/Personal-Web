@@ -4,7 +4,7 @@ import { resetServerContext } from "react-beautiful-dnd";
 import { Wrapper } from "../../src/components/Admin/Nav/Wrapper";
 import { DashboardHome } from "../../src/components/Admin/Home";
 import { IDashboardProps } from "../../src/interfaces/props";
-import { SERVER_V1, validateStaff } from "../../src/helper";
+import { SERVER_V1 } from "../../src/helper";
 
 const dashboardHome: NextPage<IDashboardProps> = (props) => {
 	return (
@@ -13,7 +13,7 @@ const dashboardHome: NextPage<IDashboardProps> = (props) => {
 				<meta charSet="UTF-8" />
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-				<title>Dashboard | Himti UIN Jakarta</title>
+				<title>Dashboard | Dadangdut33 Personal Web</title>
 			</Head>
 			<Wrapper {...props}>
 				<DashboardHome {...props} />
@@ -37,7 +37,6 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 
 	// validate role
 	const parsed = await checkLoggedIn.json();
-	if (!validateStaff(parsed.data)) return { notFound: true };
 
 	resetServerContext();
 	return {

@@ -26,7 +26,6 @@ import {
 } from "@tabler/icons";
 import { IDashboardProps } from "../../../interfaces/props/Dashboard";
 import { UserPopout } from "./Userpopout";
-import { validateAdmin, validateEditor, validateForumMod, validateShortlinkMod, validateStaff } from "../../../helper/global/role";
 
 const useStyles = createStyles((theme) => ({
 	link: {
@@ -174,15 +173,11 @@ const genericMenu = (theme: MantineTheme, type: string) => {
 };
 
 const navData = [
-	{ icon: IconDashboard, label: "Dashboard Home", path: "/admin", validate: validateStaff, disabled: false },
-	{ icon: IconNotebook, label: "Blog", path: "/admin/blog", validate: validateEditor, menuItem: blogMenu, disabled: true },
-	{ icon: IconCalendarEvent, label: "Event", path: "/admin/event", validate: validateEditor, menuItem: eventMenu, disabled: true },
-	{ icon: IconMessage, label: "Forum", path: "/admin/forum", validate: validateForumMod, menuItem: forumMenu, disabled: true },
-	{ icon: IconMessages, label: "Comment", path: "/admin/comment", validate: validateForumMod, disabled: false },
-	{ icon: IconLink, label: "Shortlink", path: "/admin/shortlink", validate: validateShortlinkMod, menuItem: genericMenu, disabled: true },
-	{ icon: IconNote, label: "Note", path: "/admin/note", validate: validateStaff, menuItem: genericMenu, disabled: true },
-	{ icon: IconUser, label: "User", path: "/admin/user", validate: validateAdmin, menuItem: genericMenu, disabled: true },
-	{ icon: IconUsers, label: "Group", path: "/admin/group", validate: validateAdmin, menuItem: genericMenu, disabled: true },
+	{ icon: IconDashboard, label: "Dashboard Home", path: "/admin", disabled: false },
+	{ icon: IconNotebook, label: "Blog", path: "/admin/blog", menuItem: blogMenu, disabled: true },
+	{ icon: IconLink, label: "Shortlink", path: "/admin/shortlink", menuItem: genericMenu, disabled: true },
+	{ icon: IconNote, label: "Note", path: "/admin/note", menuItem: genericMenu, disabled: true },
+	{ icon: IconUser, label: "User", path: "/admin/user", menuItem: genericMenu, disabled: true },
 ];
 
 export const DashboardNav: NextPage<IDashboardProps> = (props) => {
@@ -194,22 +189,20 @@ export const DashboardNav: NextPage<IDashboardProps> = (props) => {
 	useEffect(() => {
 		setLinks(
 			navData.map((link, index) => {
-				if (link.validate(props.user!))
-					return (
-						<Menu width={300} position="right" transition="pop" trigger="hover" key={link.path}>
-							<Link href={link.path}>
-								<a>
-									<Menu.Target>
-										<ActionIcon size={50} sx={{ display: "flex", flexDirection: "column" }}>
-											<NavbarLink onClick={() => setActive(index)} {...link} active={index === active} />
-										</ActionIcon>
-									</Menu.Target>
-								</a>
-							</Link>
-							{link.menuItem ? link.menuItem(theme, link.label) : null}
-						</Menu>
-					);
-				else return <></>;
+				return (
+					<Menu width={300} position="right" transition="pop" trigger="hover" key={link.path}>
+						<Link href={link.path}>
+							<a>
+								<Menu.Target>
+									<ActionIcon size={50} sx={{ display: "flex", flexDirection: "column" }}>
+										<NavbarLink onClick={() => setActive(index)} {...link} active={index === active} />
+									</ActionIcon>
+								</Menu.Target>
+							</a>
+						</Link>
+						{link.menuItem ? link.menuItem(theme, link.label) : null}
+					</Menu>
+				);
 			})
 		);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
