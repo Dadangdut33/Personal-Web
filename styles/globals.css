@@ -39,6 +39,16 @@ h6 {
 	font-weight: 700;
 }
 
+/* Flex */
+.d-flex {
+	display: flex;
+}
+
+.flex-column {
+	flex-direction: column;
+}
+
+/* Links */
 .subtle-link {
 	display: inline-block;
 	position: relative;

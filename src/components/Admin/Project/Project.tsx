@@ -12,6 +12,7 @@ import { actionPrompt, fillDataPage, fillDataAll, handleAdminTabChange, handleIn
 import { formatDateWithTz } from "../../../helper/global";
 import { Th, useTableStyles } from "../../Utils/Dashboard";
 import { TableView } from "../Reusable/TableView";
+import { NextLink } from "@mantine/next";
 
 export const iconMap: any = {
 	github: IconBrandGithub,
@@ -317,15 +318,13 @@ export const Project: NextPage<IDashboardProps> = (props) => {
 												<Text variant="link">{row.title}</Text>
 											</a>
 										</Link>
-										<Tooltip label={"Edit order"}>
-											<Link href={`${props.pathname?.split("?")[0]}/order`}>
-												<a>
-													<Text color="dimmed" mt={8}>
-														{row.position}
-													</Text>
-												</a>
-											</Link>
-										</Tooltip>
+										<Group mt={8}>
+											<Tooltip label={"Edit order"}>
+												<Text color="dimmed" component={NextLink} href={`${props.pathname?.split("?")[0]}/order`}>
+													{row.position}
+												</Text>
+											</Tooltip>
+										</Group>
 									</td>
 									<td>{row.description}</td>
 									<td>
@@ -347,18 +346,20 @@ export const Project: NextPage<IDashboardProps> = (props) => {
 											: "Deleted/None"}
 									</td>
 									<td>
-										{row.links && row.links.length > 0
-											? row.links.map((links, i) => {
-													const LinkIcon = iconMap[links.type];
-													return (
-														<Link href={links.url} passHref key={i}>
-															<ActionIcon component="a">
-																<LinkIcon />
-															</ActionIcon>
-														</Link>
-													);
-											  })
-											: "Deleted/None"}
+										<div className="d-flex">
+											{row.links && row.links.length > 0
+												? row.links.map((links, i) => {
+														const LinkIcon = iconMap[links.type];
+														return (
+															<Tooltip label={links.url} key={i}>
+																<ActionIcon component={NextLink} href={links.url}>
+																	<LinkIcon />
+																</ActionIcon>
+															</Tooltip>
+														);
+												  })
+												: "Deleted/None"}
+										</div>
 									</td>
 									<td>
 										{row.updatedAt !== row.createdAt ? (
