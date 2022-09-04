@@ -2,7 +2,8 @@ import { useEffect, useState } from "react";
 import { createStyles, Header, Container, Group, Burger, Paper, Transition, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useRouter } from "next/router";
-import { ColorSchemeToggle } from "./Looks/ColorSchemeToggle";
+import { ColorSchemeToggle } from "../Looks/ColorSchemeToggle";
+import Link from "next/link";
 
 const HEADER_HEIGHT = 60;
 const useStyles = createStyles((theme) => ({
@@ -74,12 +75,8 @@ const useStyles = createStyles((theme) => ({
 	},
 }));
 
-interface HeaderResponsiveProps {
-	links: { link: string; label: string }[];
-}
-
 export function HeaderResponsive() {
-	const [opened, { toggle, close }] = useDisclosure(false);
+	const [opened, { toggle }] = useDisclosure(false);
 	const [active, setActive] = useState<string | null>(null);
 	const { classes, cx } = useStyles();
 	const router = useRouter();
@@ -92,18 +89,11 @@ export function HeaderResponsive() {
 	];
 
 	const items = links.map((link) => (
-		<a
-			key={link.label}
-			href={link.link}
-			className={cx(classes.link, { [classes.linkActive]: active === link.link })}
-			onClick={(event) => {
-				event.preventDefault();
-				setActive(link.link);
-				close();
-			}}
-		>
-			{link.label}
-		</a>
+		<span className="subtle-link" key={link.label}>
+			<Link href={link.link}>
+				<a className={cx(classes.link, { [classes.linkActive]: active === link.link })}>{link.label}</a>
+			</Link>
+		</span>
 	));
 
 	useEffect(() => {
@@ -116,7 +106,7 @@ export function HeaderResponsive() {
 	}, []);
 
 	return (
-		<Header height={HEADER_HEIGHT} mb={120} className={classes.root}>
+		<Header height={HEADER_HEIGHT} className={classes.root}>
 			<Container className={classes.header}>
 				<Title order={3}>Dadangdut33</Title>
 				<Group spacing={5} className={classes.links}>

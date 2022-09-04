@@ -1,5 +1,6 @@
 import { NextPage } from "next";
 import { IDashboardProps } from "../../../interfaces/props/Dashboard";
+import MouseHover from "../../Utils/Looks/MouseHover";
 import { DashboardNav } from "./DashboardNav";
 
 interface Iwrapper extends IDashboardProps {
@@ -8,9 +9,12 @@ interface Iwrapper extends IDashboardProps {
 
 export const Wrapper: NextPage<Iwrapper> = (props) => {
 	return (
-		<div className="dashboard nav-wrap">
-			<DashboardNav {...props} />
-			<main className="dashboard content-wrap">{props.children}</main>
-		</div>
+		<>
+			<MouseHover />
+			<div className="dashboard nav-wrap">
+				<DashboardNav {...props} />
+				<main className="dashboard content-wrap">{props.children}</main>
+			</div>
+		</>
 	);
 };

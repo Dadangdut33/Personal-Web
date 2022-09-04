@@ -1,6 +1,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { HeaderResponsive } from "../Utils/Header";
+import { Wrapper } from "../Utils/Looks/Wrapper";
+import { HeaderResponsive, FooterWeb } from "../Utils/Template";
 
 export const Home: NextPage = (props) => {
 	return (
@@ -12,7 +13,9 @@ export const Home: NextPage = (props) => {
 				<title>Dadangdut33</title>
 			</Head>
 
-			<HeaderResponsive />
+			<Wrapper>
+				<div>aaaaaaa</div>
+			</Wrapper>
 		</>
 	);
 };
