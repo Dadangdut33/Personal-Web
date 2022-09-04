@@ -40,7 +40,6 @@ export const UserForm: NextPage<IUserFormProps> = (props) => {
 			email: (value) => (emailRegex.test(value) ? undefined : "Invalid email"),
 		},
 	});
-	const [group, setGroup] = useState<string[]>([]);
 	const [password, setPassword] = useState<string>("");
 	const [passwordConfirm, setPasswordConfirm] = useState<string>("");
 
@@ -64,7 +63,6 @@ export const UserForm: NextPage<IUserFormProps> = (props) => {
 		setPasswordConfirm("");
 		if (!props.userData) {
 			forms.reset();
-			setGroup([]);
 		} else {
 			forms.setValues({
 				username: props.userData.username,
@@ -157,33 +155,10 @@ export const UserForm: NextPage<IUserFormProps> = (props) => {
 		}
 	};
 
-	const fetchGroups = async () => {
-		showNotification({ id: "group-load", title: "Loading groups", message: "Please wait...", disallowClose: true, autoClose: false, loading: true });
-		try {
-			const req = await fetch(`${SERVER_V1}/group`, {
-				method: "GET",
-				credentials: "include",
-				headers: {
-					"Content-Type": "application/json",
-				},
-			});
-			const { message }: { message: string } = await req.json();
-
-			if (req.status === 200) {
-				updateNotification({ id: "group-load", title: "Success", message, disallowClose: false, autoClose: 1500, loading: false });
-			} else {
-				updateNotification({ id: "group-load", title: "Error", message, disallowClose: true, color: "red", autoClose: 3500, loading: false });
-			}
-		} catch (error: any) {
-			updateNotification({ id: "group-load", title: "Error", message: error.message, disallowClose: true, color: "red", autoClose: 3500, loading: false });
-		}
-	};
-
 	// ------------------------------------------------------------
 	// page open
 	useEffect(() => {
 		if (!pageOpenFetched) {
-			fetchGroups();
 			if (props.userData) {
 				// edit mode
 				forms.setValues({
