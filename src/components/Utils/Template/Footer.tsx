@@ -1,5 +1,5 @@
 import { createStyles, Container, Group, ActionIcon, Text } from "@mantine/core";
-import { IconBrandTwitter, IconBrandYoutube, IconBrandInstagram } from "@tabler/icons";
+import { IconCoffee, IconBrandGithub, IconBrandLinkedin, IconMail } from "@tabler/icons";
 import Link from "next/link";
 
 const useStyles = createStyles((theme) => ({
@@ -34,26 +34,39 @@ export function FooterWeb() {
 	return (
 		<footer className={classes.footer + " footer"}>
 			<Container className={classes.inner}>
-				<Group spacing={0} className={classes.links}>
+				<Group spacing={8} className={classes.links}>
 					<span className="subtle-link">
-						<ActionIcon size="lg">
-							<IconBrandTwitter size={18} stroke={1.5} />
-						</ActionIcon>
+						<Link href={"https://www.linkedin.com/in/fauzan-farhan-antoro/"} passHref>
+							<ActionIcon size="lg" component="a" target="_blank" rel="noopener noreferrer">
+								<IconBrandLinkedin stroke={1.5} />
+							</ActionIcon>
+						</Link>
 					</span>
 					<span className="subtle-link">
-						<ActionIcon size="lg">
-							<IconBrandYoutube size={18} stroke={1.5} />
-						</ActionIcon>
+						<Link href={"https://github.com/Dadangdut33/"} passHref>
+							<ActionIcon size="lg" component="a" target="_blank" rel="noopener noreferrer">
+								<IconBrandGithub stroke={1.5} />
+							</ActionIcon>
+						</Link>
 					</span>
 					<span className="subtle-link">
-						<ActionIcon size="lg">
-							<IconBrandInstagram size={18} stroke={1.5} />
-						</ActionIcon>
+						<Link href={"mailto:contact@dadangdut33.codes"} passHref>
+							<ActionIcon size="lg" component="a">
+								<IconMail stroke={1.5} />
+							</ActionIcon>
+						</Link>
+					</span>
+					<span className="subtle-link">
+						<Link href={"https://ko-fi.com/dadangdut33"} passHref>
+							<ActionIcon size="lg" component="a" target="_blank" rel="noopener noreferrer">
+								<IconCoffee stroke={1.5} />
+							</ActionIcon>
+						</Link>
 					</span>
 				</Group>
 				<span className="subtle-link pointer" style={{ marginTop: "1rem" }}>
-					<Link href={"https://github.com/Dadangdut33"}>
-						<Text component="a" color={"#2978b5"} style={{ textDecoration: "none" }} weight={550} size={16}>
+					<Link href={"https://github.com/Dadangdut33/Personal-Web"} passHref>
+						<Text component="a" color={"#2978b5"} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }} weight={550} size={16}>
 							© 2022 Dadangdut33
 						</Text>
 					</Link>
