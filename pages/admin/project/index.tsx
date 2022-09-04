@@ -1,21 +1,21 @@
 import type { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import { Wrapper } from "../../../src/components/Admin/Nav/Wrapper";
-import { Note } from "../../../src/components/Admin/Note";
+import { Project } from "../../../src/components/Admin/Project";
 import { IDashboardProps } from "../../../src/interfaces/props/Dashboard";
 import { SERVER_V1 } from "../../../src/helper";
 
-const note: NextPage<IDashboardProps> = (props) => {
+const project: NextPage<IDashboardProps> = (props) => {
 	return (
 		<>
 			<Head>
 				<meta charSet="UTF-8" />
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-				<title>Note Dashboard | Dadangdut33 Personal Web</title>
+				<title>Project Dashboard | Dadangdut33 Personal Web</title>
 			</Head>
 			<Wrapper {...props}>
-				<Note {...props} />
+				<Project {...props} />
 			</Wrapper>
 		</>
 	);
@@ -46,4 +46,4 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	};
 };
 
-export default note;
+export default project;

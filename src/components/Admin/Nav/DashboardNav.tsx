@@ -9,13 +9,9 @@ import {
 	IconHome2,
 	IconNotebook,
 	IconLink,
-	IconCalendarEvent,
 	IconUser,
-	IconUsers,
 	IconNote,
 	IconLogout,
-	IconMessage,
-	IconMessages,
 	IconDashboard,
 	IconCirclePlus,
 	IconTags,
@@ -23,6 +19,7 @@ import {
 	IconAffiliate,
 	IconId,
 	IconHistory,
+	IconDeviceLaptop,
 } from "@tabler/icons";
 import { IDashboardProps } from "../../../interfaces/props/Dashboard";
 import { UserPopout } from "./Userpopout";
@@ -98,56 +95,23 @@ const blogMenu = (theme: MantineTheme, _type: string) => {
 	);
 };
 
-const eventMenu = (theme: MantineTheme, _type: string) => {
+const projectMenu = (theme: MantineTheme, _type: string) => {
 	return (
 		<Menu.Dropdown>
-			<Menu.Label>Event</Menu.Label>
-			<Link href={`/admin/event`}>
+			<Menu.Label>Project</Menu.Label>
+			<Link href={`/admin/project`}>
 				<a>
-					<Menu.Item icon={<IconList size={14} stroke={1.5} color={theme.colors.grape[6]} />}>Events</Menu.Item>
+					<Menu.Item icon={<IconList size={14} stroke={1.5} color={theme.colors.grape[6]} />}>Projects</Menu.Item>
 				</a>
 			</Link>
-			<Link href={`/admin/event/create`}>
+			<Link href={`/admin/project/create`}>
 				<a>
-					<Menu.Item icon={<IconCirclePlus size={14} stroke={1.5} color={theme.colors.red[6]} />}>Create new Event</Menu.Item>
+					<Menu.Item icon={<IconCirclePlus size={14} stroke={1.5} color={theme.colors.red[6]} />}>Add Project</Menu.Item>
 				</a>
 			</Link>
-			<Link href={`/admin/event/revision`}>
-				<a>
-					<Menu.Item icon={<IconHistory size={14} stroke={1.5} color={theme.colors.grape[6]} />}>Revisions</Menu.Item>
-				</a>
-			</Link>
-			<Link href={`/admin/event/tags`}>
+			<Link href={`/admin/project/tags`}>
 				<a>
 					<Menu.Item icon={<IconTags size={14} stroke={1.5} color={theme.colors.yellow[6]} />}>Tags</Menu.Item>
-				</a>
-			</Link>
-			<Link href={`/admin/event/organizer`}>
-				<a>
-					<Menu.Item icon={<IconAffiliate size={14} stroke={1.5} color={theme.colors.teal[6]} />}>Organizer</Menu.Item>
-				</a>
-			</Link>
-		</Menu.Dropdown>
-	);
-};
-
-const forumMenu = (theme: MantineTheme, _type: string) => {
-	return (
-		<Menu.Dropdown>
-			<Menu.Label>Forum</Menu.Label>
-			<Link href={`/admin/forum`}>
-				<a>
-					<Menu.Item icon={<IconList size={14} stroke={1.5} color={theme.colors.grape[6]} />}>Forum Posts</Menu.Item>
-				</a>
-			</Link>
-			<Link href={`/admin/forum/create`}>
-				<a>
-					<Menu.Item icon={<IconCirclePlus size={14} stroke={1.5} color={theme.colors.red[6]} />}>Create new Forum Post</Menu.Item>
-				</a>
-			</Link>
-			<Link href={`/admin/forum/category`}>
-				<a>
-					<Menu.Item icon={<IconId size={14} stroke={1.5} color={theme.colors.cyan[6]} />}>Category</Menu.Item>
 				</a>
 			</Link>
 		</Menu.Dropdown>
@@ -175,6 +139,7 @@ const genericMenu = (theme: MantineTheme, type: string) => {
 const navData = [
 	{ icon: IconDashboard, label: "Dashboard Home", path: "/admin", disabled: false },
 	{ icon: IconNotebook, label: "Blog", path: "/admin/blog", menuItem: blogMenu, disabled: true },
+	{ icon: IconDeviceLaptop, label: "Project", path: "/admin/project", menuItem: projectMenu, disabled: true },
 	{ icon: IconLink, label: "Shortlink", path: "/admin/shortlink", menuItem: genericMenu, disabled: true },
 	{ icon: IconNote, label: "Note", path: "/admin/note", menuItem: genericMenu, disabled: true },
 	{ icon: IconUser, label: "User", path: "/admin/user", menuItem: genericMenu, disabled: true },
