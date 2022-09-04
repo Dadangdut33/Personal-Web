@@ -53,7 +53,7 @@ export function FooterWeb() {
 				</Group>
 				<span className="subtle-link pointer" style={{ marginTop: "1rem" }}>
 					<Link href={"https://github.com/Dadangdut33"}>
-						<Text component="a" variant="link" style={{ textDecoration: "none" }} weight={500} size={14}>
+						<Text component="a" color={"#2978b5"} style={{ textDecoration: "none" }} weight={550} size={16}>
 							© 2022 Dadangdut33
 						</Text>
 					</Link>

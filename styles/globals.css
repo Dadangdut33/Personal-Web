@@ -101,20 +101,3 @@ h6 {
 	transform: scaleX(1);
 	transform-origin: bottom left;
 }
-
-/* ----------------------------------------------- */
-/* mouse hover */
-.cursor {
-	position: fixed;
-	left: 0;
-	top: 0;
-	margin-left: 3px;
-	margin-top: 3px;
-	width: 26px;
-	height: 26px;
-	border-radius: 16px;
-	background-color: yellow;
-	mix-blend-mode: difference;
-	z-index: 999;
-	pointer-events: none;
-}

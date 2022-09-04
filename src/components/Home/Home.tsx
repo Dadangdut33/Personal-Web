@@ -1,7 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { Wrapper } from "../Utils/Looks/Wrapper";
-import { HeaderResponsive, FooterWeb } from "../Utils/Template";
+import { Wrapper } from "../Utils/Template/Wrapper";
 
 export const Home: NextPage = (props) => {
 	return (
