@@ -1,4 +1,4 @@
-import { Breadcrumbs, Button, Skeleton, Text } from "@mantine/core";
+import { Breadcrumbs, Button, Skeleton, Text, Title } from "@mantine/core";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { TablerIcon, IconFilePlus } from "@tabler/icons";
@@ -27,7 +27,7 @@ export const TitleDashboard = ({ title, hrefLink, hrefText, HrefIcon = IconFileP
 	return (
 		<div className="dash-flex-column" style={{ marginBottom: mb ? mb : "1.5rem" }}>
 			<div className="dash-flex">
-				<h1>{title}</h1>
+				<Title order={1}>{title}</Title>
 				{hrefLink && hrefText && (
 					<Link href={hrefLink}>
 						<a>

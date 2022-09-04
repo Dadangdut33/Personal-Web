@@ -12,7 +12,7 @@ const edit: NextPage<IDashboardProps> = (props) => {
 				<meta charSet="UTF-8" />
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-				<title>Note View/Edit | Dadangdut33 Personal Web</title>
+				<title>Project View/Edit | Dadangdut33 Personal Web</title>
 			</Head>
 			<Wrapper {...props}>
 				<NoteForm {...props} />
@@ -38,7 +38,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 	const parsed = await checkLoggedIn.json();
 
 	// get note data
-	const fetchNote = await fetch(`${SERVER_V1}/note/${context.params!._id}`, {
+	const fetchNote = await fetch(`${SERVER_V1}/project/${context.params!._id}`, {
 		method: "GET",
 		headers: {
 			"Content-Type": "application/json",

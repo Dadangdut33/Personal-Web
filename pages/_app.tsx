@@ -23,11 +23,12 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
 				<MantineProvider
 					theme={{
 						colorScheme,
-						fontFamily: ["Raleway", "sans-serif"],
 						lineHeight: "1.2", // default web line height
 						colors: {
-							dark: ["#FFFFFF", "#A6A7AB", "#909296", "#5C5F66", "#373A40", "#2c3048", "#303446", "#23283e", "#141517", "#101113"],
+							dark: ["#FFFFFF", "#A6A7AB", "#909296", "#5C5F66", "#373A40", "#2c3048", "#303446", "#24273a", "#141517", "#101113"],
 						},
+						// fontFamily: 'Lato, -apple-system, "BlinkMacSystemFont", "Segoe UI", sans-serif, Roboto, "Apple Color Emoji", "Segoe UI Emoji"',
+						headings: { fontFamily: "Poppins, sans-serif" },
 					}}
 					withGlobalStyles
 					withNormalizeCSS
