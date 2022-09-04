@@ -1,8 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { ColorSchemeToggle } from "../Utils/Looks/ColorSchemeToggle";
-import { Header } from "../Template/Header";
-import Link from "next/link";
+import { HeaderResponsive } from "../Utils/Header";
 
 export const Home: NextPage = (props) => {
 	return (
@@ -14,12 +12,7 @@ export const Home: NextPage = (props) => {
 				<title>Dadangdut33</title>
 			</Head>
 
-			<Link href="/auth/login">
-				<a>test </a>
-			</Link>
-
-			<Header />
-			<ColorSchemeToggle />
+			<HeaderResponsive />
 		</>
 	);
 };
