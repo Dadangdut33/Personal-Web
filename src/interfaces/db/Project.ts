@@ -10,6 +10,7 @@ export interface IProject {
 	description: string;
 	tags: string[];
 	links: linkIcon[];
+	position: number;
 	createdAt: Date;
 	updatedAt: Date;
 }

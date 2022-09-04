@@ -317,6 +317,15 @@ export const Project: NextPage<IDashboardProps> = (props) => {
 												<Text variant="link">{row.title}</Text>
 											</a>
 										</Link>
+										<Tooltip label={"Edit order"}>
+											<Link href={`${props.pathname?.split("?")[0]}/order`}>
+												<a>
+													<Text color="dimmed" mt={8}>
+														{row.position}
+													</Text>
+												</a>
+											</Link>
+										</Tooltip>
 									</td>
 									<td>{row.description}</td>
 									<td>

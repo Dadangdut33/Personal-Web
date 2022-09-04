@@ -16,10 +16,9 @@ import {
 	IconCirclePlus,
 	IconTags,
 	IconList,
-	IconAffiliate,
-	IconId,
 	IconHistory,
 	IconDeviceLaptop,
+	IconReplace,
 } from "@tabler/icons";
 import { IDashboardProps } from "../../../interfaces/props/Dashboard";
 import { UserPopout } from "./Userpopout";
@@ -112,6 +111,11 @@ const projectMenu = (theme: MantineTheme, _type: string) => {
 			<Link href={`/admin/project/tags`}>
 				<a>
 					<Menu.Item icon={<IconTags size={14} stroke={1.5} color={theme.colors.yellow[6]} />}>Tags</Menu.Item>
+				</a>
+			</Link>
+			<Link href={`/admin/project/order`}>
+				<a>
+					<Menu.Item icon={<IconReplace size={14} stroke={1.5} color={theme.colors.blue[6]} />}>Order</Menu.Item>
 				</a>
 			</Link>
 		</Menu.Dropdown>
