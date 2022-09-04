@@ -1,7 +1,7 @@
 import type { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import { Wrapper } from "../../../src/components/Admin/Nav/Wrapper";
-import { NoteForm } from "../../../src/components/Admin/Note";
+import { ProjectForm } from "../../../src/components/Admin/Project";
 import { IDashboardProps } from "../../../src/interfaces/props/Dashboard";
 import { SERVER_V1 } from "../../../src/helper";
 
@@ -12,10 +12,10 @@ const create: NextPage<IDashboardProps> = (props) => {
 				<meta charSet="UTF-8" />
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-				<title>Project Create | Dadangdut33 Personal Web</title>
+				<title>Project Add | Dadangdut33 Personal Web</title>
 			</Head>
 			<Wrapper {...props}>
-				<NoteForm {...props} />
+				<ProjectForm {...props} />
 			</Wrapper>
 		</>
 	);

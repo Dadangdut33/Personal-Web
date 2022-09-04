@@ -1,7 +1,7 @@
 import type { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
 import { Wrapper } from "../../../src/components/Admin/Nav/Wrapper";
-import { NoteForm } from "../../../src/components/Admin/Note";
+import { ProjectForm } from "../../../src/components/Admin/Project";
 import { IDashboardProps } from "../../../src/interfaces/props/Dashboard";
 import { SERVER_V1 } from "../../../src/helper";
 
@@ -15,7 +15,7 @@ const edit: NextPage<IDashboardProps> = (props) => {
 				<title>Project View/Edit | Dadangdut33 Personal Web</title>
 			</Head>
 			<Wrapper {...props}>
-				<NoteForm {...props} />
+				<ProjectForm {...props} />
 			</Wrapper>
 		</>
 	);
@@ -55,7 +55,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 			pathname: context.resolvedUrl,
 			user: parsed.data,
 			token: context.req.cookies["connect.sid"],
-			note: data,
+			project: data,
 		},
 	};
 };

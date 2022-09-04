@@ -15,7 +15,7 @@ import { TableView } from "../Reusable/TableView";
 
 export const iconMap: any = {
 	github: IconBrandGithub,
-	deploy: IconWorld,
+	link: IconWorld,
 	download: IconDownload,
 };
 
@@ -140,7 +140,7 @@ export const Project: NextPage<IDashboardProps> = (props) => {
 			<TableView
 				{...props}
 				api_url={api_url}
-				title={"Notes"}
+				title={"Projects"}
 				isSearching={isSearching()}
 				router={router}
 				// loading
@@ -342,7 +342,7 @@ export const Project: NextPage<IDashboardProps> = (props) => {
 											? row.links.map((links, i) => {
 													const LinkIcon = iconMap[links.type];
 													return (
-														<Link href={links.url} passHref>
+														<Link href={links.url} passHref key={i}>
 															<ActionIcon component="a">
 																<LinkIcon />
 															</ActionIcon>
