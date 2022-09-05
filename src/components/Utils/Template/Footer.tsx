@@ -4,8 +4,8 @@ import Link from "next/link";
 
 const useStyles = createStyles((theme) => ({
 	footer: {
-		marginTop: 120,
-		borderTop: `1px solid ${theme.colorScheme === "dark" ? theme.colors.dark[5] : theme.colors.gray[2]}`,
+		// marginTop: 120,
+		// borderTop: `1px solid ${theme.colorScheme === "dark" ? theme.colors.dark[5] : theme.colors.gray[2]}`,
 	},
 
 	inner: {
@@ -64,7 +64,7 @@ export function FooterWeb() {
 						</Link>
 					</span>
 				</Group>
-				<span className="subtle-link pointer" style={{ marginTop: "1rem" }}>
+				<span style={{ marginTop: "1rem" }}>
 					<Link href={"https://github.com/Dadangdut33/Personal-Web"} passHref>
 						<Text component="a" color={"#2978b5"} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }} weight={550} size={16}>
 							© 2022 Dadangdut33

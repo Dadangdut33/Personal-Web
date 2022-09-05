@@ -5,12 +5,4 @@ const index: NextPage = (props) => {
 	return <Home {...props} />;
 };
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
-	return {
-		props: {
-			test: "test",
-		},
-	};
-};
-
 export default index;

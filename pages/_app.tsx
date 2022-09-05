@@ -1,3 +1,4 @@
+import "../styles/fonts.css";
 import "../styles/globals.css";
 import "../styles/dashboard.css";
 import "../styles/markdown.css";
@@ -28,8 +29,19 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
 							dark: ["#FFFFFF", "#A6A7AB", "#909296", "#5C5F66", "#373A40", "#2c3048", "#303446", "#24273a", "#141517", "#101113"],
 						},
 						fontFamily: 'Lato, -apple-system, "BlinkMacSystemFont", "Segoe UI", sans-serif, Roboto, "Apple Color Emoji", "Segoe UI Emoji"',
-						headings: { fontFamily: "Poppins, sans-serif" },
+						headings: {
+							fontFamily: "Poppins, sans-serif",
+							sizes: {
+								h1: { fontSize: "2.5rem" },
+								h2: { fontSize: "2rem" },
+								h3: { fontSize: "1.75rem" },
+								h4: { fontSize: "1.5rem" },
+								h5: { fontSize: "1.25rem" },
+								h6: { fontSize: "1rem" },
+							},
+						},
 					}}
+					withCSSVariables
 					withGlobalStyles
 					withNormalizeCSS
 				>
