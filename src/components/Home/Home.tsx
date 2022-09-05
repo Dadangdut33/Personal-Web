@@ -1,7 +1,7 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Typewriter from "typewriter-effect";
-import { Center, createStyles, Title, Text, Group, Stack, MediaQuery } from "@mantine/core";
+import { Center, createStyles, Title, Text, Group, Stack } from "@mantine/core";
 import { Wrapper } from "../Utils/Template/Wrapper";
 
 const useStyles = createStyles((theme) => ({
@@ -15,6 +15,15 @@ const useStyles = createStyles((theme) => ({
 	centerText: {
 		textAlign: "center",
 		textJustify: "inter-word",
+	},
+	centerMobile: {
+		[theme.fn.smallerThan("xs")]: {
+			display: "flex",
+			textAlign: "center",
+			textJustify: "inter-word",
+			justifyContent: "center",
+			alignItems: "center",
+		},
 	},
 }));
 
@@ -48,26 +57,7 @@ export const Home: NextPage = (props) => {
 										</Text>
 									</Title>
 
-									{/* mobile */}
-									<MediaQuery largerThan="xs" styles={{ display: "none" }}>
-										<Center>
-											<Group spacing={"xs"}>
-												<Text>A</Text>
-												<Text size={"xl"} variant="gradient" gradient={{ from: "blue", to: "cyan", deg: 30 }}>
-													<Typewriter
-														options={{
-															strings: ["Full Stack Developer", "Student", "Leaner"],
-															autoStart: true,
-															loop: true,
-														}}
-													/>
-												</Text>
-											</Group>
-										</Center>
-									</MediaQuery>
-
-									{/* pc */}
-									<MediaQuery smallerThan="xs" styles={{ display: "none" }}>
+									<div className={classes.centerMobile}>
 										<Group spacing={"xs"}>
 											<Text>A</Text>
 											<Text size={"xl"} variant="gradient" gradient={{ from: "blue", to: "cyan", deg: 30 }}>
@@ -80,7 +70,7 @@ export const Home: NextPage = (props) => {
 												/>
 											</Text>
 										</Group>
-									</MediaQuery>
+									</div>
 								</Stack>
 							</Center>
 						</Stack>
