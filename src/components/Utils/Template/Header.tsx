@@ -1,9 +1,8 @@
 import { useEffect, useState } from "react";
-import { createStyles, Header, Container, Group, Burger, Paper, Transition, Title, useMantineColorScheme } from "@mantine/core";
+import { createStyles, Header, Container, Group, Burger, Paper, Transition, Title } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useRouter } from "next/router";
 import { ColorSchemeToggle } from "../Looks/ColorSchemeToggle";
-import { SunIcon, MoonIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 
 const HEADER_HEIGHT = 60;
@@ -77,7 +76,6 @@ const useStyles = createStyles((theme) => ({
 }));
 
 export function HeaderResponsive() {
-	const { colorScheme, toggleColorScheme } = useMantineColorScheme();
 	const [opened, { toggle }] = useDisclosure(false);
 	const [active, setActive] = useState<string | null>(null);
 	const { classes, cx } = useStyles();
@@ -87,7 +85,6 @@ export function HeaderResponsive() {
 		{ link: "/", label: "About" },
 		{ link: "/project", label: "Projects" },
 		{ link: "/blog", label: "Blog" },
-		{ link: "/contact", label: "Contact" },
 	];
 
 	const items = links.map((link) => (
@@ -122,15 +119,15 @@ export function HeaderResponsive() {
 					<ColorSchemeToggle />
 				</Group>
 
-				<Burger opened={opened} onClick={toggle} className={classes.burger} size="sm" />
+				<Group spacing={4} className={classes.burger}>
+					<ColorSchemeToggle />
+					<Burger opened={opened} onClick={toggle} size="sm" />
+				</Group>
 
 				<Transition transition="pop-top-right" duration={200} mounted={opened}>
 					{(styles) => (
 						<Paper className={classes.dropdown} withBorder style={styles}>
 							{items}
-							<span onClick={() => toggleColorScheme()} className={classes.link} style={{ padding: "10px", paddingTop: "16px", display: "inline-block", position: "absolute" }}>
-								{colorScheme === "dark" ? <SunIcon width={16} height={16} /> : <MoonIcon width={16} height={16} />}
-							</span>
 						</Paper>
 					)}
 				</Transition>

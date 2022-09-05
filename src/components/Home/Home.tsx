@@ -82,6 +82,8 @@ export const Home: NextPage = (props) => {
 								</Group>
 							</Center>
 						</Stack>
+
+						<Center mt={"xl"}>PROJECT</Center>
 					</Stack>
 				</Center>
 			</Wrapper>
