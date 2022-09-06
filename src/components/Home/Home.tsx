@@ -1,20 +1,14 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import Typewriter from "typewriter-effect";
-import { Center, createStyles, Title, Text, Group, Stack } from "@mantine/core";
+import { Center, createStyles, Title, Text, Group, Stack, Button } from "@mantine/core";
 import { Wrapper } from "../Utils/Template/Wrapper";
+import { NoScrollLink } from "../Utils/Looks/NoScrollLink";
 
 const useStyles = createStyles((theme) => ({
-	titleWrapper: {
-		marginTop: "4rem",
-	},
 	contentWrap: {
 		width: "90%",
 		maxWidth: "500px",
-	},
-	centerText: {
-		textAlign: "center",
-		textJustify: "inter-word",
 	},
 	centerMobile: {
 		[theme.fn.smallerThan("xs")]: {
@@ -65,7 +59,7 @@ export const Home: NextPage = (props) => {
 
 			<Wrapper>
 				<Center>
-					<Stack spacing={0} className={classes.titleWrapper}>
+					<Stack spacing={0} className={"header-spacing"}>
 						<Stack spacing={0}>
 							<Center>
 								<picture>
@@ -73,7 +67,7 @@ export const Home: NextPage = (props) => {
 								</picture>
 							</Center>
 							<Center>
-								<Stack className={classes.centerText} spacing={"xs"}>
+								<Stack className={"center-text"} spacing={"xs"}>
 									<Title order={1} mt="xl">
 										Hello! I'm{" "}
 										<Text variant="gradient" component="span" gradient={{ from: "blue", to: "cyan", deg: 30 }} inherit>
@@ -100,14 +94,25 @@ export const Home: NextPage = (props) => {
 						</Stack>
 						<Stack spacing={8} mt={"xl"}>
 							<Center>
-								<Group className={classes.contentWrap + " " + classes.centerText}>
+								<Group className={classes.contentWrap + " center-text"}>
 									I'm currently pursuing my bachelor degree as an Informatics Engineering Student at UIN Jakarta. I like to learn new things and do some coding for side projects on my free
 									time.
 								</Group>
 							</Center>
 						</Stack>
 
-						<Center mt={"xl"}>PROJECT</Center>
+						<Center mt={"xl"}>
+							<Group>
+								<NoScrollLink href={"/portofolio"} passHref>
+									<Button component="a">Portofolio</Button>
+								</NoScrollLink>
+								<NoScrollLink href={"/blog"} passHref>
+									<Button component="a" color={"lime"}>
+										Blog
+									</Button>
+								</NoScrollLink>
+							</Group>
+						</Center>
 					</Stack>
 				</Center>
 			</Wrapper>

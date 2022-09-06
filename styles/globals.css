@@ -94,6 +94,11 @@ h6 {
 	width: 100%;
 }
 
+/* page content */
+.header-spacing {
+	margin-top: 4rem;
+}
+
 /* ----------------------------------------------- */
 /* Flex */
 .d-flex {
@@ -143,4 +148,20 @@ h6 {
 .subtle-link:hover:after {
 	transform: scaleX(1);
 	transform-origin: bottom left;
+}
+
+/* ----------------------------------------------- */
+/* Text */
+.justify-text {
+	text-align: justify;
+	text-justify: inter-word;
+}
+
+.center-text {
+	text-align: center;
+	text-justify: inter-word;
+}
+
+.break-word {
+	word-break: break-word;
 }

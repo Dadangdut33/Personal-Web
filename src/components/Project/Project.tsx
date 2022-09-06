@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { Center, createStyles, Title, Text, Group, Stack } from "@mantine/core";
+import { Center, createStyles, Title, Card, Text, Button, Stack, SimpleGrid } from "@mantine/core";
 import { Wrapper } from "../Utils/Template/Wrapper";
 
 const useStyles = createStyles((theme) => ({
@@ -65,9 +65,30 @@ export const Project: NextPage = (props) => {
 
 			<Wrapper>
 				<Center>
-					<Title order={1} mt="xl">
-						Projects
-					</Title>
+					<Stack>
+						<Center>
+							<Title order={1} mt="xl">
+								Projects
+							</Title>
+						</Center>
+						<Center>
+							<SimpleGrid cols={3} sx={{ width: "95%" }}>
+								<Card shadow="lg" p="lg" radius="md" withBorder sx={{ maxWidth: "320px" }}>
+									<Center mb={"xs"}>
+										<Title order={4}>A Title</Title>
+									</Center>
+
+									<Text size="sm" color="dimmed" className="justify-text">
+										With Fjord Tours you can explore more of the magical fjord landscapes with tours and activities on and around the fjords of Norway
+									</Text>
+
+									<Button variant="light" color="blue" fullWidth mt="md" radius="md">
+										Book classic tour now
+									</Button>
+								</Card>
+							</SimpleGrid>
+						</Center>
+					</Stack>
 				</Center>
 			</Wrapper>
 		</>
