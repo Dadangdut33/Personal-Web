@@ -230,7 +230,7 @@ export const BlogRevision: NextPage<IBlogRevisionProps> = (props) => {
 											{revisionData[selectedIndex].tags && revisionData![selectedIndex].tags!.length > 0
 												? revisionData[selectedIndex].tags?.map((tags, i) => {
 														return (
-															<span key={i}>
+															<span key={tags}>
 																<Link href={`../tags?qAll=${tags}`}>
 																	<a>
 																		<Text component="span" variant="link">

@@ -149,7 +149,7 @@ export const DashboardHome: NextPage<IDashboardProps> = (props) => {
 					{statsData.map((data, i) => {
 						const IconProps = dataElProps[i].icon;
 						return (
-							<Paper withBorder p="md" radius="md" key={i}>
+							<Paper withBorder p="md" radius="md" key={dataElProps[i].name}>
 								<Group position="apart">
 									<Text size="xs" color="dimmed" className={classes.title}>
 										{dataElProps[i].name.replaceAll("_", " ")}

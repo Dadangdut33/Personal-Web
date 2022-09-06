@@ -164,7 +164,6 @@ export const Shortlink: NextPage<IDashboardProps> = (props) => {
 							<Collapse in={tabIndex === 0}>
 								<Text color="dimmed">Quick search by any field</Text>
 								<TextInput
-									key={1}
 									placeholder="Search by any field"
 									name="qAll"
 									mb="md"
@@ -181,7 +180,6 @@ export const Shortlink: NextPage<IDashboardProps> = (props) => {
 								<Text color="dimmed">Search more accurately by searching for each field</Text>
 
 								<TextInput
-									key={1}
 									placeholder="Search by shorten url"
 									name="shorten"
 									label="Shorten"
@@ -191,7 +189,6 @@ export const Shortlink: NextPage<IDashboardProps> = (props) => {
 									mt={16}
 								/>
 								<TextInput
-									key={2}
 									placeholder="Search by original url"
 									name="originalUrl"
 									label="Original URL"
@@ -201,7 +198,6 @@ export const Shortlink: NextPage<IDashboardProps> = (props) => {
 									mt={8}
 								/>
 								<NumberInput
-									key={3}
 									placeholder="Search by clicks field"
 									name="clicks"
 									label="Clicks"
@@ -220,7 +216,6 @@ export const Shortlink: NextPage<IDashboardProps> = (props) => {
 									min={0}
 								/>
 								<TextInput
-									key={4}
 									placeholder="Search by author field"
 									name="author"
 									label="Author"
@@ -230,7 +225,6 @@ export const Shortlink: NextPage<IDashboardProps> = (props) => {
 									mt={8}
 								/>
 								<TextInput
-									key={5}
 									placeholder="Search by createdAt field"
 									label="Created At"
 									name="createdAt"

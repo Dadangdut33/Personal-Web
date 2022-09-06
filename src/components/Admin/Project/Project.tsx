@@ -331,7 +331,7 @@ export const Project: NextPage<IDashboardProps> = (props) => {
 										{row.tags && row.tags.length > 0
 											? row.tags.map((tags, i) => {
 													return (
-														<span key={i}>
+														<span key={tags}>
 															<Link href={`${props.pathname?.split("?")[0]}/tags?qAll=${tags}`}>
 																<a>
 																	<Text component="span" variant="link">

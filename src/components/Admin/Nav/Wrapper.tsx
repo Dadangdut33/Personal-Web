@@ -1,6 +1,6 @@
 import { NextPage } from "next";
 import { IDashboardProps } from "../../../interfaces/props/Dashboard";
-import MouseHover from "../../Utils/Looks/MouseHover";
+import { MouseHover } from "../../Utils/Looks/MouseHover";
 import { DashboardNav } from "./DashboardNav";
 
 interface Iwrapper extends IDashboardProps {
