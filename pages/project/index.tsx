@@ -1,8 +1,8 @@
 import type { NextPage } from "next";
-import { Home } from "../src/components/Home/Home";
+import { Project } from "../../src/components/Project/Project";
 
 const index: NextPage = (props) => {
-	return <Home {...props} />;
+	return <Project {...props} />;
 };
 
 export default index;

@@ -27,14 +27,15 @@ const useStyles = createStyles((theme) => ({
 	},
 }));
 
-export const Home: NextPage = (props) => {
+export const Project: NextPage = (props) => {
 	const { classes } = useStyles();
-	const title = "Dadangdut33",
-		desc = "Dadangdut33's personal website. It is somewhat of an online portofolio that showcase some of my projects and place where I can share my thoughts and experiences.";
-
+	const title = "Projects | Dadangdut33",
+		desc = "Showcase of some of my projects or things that i have made on my free time";
 	return (
 		<>
 			<Head>
+				<title>test</title>
+
 				<meta charSet="UTF-8" />
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -64,50 +65,9 @@ export const Home: NextPage = (props) => {
 
 			<Wrapper>
 				<Center>
-					<Stack spacing={0} className={classes.titleWrapper}>
-						<Stack spacing={0}>
-							<Center>
-								<picture>
-									<img src="/logo512.png" alt="Logo" className="logo-main" />
-								</picture>
-							</Center>
-							<Center>
-								<Stack className={classes.centerText} spacing={"xs"}>
-									<Title order={1} mt="xl">
-										Hello! I'm{" "}
-										<Text variant="gradient" component="span" gradient={{ from: "blue", to: "cyan", deg: 30 }} inherit>
-											Fauzan
-										</Text>
-									</Title>
-
-									<div className={classes.centerMobile}>
-										<Group spacing={"xs"}>
-											<Text>A</Text>
-											<Text size={"xl"} variant="gradient" gradient={{ from: "blue", to: "cyan", deg: 30 }}>
-												<Typewriter
-													options={{
-														strings: ["Full Stack Developer", "Student", "Leaner"],
-														autoStart: true,
-														loop: true,
-													}}
-												/>
-											</Text>
-										</Group>
-									</div>
-								</Stack>
-							</Center>
-						</Stack>
-						<Stack spacing={8} mt={"xl"}>
-							<Center>
-								<Group className={classes.contentWrap + " " + classes.centerText}>
-									I'm currently pursuing my bachelor degree as an Informatics Engineering Student at UIN Jakarta. I like to learn new things and do some coding for side projects on my free
-									time.
-								</Group>
-							</Center>
-						</Stack>
-
-						<Center mt={"xl"}>PROJECT</Center>
-					</Stack>
+					<Title order={1} mt="xl">
+						Projects
+					</Title>
 				</Center>
 			</Wrapper>
 		</>
