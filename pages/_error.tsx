@@ -1,6 +1,8 @@
 import type { NextPage } from "next";
 import { useRouter } from "next/router";
 import { createStyles, Title, Text, Button, Container, Group } from "@mantine/core";
+import { Wrapper } from "../src/components/Utils/Template/Wrapper";
+import Head from "next/head";
 
 const useStyles = createStyles((theme) => ({
 	root: {
@@ -54,23 +56,32 @@ const Error: NextPage<Props> = ({ statusCode }) => {
 	};
 
 	return (
-		<div className={classes.root}>
-			<Container>
-				<div className={classes.label}>{statusCode || 500}</div>
-				<Title className={classes.title}>Something bad just happened...</Title>
-				<Text size="lg" align="center" className={classes.description}>
-					Our servers could not handle your request. It might be down for a moment. Try refreshing the page.
-					<Text size="xs" align="center" mt="1rem">
-						(Check browser console for more details)
-					</Text>
-				</Text>
-				<Group position="center">
-					<Button size="md" onClick={btnClick}>
-						Refresh the page
-					</Button>
-				</Group>
-			</Container>
-		</div>
+		<>
+			<Head>
+				<title>{statusCode || 500} - Unexpected Error | Dadangdut33</title>
+				<meta charSet="UTF-8" />
+				<link rel="icon" href="/favicon.ico" />
+			</Head>
+			<Wrapper noHeader noFooter>
+				<div className={classes.root}>
+					<Container>
+						<div className={classes.label}>{statusCode || 500}</div>
+						<Title className={classes.title}>Something bad just happened...</Title>
+						<Text size="lg" align="center" className={classes.description}>
+							Our servers could not handle your request. It might be down for a moment. Try refreshing the page.
+							<Text size="xs" align="center" mt="1rem">
+								(Check browser console for more details)
+							</Text>
+						</Text>
+						<Group position="center">
+							<Button size="md" onClick={btnClick}>
+								Refresh the page
+							</Button>
+						</Group>
+					</Container>
+				</div>
+			</Wrapper>
+		</>
 	);
 };
 

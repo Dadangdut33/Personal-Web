@@ -5,6 +5,8 @@ import { MouseHover } from "../Looks/MouseHover";
 
 interface IWrapper {
 	children: React.ReactNode;
+	noHeader?: boolean;
+	noFooter?: boolean;
 }
 
 const variants = {
@@ -19,7 +21,7 @@ export const Wrapper: NextPage<IWrapper> = (props) => {
 			<MouseHover />
 			<div className="page-container">
 				<div className="content-wrap">
-					<HeaderResponsive />
+					{!props.noHeader && <HeaderResponsive />}
 					<motion.div
 						variants={variants} // Pass the variant object into Framer Motion
 						initial="hidden" // Set the initial state to variants.hidden
@@ -30,7 +32,7 @@ export const Wrapper: NextPage<IWrapper> = (props) => {
 						{props.children}
 					</motion.div>
 				</div>
-				<FooterWeb />
+				{!props.noFooter && <FooterWeb />}
 			</div>
 		</>
 	);

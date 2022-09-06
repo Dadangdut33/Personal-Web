@@ -1,6 +1,5 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Typewriter from "typewriter-effect";
 import { Center, createStyles, Title, Text, Group, Stack } from "@mantine/core";
 import { Wrapper } from "../Utils/Template/Wrapper";
 
@@ -27,14 +26,15 @@ const useStyles = createStyles((theme) => ({
 	},
 }));
 
+const title = "Projects | Dadangdut33",
+	desc = "Showcase of some of my projects or things that i have made on my free time";
+
 export const Project: NextPage = (props) => {
 	const { classes } = useStyles();
-	const title = "Projects | Dadangdut33",
-		desc = "Showcase of some of my projects or things that i have made on my free time";
 	return (
 		<>
 			<Head>
-				<title>test</title>
+				<title>{title}</title>
 
 				<meta charSet="UTF-8" />
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />

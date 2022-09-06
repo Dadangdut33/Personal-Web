@@ -3,6 +3,7 @@ import Head from "next/head";
 import Link from "next/link";
 import { createStyles, Title, Text, Button, Container, Group } from "@mantine/core";
 import { useRouter } from "next/router";
+import { Wrapper } from "../src/components/Utils/Template/Wrapper";
 
 const useStyles = createStyles((theme) => ({
 	root: {
@@ -49,25 +50,27 @@ const PageNotFound: NextPage = (props) => {
 	return (
 		<>
 			<Head>
-				<title>404 - Page Not Found - HIMTI UIN Jakarta</title>
+				<title>404 - Page Not Found | Dadangdut33</title>
 				<meta charSet="UTF-8" />
 				<link rel="icon" href="/favicon.ico" />
 			</Head>
-			<Container className={classes.root}>
-				<div className={classes.label}>404</div>
-				<Title className={classes.title}>Page Not Found.</Title>
-				<Text color="dimmed" size="lg" align="center" className={classes.description}>
-					You may have mistyped the address, or the page has been moved to another URL.
-				</Text>
-				<Group position="center">
-					<Button size="md" color="green" onClick={() => router.back()}>
-						Go back
-					</Button>
-					<Link href="/">
-						<Button size="md">Take me to home page</Button>
-					</Link>
-				</Group>
-			</Container>
+			<Wrapper noHeader noFooter>
+				<Container className={classes.root}>
+					<div className={classes.label}>404</div>
+					<Title className={classes.title}>Page Not Found.</Title>
+					<Text color="dimmed" size="lg" align="center" className={classes.description}>
+						You may have mistyped the address, or the page has been moved to another URL.
+					</Text>
+					<Group position="center">
+						<Button size="md" color="green" onClick={() => router.back()}>
+							Go back
+						</Button>
+						<Link href="/">
+							<Button size="md">Take me to home page</Button>
+						</Link>
+					</Group>
+				</Container>
+			</Wrapper>
 		</>
 	);
 };
