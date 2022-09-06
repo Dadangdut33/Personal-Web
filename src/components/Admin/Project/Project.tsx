@@ -352,14 +352,14 @@ export const Project: NextPage<IDashboardProps> = (props) => {
 												? row.links.map((links, i) => {
 														const LinkIcon = iconMap[links.type];
 														return (
-															<Tooltip label={links.url} key={i}>
+															<Tooltip label={links.url} key={links.url}>
 																<ActionIcon component={NextLink} href={links.url}>
 																	<LinkIcon />
 																</ActionIcon>
 															</Tooltip>
 														);
 												  })
-												: "Deleted/None"}
+												: "None"}
 										</div>
 									</td>
 									<td>

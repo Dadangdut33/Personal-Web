@@ -98,8 +98,14 @@ h6 {
 .header-spacing {
 	margin-top: 4rem;
 }
+/* ----------------------------------------------- */
+/* Position */
+.relative {
+	position: relative;
+}
 
 /* ----------------------------------------------- */
+/* Display */
 /* Flex */
 .d-flex {
 	display: flex;
