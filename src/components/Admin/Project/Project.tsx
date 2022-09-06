@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { UnstyledButton, Group, Text, TextInput, Tooltip, ActionIcon, Tabs, Collapse, MultiSelect } from "@mantine/core";
 import { keys } from "@mantine/utils";
 import { useLocalStorage } from "@mantine/hooks";
-import { IconSearch, IconEdit, IconTrash, IconTags, IconLetterA, IconLicense, IconDeviceWatch, IconBrandGithub, IconWorld, IconDownload } from "@tabler/icons";
+import { IconSearch, IconEdit, IconTrash, IconTags, IconLetterA, IconLicense, IconDeviceWatch, IconBrandGithub, IconWorld, IconDownload, IconPencil } from "@tabler/icons";
 import { IDashboardProps } from "../../../interfaces/props/Dashboard";
 import { IProject, validProjectSort, ProjectSort } from "../../../interfaces/db";
 import { actionPrompt, fillDataPage, fillDataAll, handleAdminTabChange, handleInputQueryChange, handleSelectQueryChange } from "../../../helper/admin";
@@ -18,6 +18,7 @@ export const iconMap: any = {
 	github: IconBrandGithub,
 	link: IconWorld,
 	download: IconDownload,
+	blog: IconPencil,
 };
 
 export const Project: NextPage<IDashboardProps> = (props) => {

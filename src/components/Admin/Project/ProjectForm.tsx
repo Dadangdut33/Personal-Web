@@ -253,7 +253,7 @@ export const ProjectForm: NextPage<IProjectFormProps> = (props) => {
 					<MultiSelect
 						mt="md"
 						data={linksData}
-						description="Use the prefix: `github` `link` `download`"
+						description="Use the prefix: `github` `link` `download` `blog`"
 						placeholder="Links"
 						value={forms.values.links.map((link) => link.type + ":" + link.url)}
 						onChange={(value) => {
@@ -277,18 +277,20 @@ export const ProjectForm: NextPage<IProjectFormProps> = (props) => {
 						searchable
 						getCreateLabel={(q) => `+ Add ${q}`}
 						// @ts-ignore
-						onCreate={(q) => {
-							// must contain github: or link: or download:
-							if (!q.includes("github:") && !q.includes("link:") && !q.includes("download:")) {
-								showNotification({ title: "Error", color: "red", message: "Links must contain prefix `github:` `link:` or `download:`" });
+						onCreate={async (q) => {
+							// must contain github: or link: or download: or blog:
+							if (!q.includes("github:") && !q.includes("link:") && !q.includes("download:") && !q.includes("blog:")) {
+								showNotification({ title: "Error", color: "red", message: "Links must contain prefix `github:` `link:` `download:` or `blog:`" });
 								return q;
 							}
 
-							// remove github: link: download: from the string
+							// remove github: link: download: blog: from the string
 							const linkGet = q
 								.replace(/github:/g, "")
 								.replace(/link:/g, "")
-								.replace(/download:/g, "");
+								.replace(/download:/g, "")
+								.replace(/blog:/g, "");
+
 							if (!isURL(linkGet)) {
 								showNotification({ title: "Error", color: "red", message: "Invalid URL provided" });
 								return q;

@@ -1,36 +1,15 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import { Center, createStyles, Title, Card, Text, Button, Stack, SimpleGrid } from "@mantine/core";
+import { useState, useEffect } from "react";
+import { Center, Title, Card, Text, Button, Stack, SimpleGrid } from "@mantine/core";
 import { Wrapper } from "../Utils/Template/Wrapper";
-
-const useStyles = createStyles((theme) => ({
-	titleWrapper: {
-		marginTop: "4rem",
-	},
-	contentWrap: {
-		width: "90%",
-		maxWidth: "500px",
-	},
-	centerText: {
-		textAlign: "center",
-		textJustify: "inter-word",
-	},
-	centerMobile: {
-		[theme.fn.smallerThan("xs")]: {
-			display: "flex",
-			textAlign: "center",
-			textJustify: "inter-word",
-			justifyContent: "center",
-			alignItems: "center",
-		},
-	},
-}));
 
 const title = "Projects | Dadangdut33",
 	desc = "Showcase of some of my projects or things that i have made on my free time";
 
 export const Project: NextPage = (props) => {
-	const { classes } = useStyles();
+	const [projects, setProjects] = useState([]);
+
 	return (
 		<>
 			<Head>
