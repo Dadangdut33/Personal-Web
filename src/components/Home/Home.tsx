@@ -27,10 +27,11 @@ const useStyles = createStyles((theme) => ({
 	},
 }));
 
+const title = "Dadangdut33",
+	desc = "Dadangdut33's personal website. It is somewhat of an online portofolio that showcase some of my projects and place where I can share my thoughts and experiences.";
+
 export const Home: NextPage = (props) => {
 	const { classes } = useStyles();
-	const title = "Dadangdut33",
-		desc = "Dadangdut33's personal website. It is somewhat of an online portofolio that showcase some of my projects and place where I can share my thoughts and experiences.";
 
 	return (
 		<>

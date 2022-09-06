@@ -3,11 +3,6 @@ import { IconCoffee, IconBrandGithub, IconBrandLinkedin, IconMail } from "@table
 import Link from "next/link";
 
 const useStyles = createStyles((theme) => ({
-	footer: {
-		// marginTop: 120,
-		// borderTop: `1px solid ${theme.colorScheme === "dark" ? theme.colors.dark[5] : theme.colors.gray[2]}`,
-	},
-
 	inner: {
 		display: "flex",
 		flexDirection: "column",
@@ -32,7 +27,7 @@ export function FooterWeb() {
 	const { classes } = useStyles();
 
 	return (
-		<footer className={classes.footer + " footer"}>
+		<footer className={"footer"}>
 			<Container className={classes.inner}>
 				<Group spacing={8} className={classes.links}>
 					<span className="subtle-link">

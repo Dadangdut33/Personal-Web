@@ -20,7 +20,7 @@ const useStyles = createStyles((theme) => ({
 	},
 }));
 
-export default function MouseHover() {
+export function MouseHover() {
 	const { classes } = useStyles();
 	const cursorX = useMotionValue(-100);
 	const cursorY = useMotionValue(-100);

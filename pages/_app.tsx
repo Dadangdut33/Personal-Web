@@ -8,9 +8,12 @@ import { NotificationsProvider } from "@mantine/notifications";
 import { RouterTransition } from "../src/components/Utils/Looks/RouterTransition";
 import { ModalsProvider } from "@mantine/modals";
 import { useLocalStorage } from "@mantine/hooks";
+import { AnimatePresence } from "framer-motion";
+import { useRouter } from "next/router";
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
 	const { Component, pageProps } = props;
+	const router = useRouter();
 	const [colorScheme, setColorScheme] = useLocalStorage<ColorScheme>({ key: "mantine-color-scheme", defaultValue: "dark" });
 
 	const toggleColorScheme = (value?: ColorScheme) => {
@@ -48,7 +51,9 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
 					<ModalsProvider>
 						<NotificationsProvider position="top-right">
 							<RouterTransition />
-							<Component {...pageProps} />
+							<AnimatePresence exitBeforeEnter initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
+								<Component {...pageProps} key={router.pathname} />
+							</AnimatePresence>
 						</NotificationsProvider>
 					</ModalsProvider>
 				</MantineProvider>

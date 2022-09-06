@@ -3,7 +3,7 @@ import { createStyles, Header, Container, Group, Burger, Paper, Transition, Titl
 import { useDisclosure } from "@mantine/hooks";
 import { useRouter } from "next/router";
 import { ColorSchemeToggle } from "../Looks/ColorSchemeToggle";
-import Link from "next/link";
+import { NoScrollLink } from "../Looks/NoScrollLink";
 
 const HEADER_HEIGHT = 60;
 const useStyles = createStyles((theme) => ({
@@ -89,9 +89,9 @@ export function HeaderResponsive() {
 
 	const items = links.map((link) => (
 		<span className="subtle-link" key={link.label}>
-			<Link href={link.link}>
+			<NoScrollLink href={link.link}>
 				<a className={cx(classes.link, { [classes.linkActive]: active === link.link })}>{link.label}</a>
-			</Link>
+			</NoScrollLink>
 		</span>
 	));
 
@@ -108,11 +108,11 @@ export function HeaderResponsive() {
 		<Header height={HEADER_HEIGHT} className={classes.root}>
 			<Container className={classes.header}>
 				<span className="subtle-link">
-					<Link href={"/"}>
+					<NoScrollLink href={"/"}>
 						<a>
 							<Title order={4}>Dadangdut33</Title>
 						</a>
-					</Link>
+					</NoScrollLink>
 				</span>
 				<Group spacing={5} className={classes.links}>
 					{items}

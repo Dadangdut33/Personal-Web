@@ -1,5 +1,5 @@
 import type { NextPage } from "next";
-import { Home } from "../src/components/Home/Home";
+import { Home } from "../src/components/Home";
 
 const index: NextPage = (props) => {
 	return <Home {...props} />;
