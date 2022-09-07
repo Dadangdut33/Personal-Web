@@ -1,16 +1,16 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useState, useEffect } from "react";
-import { Center, Title, Stack, SimpleGrid, LoadingOverlay, Text } from "@mantine/core";
+import { Center, Title, Stack, SimpleGrid, LoadingOverlay } from "@mantine/core";
 import { Wrapper } from "../Utils/Template/Wrapper";
 import { SERVER_V1 } from "../../helper";
 import { IProject } from "../../interfaces/db";
-import { PCard } from "./PCard";
+import { BlogCard } from "./BlogCard";
 
 const title = "Projects | Dadangdut33",
 	desc = "Showcase of some of my projects or things that i have made on my free time";
 
-export const Project: NextPage = (props) => {
+export const Blog: NextPage = (props) => {
 	const [projects, setProjects] = useState<IProject[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [loadFail, setLoadFail] = useState(false);
@@ -91,31 +91,29 @@ export const Project: NextPage = (props) => {
 					<Stack>
 						<Center>
 							<Title order={1} mt="xl">
-								Projects
+								Blogs
 							</Title>
 						</Center>
-						<Text mx={"auto"} sx={{ maxWidth: "300px", width: "95%" }} className="center-text">
-							Showcase of some of my projects or things that i have made on my free time
-						</Text>
 						<Center className="relative" mt={"md"}>
 							<LoadingOverlay visible={loading} overlayBlur={3} />
 							<SimpleGrid
 								cols={loadFail ? 1 : maxCol}
 								sx={{ width: "95%" }}
 								breakpoints={[
+									{ maxWidth: "md", cols: 3, spacing: "md" },
 									{ maxWidth: "sm", cols: 2, spacing: "sm" },
 									{ maxWidth: "xs", cols: 1, spacing: "sm" },
 								]}
 								spacing="lg"
 							>
 								{projects.length > 0 ? (
-									projects.map((project) => <PCard key={project._id} title={project.title} desc={project.description} tags={project.tags} links={project.links} />)
+									projects.map((project) => <BlogCard key={project._id} title={project.title} desc={project.description} tags={project.tags} links={project.links} />)
 								) : (
 									<>
 										{loadFail ? (
-											<PCard title="Fail to Load" desc={failMsg} tags={[]} links={[]} btnReloadFunction={() => fetchData()} />
+											<BlogCard title="Fail to Load" desc={failMsg} tags={[]} links={[]} btnReloadFunction={() => fetchData()} />
 										) : (
-											<PCard title="No Projects" desc="Projects have not been added yet" tags={[]} links={[]} />
+											<BlogCard title="No Projects" desc="Projects have not been added yet" tags={[]} links={[]} />
 										)}
 									</>
 								)}

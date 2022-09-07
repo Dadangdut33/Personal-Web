@@ -83,7 +83,7 @@ export function HeaderResponsive() {
 
 	const links = [
 		{ link: "/", label: "About" },
-		{ link: "/portofolio", label: "Portofolio" },
+		{ link: "/project", label: "Projects" },
 		{ link: "/blog", label: "Blog" },
 	];
 

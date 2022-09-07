@@ -103,8 +103,8 @@ export const Home: NextPage = (props) => {
 
 						<Center mt={"xl"}>
 							<Group>
-								<NoScrollLink href={"/portofolio"} passHref>
-									<Button component="a">Portofolio</Button>
+								<NoScrollLink href={"/project"} passHref>
+									<Button component="a">Projects</Button>
 								</NoScrollLink>
 								<NoScrollLink href={"/blog"} passHref>
 									<Button component="a" color={"lime"}>

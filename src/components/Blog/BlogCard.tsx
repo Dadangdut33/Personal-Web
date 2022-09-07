@@ -24,7 +24,7 @@ interface IProjectCardProps {
 	btnReloadFunction?: () => void;
 }
 
-export const PCard = ({ title, desc, links, tags, btnReloadFunction }: IProjectCardProps) => {
+export const BlogCard = ({ title, desc, links, tags, btnReloadFunction }: IProjectCardProps) => {
 	const { classes } = useStyles();
 
 	return (
@@ -33,9 +33,7 @@ export const PCard = ({ title, desc, links, tags, btnReloadFunction }: IProjectC
 				<Stack justify="space-between">
 					<Stack>
 						<Center mb={"xs"}>
-							<Title order={5} className="center-text">
-								{title}
-							</Title>
+							<Title order={5}>{title}</Title>
 						</Center>
 
 						<Center mb={"xs"}>
