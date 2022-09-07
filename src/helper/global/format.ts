@@ -3,6 +3,11 @@ export const formatDateWithTz = (date: Date, tz: string) => {
 	return `${d.getFullYear()}/${d.getMonth() + 1}/${d.getDate()} - ${d.toLocaleTimeString("en-us", { timeZone: tz })}`;
 };
 
+export const formatDateDayNameWithTz = (date: Date, tz: string) => {
+	const d = new Date(date);
+	return `${d.toLocaleDateString("en", { weekday: "long", timeZone: tz })}, ${d.getDate()} ${d.toLocaleDateString("en", { month: "long", timeZone: tz })} ${d.getFullYear()}`;
+};
+
 export const formatBytes = (bytes: number, decimals = 2) => {
 	if (bytes === 0) return "0 Bytes";
 

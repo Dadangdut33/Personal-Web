@@ -85,7 +85,7 @@ h6 {
 }
 
 .content-wrap {
-	padding-bottom: 2.5rem; /* Footer height */
+	padding-bottom: 7rem; /* Footer height */
 }
 
 .footer {
@@ -102,6 +102,10 @@ h6 {
 /* Position */
 .relative {
 	position: relative;
+}
+
+.absolute {
+	position: absolute;
 }
 
 /* ----------------------------------------------- */
@@ -170,4 +174,23 @@ h6 {
 
 .break-word {
 	word-break: break-word;
+}
+
+/* ----------------------------------------------- */
+/* maxwidth */
+.mw-95 {
+	max-width: 95%;
+}
+
+.mw-90 {
+	max-width: 90%;
+}
+
+/* width */
+.w-95 {
+	width: 95%;
+}
+
+.w-90 {
+	width: 90%;
 }

@@ -103,7 +103,7 @@ export const Project: NextPage = (props) => {
 								cols={loadFail ? 1 : maxCol}
 								sx={{ width: "95%" }}
 								breakpoints={[
-									{ maxWidth: "sm", cols: 2, spacing: "sm" },
+									{ maxWidth: "sm", cols: maxCol > 1 ? 2 : maxCol, spacing: "sm" },
 									{ maxWidth: "xs", cols: 1, spacing: "sm" },
 								]}
 								spacing="lg"
