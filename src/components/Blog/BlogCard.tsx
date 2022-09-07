@@ -1,82 +1,91 @@
-import { Center, Title, Card, Text, Stack, Button, ActionIcon, createStyles, Badge, ScrollArea } from "@mantine/core";
+import { Center, Title, Card, Text, Stack, Button, ActionIcon, createStyles, Badge, ScrollArea, Image, Group } from "@mantine/core";
 import { motion } from "framer-motion";
+import { IconHeart } from "@tabler/icons";
 import Link from "next/link";
-import { linkIcon } from "../../interfaces/db";
-import { iconMap } from "../Admin/Project";
+import { useEffect, useState } from "react";
+import { NoScrollLink } from "../Utils/Looks/NoScrollLink";
 
 const useStyles = createStyles((theme) => ({
-	cardLinks: {
-		position: "absolute",
-		bottom: "10px",
-		left: 0,
-		right: 0,
-		marginLeft: "auto",
-		marginRight: "auto",
-		textAlign: "center",
+	card: {
+		backgroundColor: theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
+		maxWidth: "350px",
+	},
+
+	section: {
+		borderBottom: `1px solid ${theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]}`,
+		paddingLeft: theme.spacing.md,
+		paddingRight: theme.spacing.md,
+		paddingBottom: theme.spacing.md,
+	},
+
+	like: {
+		color: theme.colors.red[6],
+	},
+
+	label: {
+		textTransform: "uppercase",
+		fontSize: theme.fontSizes.xs,
+		fontWeight: 700,
 	},
 }));
 
 interface IProjectCardProps {
+	_id: string;
+	image: string;
 	title: string;
 	desc: string;
 	tags: string[];
-	links: linkIcon[];
 	btnReloadFunction?: () => void;
 }
 
-export const BlogCard = ({ title, desc, links, tags, btnReloadFunction }: IProjectCardProps) => {
-	const { classes } = useStyles();
+export const BlogCard = ({ _id, image, title, desc, tags, btnReloadFunction }: IProjectCardProps) => {
+	const { classes, theme } = useStyles();
+	const [views, setViews] = useState(0);
+	const link = title.replace(/ /g, "-") + "-" + _id;
+
+	const features = tags.map((tag) => (
+		<Badge color={theme.colorScheme === "dark" ? "dark" : "gray"} key={tag}>
+			{tag}
+		</Badge>
+	));
+
+	useEffect(() => {
+		// TODO: fetch views from analytics...
+	}, []);
 
 	return (
-		<motion.div whileHover={{ y: "-7px", transition: { duration: 0.2 } }}>
-			<Card shadow="lg" p="lg" radius="md" withBorder sx={{ maxWidth: "350px" }} className="relative">
-				<Stack justify="space-between">
-					<Stack>
-						<Center mb={"xs"}>
-							<Title order={5}>{title}</Title>
-						</Center>
+		<Card withBorder radius="md" p="md" className={classes.card}>
+			<NoScrollLink passHref href={link}>
+				<Card.Section component="a">
+					<Image src={image} alt={title} height={180} />
+				</Card.Section>
+			</NoScrollLink>
 
-						<Center mb={"xs"}>
-							<Text size="sm" color="dimmed" className="center-text">
-								{desc}
-							</Text>
-						</Center>
+			<NoScrollLink passHref href={link}>
+				<Card.Section component="a" className={classes.section} mt="md">
+					<Group position="apart">
+						<Title order={5}>{title}</Title>
+						<Badge size="sm">{views} views</Badge>
+					</Group>
+					<Text size="sm" mt="xs">
+						{desc}
+					</Text>
+				</Card.Section>
+			</NoScrollLink>
 
-						<ScrollArea type="hover" scrollHideDelay={300} scrollbarSize={6} mb="1.5rem">
-							<Center mb={"sm"}>
-								{tags.map((tag) => (
-									<Badge key={tag} mx={4}>
-										{tag}
-									</Badge>
-								))}
-							</Center>
-						</ScrollArea>
-					</Stack>
+			<Card.Section className={classes.section}>
+				<Group spacing={7} mt={"md"}>
+					{features}
+				</Group>
+			</Card.Section>
 
-					<Center className={classes.cardLinks}>
-						{links &&
-							links.length > 0 &&
-							links.map((links) => {
-								const LinkIcon = iconMap[links.type];
-								return (
-									<span className="subtle-link" key={links.url}>
-										<Link href={links.url} passHref>
-											<ActionIcon size="lg" component="a" target="_blank" rel="noopener noreferrer">
-												<LinkIcon stroke={1.5} />
-											</ActionIcon>
-										</Link>
-									</span>
-								);
-							})}
-					</Center>
-
-					{btnReloadFunction && (
-						<Button variant="light" color="blue" fullWidth mt="md" radius="md" onClick={btnReloadFunction}>
-							Reload
-						</Button>
-					)}
-				</Stack>
-			</Card>
-		</motion.div>
+			{btnReloadFunction && (
+				<Group mt="xs">
+					<Button radius="md" style={{ flex: 1 }} onClick={btnReloadFunction}>
+						Reload
+					</Button>
+				</Group>
+			)}
+		</Card>
 	);
 };

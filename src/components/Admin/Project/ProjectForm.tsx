@@ -42,7 +42,7 @@ export const ProjectForm: NextPage<IProjectFormProps> = (props) => {
 
 		validate: {
 			title: (value) =>
-				urlSafeRegex.test(value) ? undefined : "Title contains invalid character. Characters allowed are Alpha numeric, underscore, hyphen, space, ', \", comma, and @ regex",
+				urlSafeRegex.test(value) ? undefined : "Title contains invalid character. Characters allowed are Alpha numeric, underscore, hyphen, space, ', \", comma, period, and @ regex",
 			description: (value) => (value.length > 0 ? undefined : "Description is required"),
 			tags: (value) => (value.length > 0 ? undefined : "Tags is required"),
 			links: (value) => (value.length > 0 ? undefined : "Links is required"),
@@ -72,7 +72,6 @@ export const ProjectForm: NextPage<IProjectFormProps> = (props) => {
 		setUnsavedChanges(false);
 		if (submitted) return;
 		const { title, description, tags, links } = forms.values;
-		console.log(links);
 		try {
 			const req = await fetch(`${SERVER_V1}/${props.project ? "project/" + props.project._id : "project"}`, {
 				method: props.project ? "PUT" : "POST",

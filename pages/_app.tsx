@@ -49,7 +49,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
 					withNormalizeCSS
 				>
 					<ModalsProvider>
-						<NotificationsProvider position="top-right">
+						<NotificationsProvider position="bottom-center">
 							<RouterTransition />
 							<AnimatePresence exitBeforeEnter initial={false} onExitComplete={() => window.scrollTo(0, 0)}>
 								<Component {...pageProps} key={router.pathname} />

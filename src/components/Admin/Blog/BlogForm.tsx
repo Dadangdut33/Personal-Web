@@ -48,7 +48,7 @@ export const BlogForm: NextPage<IBlogFormProps> = (props) => {
 
 		validate: {
 			title: (value) =>
-				urlSafeRegex.test(value) ? undefined : "Title contains invalid character. Characters allowed are Alpha numeric, underscore, hyphen, space, ', \", comma, and @ regex",
+				urlSafeRegex.test(value) ? undefined : "Title contains invalid character. Characters allowed are Alpha numeric, underscore, hyphen, space, ', \", comma, period, and @ regex",
 			thumbnail: (value) => (value.length > 0 ? (imageUrlRegex.test(value) ? undefined : "Invalid image URL") : undefined),
 			description: (value) => (value.length > 50 ? undefined : "Description must be at least 50 characters"),
 			visibility: (value) => (value.length > 0 ? undefined : "Visibility must be selected"),
@@ -305,18 +305,20 @@ export const BlogForm: NextPage<IBlogFormProps> = (props) => {
 					</Text>
 					<MDE content={content} setContent={setContent} editable={!editable} />
 					<Group>
-						<Group mt="md">
-							<Link href={props.pathname?.split("?")[0] + "/revision?fromEdit=true"}>
-								<a>
-									<Button>
-										<IconHistory size={20} />
-										<Text component="span" ml={4}>
-											View Revision History
-										</Text>
-									</Button>
-								</a>
-							</Link>
-						</Group>
+						{props.blog && (
+							<Group mt="md">
+								<Link href={props.pathname?.split("?")[0] + "/revision?fromEdit=true"}>
+									<a>
+										<Button>
+											<IconHistory size={20} />
+											<Text component="span" ml={4}>
+												View Revision History
+											</Text>
+										</Button>
+									</a>
+								</Link>
+							</Group>
+						)}
 
 						<Group position="right" mt="md" ml="auto">
 							{props.blog ? (

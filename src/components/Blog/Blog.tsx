@@ -1,17 +1,17 @@
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useState, useEffect } from "react";
-import { Center, Title, Stack, SimpleGrid, LoadingOverlay } from "@mantine/core";
+import { Center, Title, Stack, SimpleGrid, LoadingOverlay, Text } from "@mantine/core";
 import { Wrapper } from "../Utils/Template/Wrapper";
 import { SERVER_V1 } from "../../helper";
-import { IProject } from "../../interfaces/db";
+import { IBlog } from "../../interfaces/db";
 import { BlogCard } from "./BlogCard";
 
-const title = "Projects | Dadangdut33",
-	desc = "Showcase of some of my projects or things that i have made on my free time";
+const title = "Blog | Dadangdut33",
+	desc = "Place where I share thoughts, ideas, and experiences that might be useful in your coding adventure";
 
 export const Blog: NextPage = (props) => {
-	const [projects, setProjects] = useState<IProject[]>([]);
+	const [posts, setPosts] = useState<IBlog[]>([]);
 	const [loading, setLoading] = useState(true);
 	const [loadFail, setLoadFail] = useState(false);
 	const [failMsg, setFailMsg] = useState("");
@@ -20,7 +20,7 @@ export const Blog: NextPage = (props) => {
 	const fetchData = async () => {
 		setLoading(true);
 		try {
-			const req = await fetch(SERVER_V1 + "/project", {
+			const req = await fetch(SERVER_V1 + "/blog", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
@@ -36,7 +36,7 @@ export const Blog: NextPage = (props) => {
 			} else {
 				setLoading(false);
 				setLoadFail(false);
-				setProjects(res.data);
+				setPosts(res.data);
 
 				if (res.data.length <= 1) setMaxCol(1);
 				else if (res.data.length % 2 === 0) setMaxCol(2);
@@ -91,29 +91,54 @@ export const Blog: NextPage = (props) => {
 					<Stack>
 						<Center>
 							<Title order={1} mt="xl">
-								Blogs
+								Blog
 							</Title>
 						</Center>
+						<Text mx={"auto"} sx={{ maxWidth: "300px", width: "95%" }} className="center-text">
+							Place where I share thoughts, ideas, and experiences that might be useful in your coding adventure
+						</Text>
 						<Center className="relative" mt={"md"}>
 							<LoadingOverlay visible={loading} overlayBlur={3} />
 							<SimpleGrid
-								cols={loadFail ? 1 : maxCol}
+								cols={2}
 								sx={{ width: "95%" }}
 								breakpoints={[
-									{ maxWidth: "md", cols: 3, spacing: "md" },
 									{ maxWidth: "sm", cols: 2, spacing: "sm" },
 									{ maxWidth: "xs", cols: 1, spacing: "sm" },
 								]}
 								spacing="lg"
 							>
-								{projects.length > 0 ? (
-									projects.map((project) => <BlogCard key={project._id} title={project.title} desc={project.description} tags={project.tags} links={project.links} />)
+								{posts.length > 0 ? (
+									<>
+										{posts.map((post) => (
+											<BlogCard
+												key={post._id}
+												_id={post._id}
+												image={post.thumbnail ? post.thumbnail : "/assets/no-image.png"}
+												title={post.title}
+												desc={post.description}
+												tags={post.tags ? post.tags : []}
+											/>
+										))}{" "}
+										{posts.map((post) => (
+											<BlogCard
+												key={post._id}
+												_id={post._id}
+												image={post.thumbnail ? post.thumbnail : "/assets/no-image.png"}
+												title={post.title}
+												desc={post.description}
+												tags={post.tags ? post.tags : []}
+											/>
+										))}
+									</>
 								) : (
 									<>
 										{loadFail ? (
-											<BlogCard title="Fail to Load" desc={failMsg} tags={[]} links={[]} btnReloadFunction={() => fetchData()} />
+											<BlogCard title="Fail to Load" desc={failMsg} tags={[]} _id={failMsg} image={"/assets/no-image.png"} btnReloadFunction={() => fetchData()} />
 										) : (
-											<BlogCard title="No Projects" desc="Projects have not been added yet" tags={[]} links={[]} />
+											<Center>
+												<Text>No post yet.</Text>
+											</Center>
 										)}
 									</>
 								)}

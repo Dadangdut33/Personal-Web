@@ -30,7 +30,7 @@ export const NoteForm: NextPage<INoteFormProps> = (props) => {
 
 		validate: {
 			title: (value) =>
-				urlSafeRegex.test(value) ? undefined : "Title contains invalid character. Characters allowed are Alpha numeric, underscore, hyphen, space, ', \", comma, and @ regex",
+				urlSafeRegex.test(value) ? undefined : "Title contains invalid character. Characters allowed are Alpha numeric, underscore, hyphen, space, ', \", comma, period, and @ regex",
 		},
 	});
 	const [content, setContent] = useState("");
