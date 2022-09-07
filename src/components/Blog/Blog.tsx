@@ -188,6 +188,7 @@ export const Blog: NextPage = (props) => {
 											tags={post.tags ? post.tags : []}
 											createdAt={post.createdAt}
 											tz={tz}
+											views={0} // TODO: fetch views from analytics and add to the blog list...
 											search={search}
 											setSearching={setOpenSearch}
 											setSearchFunction={setSearch}
@@ -196,16 +197,7 @@ export const Blog: NextPage = (props) => {
 								) : (
 									<>
 										{loadFail ? (
-											<BlogCard
-												_id={failMsg}
-												title="Fail to Load"
-												desc={failMsg}
-												tags={[]}
-												createdAt={new Date()}
-												tz={tz}
-												image={"/assets/no-image.png"}
-												btnReloadFunction={() => fetchData()}
-											/>
+											<BlogCard _id={failMsg} title="Fail to Load" desc={failMsg} tags={[]} tz={tz} image={"/assets/no-image.png"} btnReloadFunction={() => fetchData()} />
 										) : (
 											<Center>
 												<Text>No post found.</Text>

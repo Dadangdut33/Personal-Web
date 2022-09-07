@@ -1,7 +1,6 @@
 import { Card, Text, Button, createStyles, Badge, Image, Group } from "@mantine/core";
 import { motion } from "framer-motion";
 import { IconEye, IconCalendar } from "@tabler/icons";
-import { useEffect, useState } from "react";
 import { NoScrollLink } from "../Utils/Looks/NoScrollLink";
 import { formatDateDayNameWithTz } from "../../helper";
 
@@ -41,8 +40,9 @@ interface IProjectCardProps {
 	title: string;
 	desc: string;
 	tags: string[];
-	createdAt: Date;
+	createdAt?: Date;
 	tz: string;
+	views?: number;
 	search?: string;
 	btnReloadFunction?: () => void;
 	setSearchFunction?: (search: string) => void;
@@ -57,13 +57,13 @@ export const BlogCard = ({
 	tags,
 	createdAt,
 	tz,
+	views,
 	search = "",
 	btnReloadFunction,
 	setSearchFunction = (search: string) => {},
 	setSearching = (searching: boolean) => {},
 }: IProjectCardProps) => {
 	const { classes, theme } = useStyles();
-	const [views, setViews] = useState(0);
 	const link = title.replace(/ /g, "-") + "-" + _id;
 
 	const tagSearch = (tag: string) => {
@@ -77,10 +77,6 @@ export const BlogCard = ({
 			setSearchFunction(tag + search);
 		}
 	};
-
-	useEffect(() => {
-		// TODO: fetch views from analytics...
-	}, []);
 
 	return (
 		<motion.div whileHover={{ scale: 1.04, transition: { duration: 0.2 } }}>
@@ -99,18 +95,22 @@ export const BlogCard = ({
 							{title}
 						</Text>
 						<Group spacing={4}>
-							<Badge size="sm" mt={"sm"} className="pointer">
-								<Group spacing={4}>
-									<IconCalendar size={13} />
-									<Text>{formatDateDayNameWithTz(createdAt, tz)}</Text>
-								</Group>
-							</Badge>
-							<Badge size="sm" mt={"sm"} className="pointer">
-								<Group spacing={4}>
-									<IconEye size={13} />
-									<Text>{views}</Text>
-								</Group>
-							</Badge>
+							{createdAt && (
+								<Badge size="sm" mt={"sm"} className="pointer">
+									<Group spacing={4}>
+										<IconCalendar size={13} />
+										<Text>{formatDateDayNameWithTz(createdAt, tz)}</Text>
+									</Group>
+								</Badge>
+							)}
+							{views !== undefined && (
+								<Badge size="sm" mt={"sm"} className="pointer">
+									<Group spacing={4}>
+										<IconEye size={13} />
+										<Text>{views}</Text>
+									</Group>
+								</Badge>
+							)}
 						</Group>
 						<Text size="sm" mt="xs" color={"dimmed"}>
 							{desc}
