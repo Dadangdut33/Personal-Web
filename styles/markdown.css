@@ -58,6 +58,7 @@ html {
 	width: 100%;
 }
 
+/* ------------------------------- */
 /* md-body */
 .md-body {
 	max-width: 700px;
@@ -82,17 +83,61 @@ html {
 	color: rgb(166, 167, 171);
 }
 
-.md-body .anchor {
-	margin-right: 5px;
+/* 1 tick code */
+.md-body p code,
+.md-body li code {
+	font-weight: 500;
+	border-spacing: 10px;
+	position: relative;
+	padding: 0.25rem;
+	border: 1px solid #cacfd6;
+	border-radius: 0.25rem;
 }
 
-.md-body.dark .anchor svg path {
-	fill: white;
+.md-body p code.light,
+.md-body li code.light {
+	color: yellow !important;
 }
 
-.md-body hr {
-	border-top: 1px solid #ddd;
-	margin: 1rem 0;
+.md-body p code.dark,
+.md-body li code.dark {
+	color: rgb(214, 51, 132) !important;
+}
+
+/* 3 tick code */
+.md-body .codeblock-wrapper {
+	position: relative;
+	background-color: #2a2139;
+}
+
+.md-body pre {
+	padding: 0 !important;
+}
+
+.md-body .codeblock-wrapper div pre {
+	margin-top: 1.5rem !important;
+	margin-bottom: 0 !important;
+	padding: 0.5rem !important;
+}
+
+.md-body .btn-copy {
+	padding: 5px 10px;
+}
+
+.md-body .btn-lang {
+	padding: 4px 8px;
+}
+
+.md-body .lang-name {
+	position: absolute;
+	left: 15px;
+	top: -2px;
+}
+
+.md-body .copy-btn {
+	position: absolute;
+	right: 5px;
+	top: 5px;
 }
 
 /* ------------------------------- */

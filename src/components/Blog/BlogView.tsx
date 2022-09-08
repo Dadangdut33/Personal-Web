@@ -4,6 +4,7 @@ import Head from "next/head";
 import { IBlog } from "../../interfaces/db";
 import { Wrapper } from "../Utils/Template/Wrapper";
 import { MDPreview } from "../Utils/Viewer/Markdown/MDPreview";
+import { ReactMD } from "../Utils/Viewer/Markdown/ReactMD";
 
 interface IBV {
 	post?: IBlog;
@@ -55,7 +56,7 @@ export const BlogView: NextPage<IBV> = ({ post }) => {
 
 					<div className="md-wrapper mx-auto">
 						<TypographyStylesProvider>
-							<MDPreview content={post?.content!} className="md-body mx-auto justify-text" />
+							<ReactMD content={post?.content!} className="md-body mx-auto" />
 						</TypographyStylesProvider>
 					</div>
 				</Stack>
