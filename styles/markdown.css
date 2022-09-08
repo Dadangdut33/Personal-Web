@@ -90,24 +90,30 @@ html {
 	border-spacing: 10px;
 	position: relative;
 	padding: 0.25rem;
-	border: 1px solid #cacfd6;
 	border-radius: 0.25rem;
+	background-color: inherit !important;
+	border: 1px solid #cacfd6 !important;
 }
 
-.md-body p code.light,
-.md-body li code.light {
-	color: yellow !important;
+.md-body.light p code,
+.md-body.light li code {
+	border: 1px solid #cacfd6;
+	color: rgb(214, 51, 132);
 }
 
-.md-body p code.dark,
-.md-body li code.dark {
-	color: rgb(214, 51, 132) !important;
+.md-body.dark p code,
+.md-body.dark li code {
+	color: yellow;
 }
 
 /* 3 tick code */
 .md-body .codeblock-wrapper {
 	position: relative;
 	background-color: #2a2139;
+}
+
+.md-body .codeblock-wrapper code {
+	border: none;
 }
 
 .md-body pre {
