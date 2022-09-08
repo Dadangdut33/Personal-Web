@@ -1,4 +1,4 @@
-import { Center, Stack, TypographyStylesProvider, Title, useMantineColorScheme, useMantineTheme, Group, Text, Button, Badge, Tooltip, CopyButton, ActionIcon } from "@mantine/core";
+import { Center, Stack, TypographyStylesProvider, Title, useMantineColorScheme, useMantineTheme, Group, Text, Button, Badge, Tooltip, CopyButton, ActionIcon, Divider } from "@mantine/core";
 import { IconCalendar, IconEye, IconHome, IconBrandReddit, IconBrandTwitter, IconBrandFacebook, IconCheck, IconLink } from "@tabler/icons";
 import { RedditShareButton, TwitterShareButton, FacebookShareButton } from "react-share";
 import { NextPage } from "next";
@@ -12,6 +12,7 @@ import { formatDateWithTz } from "../../helper";
 import { NoScrollLink } from "../Utils/Looks/NoScrollLink";
 // @ts-ignore
 import ProgressBar from "react-scroll-progress-bar";
+import Comment from "../Utils/Template/Comment";
 
 interface IBV {
 	post?: IBlog;
@@ -73,8 +74,8 @@ export const BlogView: NextPage<IBV> = ({ post }) => {
 						<NoScrollLink href="/blog">
 							<a>
 								<Button variant="outline" className="w-95">
-									<IconHome />
-									Go back to blog posts
+									<IconHome size={15} />
+									<Text ml={4}>Go back to blog posts</Text>
 								</Button>
 							</a>
 						</NoScrollLink>
@@ -145,6 +146,14 @@ export const BlogView: NextPage<IBV> = ({ post }) => {
 							</Tooltip>
 						</Group>
 					</Stack>
+
+					<Center>
+						<div className="comment-wrap w-95">
+							<Divider mb={"sm"} />
+							<Comment theme={colorScheme} />
+							<Divider my={"sm"} />
+						</div>
+					</Center>
 				</Stack>
 			</Wrapper>
 		</>

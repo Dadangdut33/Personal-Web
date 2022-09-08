@@ -40,9 +40,13 @@ html {
 	max-width: var(--md-max-width);
 }
 
-/* title */
+/* wrapper */
+.comment-wrap {
+	max-width: var(--md-max-width);
+}
+
 .post-title-wrapper {
-	max-width: 700px;
+	max-width: var(--md-max-width);
 	overflow: break-word;
 	margin: 0 auto 1rem;
 }
@@ -60,7 +64,7 @@ html {
 /* ------------------------------- */
 /* md-body */
 .md-body {
-	max-width: 700px;
+	max-width: var(--md-max-width);
 	border-left: 1px solid #ddd;
 	border-right: 1px solid #ddd;
 	padding: 0 2rem;
@@ -172,13 +176,6 @@ html {
 @media (max-width: 900px) {
 	.md-body {
 		border: none;
-		padding: 0 auto;
-	}
-}
-
-@media (max-width: 500px) {
-	.md-body {
-		border: none;
-		padding: 0 1rem;
+		padding: 0;
 	}
 }
