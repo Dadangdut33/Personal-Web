@@ -69,7 +69,7 @@ export const Home: NextPage = (props) => {
 							<Center>
 								<Stack className={"center-text"} spacing={"xs"}>
 									<Title order={1} mt="xl">
-										Hello! I'm{" "}
+										Hello! I&apos;m{" "}
 										<Text variant="gradient" component="span" gradient={{ from: "blue", to: "cyan", deg: 30 }} inherit>
 											Fauzan
 										</Text>
@@ -95,8 +95,8 @@ export const Home: NextPage = (props) => {
 						<Stack spacing={8} mt={"xl"}>
 							<Center>
 								<Group className={classes.contentWrap + " center-text"}>
-									I'm currently pursuing my bachelor degree as an Informatics Engineering Student at UIN Jakarta. I like to learn new things and do some coding for side projects on my free
-									time.
+									I&apos;m currently pursuing my bachelor degree as an Informatics Engineering Student at UIN Jakarta. I like to learn new things and do some coding for side projects on my
+									free time.
 								</Group>
 							</Center>
 						</Stack>

@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { motion, useMotionValue, useSpring } from "framer-motion";
-import { useDeviceSelectors } from "react-device-detect";
+import { isMobile } from "react-device-detect";
 import { createStyles } from "@mantine/core";
 
 const useStyles = createStyles((theme) => ({
@@ -30,9 +30,6 @@ export function MouseHover() {
 	const cursorYSpring = useSpring(cursorY, springConfig);
 
 	useEffect(() => {
-		const [selectors] = useDeviceSelectors(window.navigator.userAgent);
-		const { isMobile } = selectors;
-
 		if (!isMobile) {
 			const moveCursor = (e: MouseEvent) => {
 				cursorX.set(e.clientX - 16);

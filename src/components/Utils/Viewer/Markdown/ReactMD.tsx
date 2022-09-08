@@ -31,7 +31,6 @@ export const ReactMD = ({ className, content }: MDRenderProps) => {
 	return (
 		<ReactMarkdown
 			className={className + ` wmde-markdown ${colorScheme}`}
-			children={content}
 			remarkPlugins={[gfm]}
 			rehypePlugins={[rehypeAutolinkHeadings, rehypeRaw]}
 			components={{
@@ -77,13 +76,15 @@ export const ReactMD = ({ className, content }: MDRenderProps) => {
 						</h6>
 					);
 				},
-				hr: ({ ...props }) => {
+				hr: ({ children, ...props }) => {
 					return <Divider {...props} my={"sm"} />;
 				},
-				img: ({ src, alt, ...props }) => {
+				img: ({ src, alt, children, ...props }) => {
 					return (
 						<a href={src} target="_blank" rel="noopener noreferrer">
-							<img src={src} alt={alt} {...props} />
+							<picture>
+								<img src={src} alt={alt} {...props} />
+							</picture>
 						</a>
 					);
 				},
@@ -101,7 +102,9 @@ export const ReactMD = ({ className, content }: MDRenderProps) => {
 							</Group>
 							<div style={{ paddingTop: "20px" }}>
 								{/* @ts-ignore */}
-								<SyntaxHighlighter children={String(children).replace(/\n$/, "")} style={synthwave84} language={match[1]} {...props} />
+								<SyntaxHighlighter style={synthwave84} language={match[1]} {...props}>
+									{String(children).replace(/\n$/, "")}
+								</SyntaxHighlighter>
 							</div>
 						</div>
 					) : (
@@ -111,6 +114,8 @@ export const ReactMD = ({ className, content }: MDRenderProps) => {
 					);
 				},
 			}}
-		/>
+		>
+			{content}
+		</ReactMarkdown>
 	);
 };

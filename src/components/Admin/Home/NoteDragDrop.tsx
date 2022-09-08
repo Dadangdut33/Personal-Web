@@ -9,7 +9,7 @@ import { IconGripVertical, IconEdit, IconPlus } from "@tabler/icons";
 import { IDashboardProps } from "../../../interfaces/props/Dashboard";
 import { SERVER_V1 } from "../../../helper/global/constants";
 import { INote } from "../../../interfaces/db/Note";
-import { MDPreview } from "../../Utils/Viewer/Markdown/MDPreview";
+import { ReactMD } from "../../Utils/Viewer/Markdown/ReactMD";
 
 const useStyles = createStyles((theme) => ({
 	item: {
@@ -161,7 +161,7 @@ export const NoteDragDrop: NextPage<IDashboardProps> = (props) => {
 															<Text>{item.title}</Text>
 															<TypographyStylesProvider>
 																<Text component="div" color="dimmed">
-																	<MDPreview content={item.content} />
+																	<ReactMD content={item.content} />
 																</Text>
 															</TypographyStylesProvider>
 														</div>
