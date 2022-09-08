@@ -1,16 +1,37 @@
-import { Center, Stack, TypographyStylesProvider, Title } from "@mantine/core";
+import { Center, Stack, TypographyStylesProvider, Title, useMantineColorScheme, useMantineTheme, Group, Text, Button, Badge, Tooltip, CopyButton, ActionIcon } from "@mantine/core";
+import { IconCalendar, IconEye, IconHome, IconBrandReddit, IconBrandTwitter, IconBrandFacebook, IconCheck, IconLink } from "@tabler/icons";
+import { RedditShareButton, TwitterShareButton, FacebookShareButton } from "react-share";
 import { NextPage } from "next";
 import Head from "next/head";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 import { IBlog } from "../../interfaces/db";
 import { Wrapper } from "../Utils/Template/Wrapper";
-import { MDPreview } from "../Utils/Viewer/Markdown/MDPreview";
 import { ReactMD } from "../Utils/Viewer/Markdown/ReactMD";
+import { formatDateWithTz } from "../../helper";
+import { NoScrollLink } from "../Utils/Looks/NoScrollLink";
+// @ts-ignore
+import ProgressBar from "react-scroll-progress-bar";
 
 interface IBV {
 	post?: IBlog;
 }
 
 export const BlogView: NextPage<IBV> = ({ post }) => {
+	const { colorScheme } = useMantineColorScheme();
+	const theme = useMantineTheme();
+	const [views, setViews] = useState(0);
+	const [tz, setTz] = useState("UTC");
+
+	const { asPath } = useRouter();
+	const origin = typeof window !== "undefined" && window.location.origin ? window.location.origin : "";
+	const URL = `${origin}${asPath}`;
+
+	useEffect(() => {
+		setTz(Intl.DateTimeFormat().resolvedOptions().timeZone);
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, []);
+
 	const pTitle = post?.title + " - Dadangdut33";
 	return (
 		<>
@@ -46,12 +67,37 @@ export const BlogView: NextPage<IBV> = ({ post }) => {
 			</Head>
 
 			<Wrapper activeLinkProp="/blog">
+				<ProgressBar bgcolor={colorScheme === "dark" ? theme.colors.yellow[4] : theme.colors.grape[4]} duration="1.5" />
 				<Stack mt={"xl"}>
-					<Stack className="post-title-wrapper">
+					<Stack className="post-title-wrapper center-text">
+						<NoScrollLink href="/blog">
+							<a>
+								<Button variant="outline" className="w-95">
+									<IconHome />
+									Go back to blog posts
+								</Button>
+							</a>
+						</NoScrollLink>
 						<picture>
 							<img className="post-thumbnail" src={post?.thumbnail ? post.thumbnail : "/assets/no-image.png"} alt={`${post?.title} thumbnail`} />
 						</picture>
 						<Title order={4}>{post?.title}</Title>
+						<Center>
+							<Group spacing="xs">
+								<Group spacing={2}>
+									<IconCalendar size={14} />
+									<Text color="dimmed" size={14}>
+										{formatDateWithTz(post?.createdAt!, tz)}
+									</Text>
+								</Group>
+								<Group spacing={2}>
+									<IconEye size={14} />
+									<Text color="dimmed" size={14}>
+										{views}
+									</Text>
+								</Group>
+							</Group>
+						</Center>
 					</Stack>
 
 					<div className="md-wrapper mx-auto">
@@ -59,6 +105,46 @@ export const BlogView: NextPage<IBV> = ({ post }) => {
 							<ReactMD content={post?.content!} className="md-body mx-auto" />
 						</TypographyStylesProvider>
 					</div>
+
+					<Stack spacing={2}>
+						<Group className="post-title-wrapper">
+							{post?.tags?.map((tag) => (
+								<NoScrollLink key={tag} href={`../blog?q=[${tag}]`}>
+									<a>
+										<Badge className="pointer">{tag}</Badge>
+									</a>
+								</NoScrollLink>
+							))}
+						</Group>
+						<Group className="post-title-wrapper">
+							<Tooltip label="Copy URL">
+								<CopyButton value={URL} timeout={2000}>
+									{({ copied, copy }) => (
+										<Tooltip label={copied ? "Copied" : "Copy"}>
+											<ActionIcon color={copied ? "teal" : "gray"} onClick={copy} className="hover-effect">
+												{copied ? <IconCheck /> : <IconLink />}
+											</ActionIcon>
+										</Tooltip>
+									)}
+								</CopyButton>
+							</Tooltip>
+							<Tooltip label="Share to reddit">
+								<RedditShareButton url={URL} title={post?.title} className="hover-effect">
+									<IconBrandReddit />
+								</RedditShareButton>
+							</Tooltip>
+							<Tooltip label="Share to twitter">
+								<TwitterShareButton url={URL} title={post?.title} hashtags={post?.tags} className="hover-effect">
+									<IconBrandTwitter />
+								</TwitterShareButton>
+							</Tooltip>
+							<Tooltip label="Share to facebook">
+								<FacebookShareButton url={URL} quote={post?.description} className="hover-effect">
+									<IconBrandFacebook />
+								</FacebookShareButton>
+							</Tooltip>
+						</Group>
+					</Stack>
 				</Stack>
 			</Wrapper>
 		</>

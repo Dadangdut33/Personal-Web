@@ -33,6 +33,7 @@ h5,
 h6 {
 	font-family: Poppins, sans-serif;
 }
+
 /* ----------------------------------------------- */
 /* typography */
 .h1 {
@@ -184,4 +185,10 @@ h6 {
 
 .w-90 {
 	width: 90%;
+}
+
+/* ----------------------------------------------- */
+/* Animation */
+.hover-effect:hover {
+	transform: scale(1.1) !important;
 }

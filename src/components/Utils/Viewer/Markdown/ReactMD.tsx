@@ -80,6 +80,13 @@ export const ReactMD = ({ className, content }: MDRenderProps) => {
 				hr: ({ ...props }) => {
 					return <Divider {...props} my={"sm"} />;
 				},
+				img: ({ src, alt, ...props }) => {
+					return (
+						<a href={src} target="_blank" rel="noopener noreferrer">
+							<img src={src} alt={alt} {...props} />
+						</a>
+					);
+				},
 				code({ node, inline, className, children, ...props }) {
 					const match = /language-(\w+)/.exec(className || "");
 					return !inline && match ? (

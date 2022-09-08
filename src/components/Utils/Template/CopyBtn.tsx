@@ -6,7 +6,7 @@ export default function CopyBtn({ text }: { text: string }) {
 		<CopyButton value={text} timeout={2000}>
 			{({ copied, copy }) => (
 				<Tooltip label={copied ? "Copied" : "Copy"} withArrow position="right">
-					<ActionIcon color={copied ? "teal" : "gray"} onClick={copy}>
+					<ActionIcon variant="outline" color={copied ? "teal" : "gray"} onClick={copy}>
 						{copied ? <IconCheck size={16} /> : <IconCopy size={16} />}
 					</ActionIcon>
 				</Tooltip>

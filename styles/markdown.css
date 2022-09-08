@@ -36,7 +36,7 @@ html {
 /* ------------------------------- */
 /* thumbnail */
 .post-thumbnail {
-	max-height: 350px;
+	width: 95%;
 	max-width: var(--md-max-width);
 }
 
@@ -45,7 +45,6 @@ html {
 	max-width: 700px;
 	overflow: break-word;
 	margin: 0 auto 1rem;
-	text-align: center;
 }
 
 /* md-wrapper */
@@ -67,6 +66,7 @@ html {
 	padding: 0 2rem;
 	overflow: hidden;
 	overflow-wrap: break-word;
+	line-height: 24px;
 }
 
 .md-body h1,
@@ -78,9 +78,30 @@ html {
 	margin-top: initial;
 }
 
+.md-body dl,
+.md-body ol,
+.md-body ul {
+	margin-top: 0;
+	margin-bottom: 1rem;
+}
+
+.md-body ol,
+.md-body ul {
+	padding-left: 2rem !important;
+}
+
+.md-body li {
+	margin-top: 0 !important;
+}
+
 .md-body.dark p,
 .md-body.dark li {
 	color: rgb(166, 167, 171);
+}
+
+.md-body img {
+	margin-bottom: 0;
+	cursor: pointer;
 }
 
 /* 1 tick code */
@@ -152,5 +173,12 @@ html {
 	.md-body {
 		border: none;
 		padding: 0 auto;
+	}
+}
+
+@media (max-width: 500px) {
+	.md-body {
+		border: none;
+		padding: 0 1rem;
 	}
 }
