@@ -64,7 +64,7 @@ export const BlogCard = ({
 	setSearching = (searching: boolean) => {},
 }: IProjectCardProps) => {
 	const { classes, theme } = useStyles();
-	const link = title.replace(/ /g, "-") + "-" + _id;
+	const link = "/blog/" + title.replace(/ /g, "-") + "-" + _id;
 
 	const tagSearch = (tag: string) => {
 		setSearching(true);

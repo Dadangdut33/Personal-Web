@@ -90,7 +90,7 @@ export const Login: NextPage<loginProps> = (props) => {
 				<meta charSet="UTF-8" />
 				<meta httpEquiv="X-UA-Compatible" content="IE=edge" />
 				<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-				<title>Dashboard Login | Dadangdut33</title>
+				<title>Dashboard Login - Dadangdut33</title>
 			</Head>
 
 			<Container size={420} my={40}>

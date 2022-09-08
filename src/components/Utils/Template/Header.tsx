@@ -75,9 +75,9 @@ const useStyles = createStyles((theme) => ({
 	},
 }));
 
-export function HeaderResponsive() {
+export function HeaderResponsive({ activeLinkProp }: { activeLinkProp?: string }) {
 	const [opened, { toggle }] = useDisclosure(false);
-	const [active, setActive] = useState<string | null>(null);
+	const [active, setActive] = useState<string | null>(activeLinkProp ? activeLinkProp : null);
 	const { classes, cx } = useStyles();
 	const router = useRouter();
 

@@ -7,7 +7,7 @@ import { SERVER_V1 } from "../../helper";
 import { IProject } from "../../interfaces/db";
 import { PCard } from "./PCard";
 
-const title = "Projects | Dadangdut33",
+const title = "Projects - Dadangdut33",
 	desc = "Showcase of some of my projects or things that i have made on my free time";
 
 export const Project: NextPage = (props) => {
@@ -73,7 +73,7 @@ export const Project: NextPage = (props) => {
 				<meta property="og:title" content={title} />
 				<meta property="og:description" content={desc} />
 				<meta property="og:image" content="/logo512.png" />
-				<meta property="og:url" content="https://dadangdut33.codes/" />
+				<meta property="og:url" content="https://dadangdut33.codes/project" />
 				<meta property="og:type" content="website" />
 				<meta property="og:site_name" content="Dadangdut33" />
 				<meta property="og:locale" content="en_US" />

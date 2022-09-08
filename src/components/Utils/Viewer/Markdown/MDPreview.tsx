@@ -5,14 +5,15 @@ import { MarkdownPreview } from "../../RTE/Markdown/MDE_Import";
 
 interface MDRenderProps {
 	content: string;
+	className?: string;
 }
 
-export const MDPreview = ({ content }: MDRenderProps) => {
+export const MDPreview = ({ content, className }: MDRenderProps) => {
 	const { colorScheme } = useMantineColorScheme();
 
 	return (
 		<div data-color-mode={colorScheme}>
-			<MarkdownPreview source={content} rehypePlugins={[rehypeAutolinkHeadings, rehypeRaw]} />
+			<MarkdownPreview className={className + ` ${colorScheme}`} source={content} rehypePlugins={[rehypeAutolinkHeadings, rehypeRaw]} />
 		</div>
 	);
 };

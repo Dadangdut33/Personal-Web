@@ -1,4 +1,56 @@
+html {
+	--md-max-width: 700px;
+}
+
+/* override wdme theme */
+.wmde-markdown {
+	background-color: inherit !important;
+	color: inherit !important;
+	font-family: inherit !important;
+}
+
+.wmde-markdown h1 {
+	font-size: 2em !important;
+}
+
+.wmde-markdown h2 {
+	font-size: 1.5em !important;
+}
+
+.wmde-markdown h3 {
+	font-size: 1.17em !important;
+}
+
+.wmde-markdown h4 {
+	font-size: 1em !important;
+}
+
+.wmde-markdown h5 {
+	font-size: 0.83em !important;
+}
+
+.wmde-markdown h6 {
+	font-size: 0.67em !important;
+}
+
+/* ------------------------------- */
+/* thumbnail */
+.post-thumbnail {
+	max-height: 350px;
+	max-width: var(--md-max-width);
+}
+
+/* title */
+.post-title-wrapper {
+	max-width: 700px;
+	overflow: break-word;
+	margin: 0 auto 1rem;
+	text-align: center;
+}
+
+/* md-wrapper */
 .md-wrapper {
+	position: relative;
 	width: 90%;
 }
 
@@ -6,8 +58,48 @@
 	width: 100%;
 }
 
-.wmde-markdown {
-	background-color: inherit !important;
-	color: inherit !important;
-	font-family: inherit !important;
+/* md-body */
+.md-body {
+	max-width: 700px;
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #ddd;
+	padding: 0 2rem;
+	overflow: hidden;
+	overflow-wrap: break-word;
+}
+
+.md-body h1,
+.md-body h2,
+.md-body h3,
+.md-body h4,
+.md-body h5,
+.md-body h6 {
+	margin-top: initial;
+}
+
+.md-body.dark p,
+.md-body.dark li {
+	color: rgb(166, 167, 171);
+}
+
+.md-body .anchor {
+	margin-right: 5px;
+}
+
+.md-body.dark .anchor svg path {
+	fill: white;
+}
+
+.md-body hr {
+	border-top: 1px solid #ddd;
+	margin: 1rem 0;
+}
+
+/* ------------------------------- */
+/* media query */
+@media (max-width: 900px) {
+	.md-body {
+		border: none;
+		padding: 0 auto;
+	}
 }

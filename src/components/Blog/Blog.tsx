@@ -10,7 +10,7 @@ import { IBlog } from "../../interfaces/db";
 import { BlogCard } from "./BlogCard";
 import { useRouter } from "next/router";
 
-const title = "Blog | Dadangdut33",
+const title = "Blog - Dadangdut33",
 	desc = "Place where I share thoughts, ideas, and experiences that might be useful in your coding adventure";
 
 export const Blog: NextPage = (props) => {
@@ -123,7 +123,7 @@ export const Blog: NextPage = (props) => {
 				<meta property="og:title" content={title} />
 				<meta property="og:description" content={desc} />
 				<meta property="og:image" content="/logo512.png" />
-				<meta property="og:url" content="https://dadangdut33.codes/" />
+				<meta property="og:url" content="https://dadangdut33.codes/blog" />
 				<meta property="og:type" content="website" />
 				<meta property="og:site_name" content="Dadangdut33" />
 				<meta property="og:locale" content="en_US" />
@@ -131,7 +131,7 @@ export const Blog: NextPage = (props) => {
 				<meta property="twitter:card" content="summary" />
 				<meta property="twitter:creator" content="@dadangdut33" />
 				<meta property="twitter:title" content={title} />
-				<meta property="twitter:url" content="https://dadangdut33.codes/" />
+				<meta property="twitter:url" content="https://dadangdut33.codes/blog" />
 				<meta property="twitter:description" content={desc} />
 				<meta property="twitter:image" content="/logo512.png" />
 			</Head>
