@@ -1,17 +1,19 @@
 import { Card, Text, Button, createStyles, Badge, Image, Group } from "@mantine/core";
-import { motion } from "framer-motion";
 import { IconEye, IconCalendar } from "@tabler/icons";
 import { NoScrollLink } from "../Utils/Looks/NoScrollLink";
 import { formatDateDayNameWithTz } from "../../helper";
 
 const useStyles = createStyles((theme) => ({
 	card: {
-		backgroundColor: theme.colorScheme === "dark" ? theme.colors.dark[7] : theme.white,
 		maxWidth: "350px",
+		transition: "transform 200ms ease, box-shadow 100ms ease",
+		"&:hover": {
+			transform: "scale(1.02)",
+		},
 	},
 
 	section: {
-		borderBottom: `1px solid ${theme.colorScheme === "dark" ? theme.colors.dark[4] : theme.colors.gray[3]}`,
+		borderBottom: `1px solid ${theme.colorScheme === "dark" ? "#3b4060" : theme.colors.gray[3]}`,
 		paddingLeft: theme.spacing.md,
 		paddingRight: theme.spacing.md,
 		paddingBottom: theme.spacing.md,
@@ -79,69 +81,67 @@ export const BlogCard = ({
 	};
 
 	return (
-		<motion.div whileHover={{ scale: 1.04, transition: { duration: 0.2 } }}>
-			<Card withBorder radius="md" p="md" className={classes.card}>
-				<Card.Section>
-					<NoScrollLink passHref href={link}>
-						<a>
-							<Image src={image} alt={title} height={180} />
-						</a>
-					</NoScrollLink>
-				</Card.Section>
-
+		<Card shadow="lg" withBorder radius="md" p="md" className={classes.card}>
+			<Card.Section>
 				<NoScrollLink passHref href={link}>
-					<Card.Section component="a" className={classes.section} mt="md">
-						<Text size="lg" weight={500}>
-							{title}
-						</Text>
-						<Group spacing={4}>
-							{createdAt && (
-								<Badge size="sm" mt={"sm"} className="pointer">
-									<Group spacing={4}>
-										<IconCalendar size={13} />
-										<Text>{formatDateDayNameWithTz(createdAt, tz)}</Text>
-									</Group>
-								</Badge>
-							)}
-							{views !== undefined && (
-								<Badge size="sm" mt={"sm"} className="pointer">
-									<Group spacing={4}>
-										<IconEye size={13} />
-										<Text>{views}</Text>
-									</Group>
-								</Badge>
-							)}
-						</Group>
-						<Text size="sm" mt="xs" color={"dimmed"}>
-							{desc}
-						</Text>
-					</Card.Section>
+					<a>
+						<Image src={image} alt={title} height={180} />
+					</a>
 				</NoScrollLink>
+			</Card.Section>
 
-				<Card.Section className={classes.section}>
-					<Group spacing={7} mt={"md"}>
-						{tags.map((tag) => (
-							<Badge
-								color={theme.colorScheme === "dark" ? "lime" : "gray"}
-								key={tag}
-								onClick={() => tagSearch(`[${tag}]`)}
-								variant={search.includes(`[${tag}]`) ? "filled" : "outline"}
-								className={classes.tagHover + " pointer"}
-							>
-								{tag}
+			<NoScrollLink passHref href={link}>
+				<Card.Section component="a" className={classes.section} mt="md">
+					<Text size="lg" weight={500}>
+						{title}
+					</Text>
+					<Group spacing={4}>
+						{createdAt && (
+							<Badge size="sm" mt={"sm"} className="pointer">
+								<Group spacing={4}>
+									<IconCalendar size={13} />
+									<Text>{formatDateDayNameWithTz(createdAt, tz)}</Text>
+								</Group>
 							</Badge>
-						))}
+						)}
+						{views !== undefined && (
+							<Badge size="sm" mt={"sm"} className="pointer">
+								<Group spacing={4}>
+									<IconEye size={13} />
+									<Text>{views}</Text>
+								</Group>
+							</Badge>
+						)}
 					</Group>
+					<Text size="sm" mt="xs" color={"dimmed"}>
+						{desc}
+					</Text>
 				</Card.Section>
+			</NoScrollLink>
 
-				{btnReloadFunction && (
-					<Group mt="xs">
-						<Button radius="md" style={{ flex: 1 }} onClick={btnReloadFunction}>
-							Reload
-						</Button>
-					</Group>
-				)}
-			</Card>
-		</motion.div>
+			<Card.Section className={classes.section}>
+				<Group spacing={7} mt={"md"}>
+					{tags.map((tag) => (
+						<Badge
+							color={theme.colorScheme === "dark" ? "lime" : "gray"}
+							key={tag}
+							onClick={() => tagSearch(`[${tag}]`)}
+							variant={search.includes(`[${tag}]`) ? "filled" : "outline"}
+							className={classes.tagHover + " pointer"}
+						>
+							{tag}
+						</Badge>
+					))}
+				</Group>
+			</Card.Section>
+
+			{btnReloadFunction && (
+				<Group mt="xs">
+					<Button radius="md" style={{ flex: 1 }} onClick={btnReloadFunction}>
+						Reload
+					</Button>
+				</Group>
+			)}
+		</Card>
 	);
 };

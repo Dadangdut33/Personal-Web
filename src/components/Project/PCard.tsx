@@ -1,10 +1,16 @@
 import { Center, Title, Card, Text, Stack, Button, ActionIcon, createStyles, Badge, ScrollArea } from "@mantine/core";
-import { motion } from "framer-motion";
 import Link from "next/link";
 import { linkIcon } from "../../interfaces/db";
 import { iconMap } from "../Admin/Project";
 
 const useStyles = createStyles((theme) => ({
+	card: {
+		maxWidth: "350px",
+		transition: "transform 200ms ease, box-shadow 100ms ease",
+		"&:hover": {
+			transform: "translateY(-5px)",
+		},
+	},
 	cardLinks: {
 		position: "absolute",
 		bottom: "10px",
@@ -12,7 +18,6 @@ const useStyles = createStyles((theme) => ({
 		right: 0,
 		marginLeft: "auto",
 		marginRight: "auto",
-		textAlign: "center",
 	},
 }));
 
@@ -28,23 +33,25 @@ export const PCard = ({ title, desc, links, tags, btnReloadFunction }: IProjectC
 	const { classes } = useStyles();
 
 	return (
-		<motion.div whileHover={{ y: "-7px", transition: { duration: 0.2 } }}>
-			<Card shadow="lg" p="lg" radius="md" withBorder sx={{ maxWidth: "350px" }} className="relative">
-				<Stack justify="space-between">
-					<Stack>
-						<Center mb={"xs"}>
-							<Title order={5} className="center-text">
-								{title}
-							</Title>
-						</Center>
+		<Card shadow="lg" p="lg" radius="md" withBorder className={classes.card + " relative"}>
+			<Stack justify="space-between">
+				<Stack mb="4rem">
+					<Center mb={"xs"}>
+						<Title order={5} className="center-text">
+							{title}
+						</Title>
+					</Center>
 
-						<Center mb={"xs"}>
-							<Text size="sm" color="dimmed" className="center-text">
-								{desc}
-							</Text>
-						</Center>
+					<Center mb={"xs"}>
+						<Text size="sm" color="dimmed" className="center-text">
+							{desc}
+						</Text>
+					</Center>
+				</Stack>
 
-						<ScrollArea type="hover" scrollHideDelay={300} scrollbarSize={6} mb="1.5rem">
+				<Stack className={classes.cardLinks} spacing={0}>
+					<div style={{ padding: "0 1rem" }}>
+						<ScrollArea type="hover" scrollHideDelay={300} scrollbarSize={6}>
 							<Center mb={"sm"}>
 								{tags.map((tag) => (
 									<Badge key={tag} mx={4}>
@@ -53,9 +60,9 @@ export const PCard = ({ title, desc, links, tags, btnReloadFunction }: IProjectC
 								))}
 							</Center>
 						</ScrollArea>
-					</Stack>
+					</div>
 
-					<Center className={classes.cardLinks}>
+					<Center>
 						{links &&
 							links.length > 0 &&
 							links.map((links) => {
@@ -71,14 +78,14 @@ export const PCard = ({ title, desc, links, tags, btnReloadFunction }: IProjectC
 								);
 							})}
 					</Center>
-
-					{btnReloadFunction && (
-						<Button variant="light" color="blue" fullWidth mt="md" radius="md" onClick={btnReloadFunction}>
-							Reload
-						</Button>
-					)}
 				</Stack>
-			</Card>
-		</motion.div>
+
+				{btnReloadFunction && (
+					<Button variant="light" color="blue" fullWidth mt="md" radius="md" onClick={btnReloadFunction}>
+						Reload
+					</Button>
+				)}
+			</Stack>
+		</Card>
 	);
 };
