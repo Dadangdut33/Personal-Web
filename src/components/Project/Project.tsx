@@ -95,7 +95,7 @@ export const Project: NextPage<ProjectPageProps> = (props) => {
 
 				<meta property="og:title" content={title} />
 				<meta property="og:description" content={desc} />
-				<meta property="og:image" content="/logo512.png" />
+				<meta property="og:image" content="/assets/preview.png" />
 				<meta property="og:url" content="https://dadangdut33.codes/project" />
 				<meta property="og:type" content="website" />
 				<meta property="og:site_name" content="Dadangdut33" />
@@ -106,7 +106,7 @@ export const Project: NextPage<ProjectPageProps> = (props) => {
 				<meta property="twitter:title" content={title} />
 				<meta property="twitter:url" content="https://dadangdut33.codes/" />
 				<meta property="twitter:description" content={desc} />
-				<meta property="twitter:image" content="/logo512.png" />
+				<meta property="twitter:image" content="/assets/preview.png" />
 			</Head>
 
 			<Wrapper>

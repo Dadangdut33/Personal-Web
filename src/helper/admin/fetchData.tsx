@@ -192,7 +192,7 @@ export const fillDataPage = async ({
 	setPages: (value: SetStateAction<number>) => void;
 	setDataPage: (value: SetStateAction<any[]>) => void;
 	extraCallback?: (data?: any) => void;
-	token: string;
+	token?: string;
 }) => {
 	try {
 		setLoadingDataPage(true);
