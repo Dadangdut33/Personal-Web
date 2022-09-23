@@ -112,7 +112,7 @@ const actuallyDeleteTheData: IDeleteData = async (_id, api_url, setDataPage?, se
 			headers: {
 				"Content-Type": "application/json",
 			},
-			credentials: "same-origin",
+			credentials: "include",
 		});
 
 		const { success, message }: { success: boolean; message: string } = await req.json();
@@ -153,7 +153,7 @@ export const fillDataAll = async ({
 				"Content-Type": "application/json",
 				Cookie: "connect.sid=" + token,
 			},
-			credentials: "same-origin",
+			credentials: "include",
 		});
 
 		const { data, success, message }: { data: any; success: boolean; message: string } = await req.json();
@@ -202,7 +202,7 @@ export const fillDataPage = async ({
 				"Content-Type": "application/json",
 				Cookie: "connect.sid=" + token,
 			},
-			credentials: "same-origin",
+			credentials: "include",
 		});
 		console.log(token);
 		console.log(req);

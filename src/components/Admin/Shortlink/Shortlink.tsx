@@ -126,7 +126,7 @@ export const Shortlink: NextPage<IDashboardProps> = (props) => {
 					"Content-Type": "application/json",
 					Cookie: "connect.sid=" + props.token,
 				},
-				credentials: "same-origin",
+				credentials: "include",
 			});
 
 			console.log(test);
