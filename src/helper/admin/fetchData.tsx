@@ -204,6 +204,8 @@ export const fillDataPage = async ({
 			},
 			credentials: "include",
 		});
+		console.log(token);
+		console.log(req);
 
 		const { data, success, message, page, pages }: { data: any; success: boolean; message: string; page: number; pages: number } = await req.json();
 		if (req.status === 200 && success) {

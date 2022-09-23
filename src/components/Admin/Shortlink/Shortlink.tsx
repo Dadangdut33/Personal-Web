@@ -9,7 +9,7 @@ import { IconSearch, IconEdit, IconTrash, IconLego, IconLink, IconExternalLink, 
 import { IDashboardProps } from "../../../interfaces/props/Dashboard";
 import { IShortlink, validShortlinkSort, ShortlinkSort } from "../../../interfaces/db";
 import { actionPrompt, fillDataPage, fillDataAll, handleAdminTabChange, handleInputQueryChange } from "../../../helper/admin";
-import { formatDateWithTz, addQueryParam, removeQueryParam } from "../../../helper/global";
+import { formatDateWithTz, addQueryParam, removeQueryParam, SERVER_V1 } from "../../../helper/global";
 import { Th, useTableStyles } from "../../Utils/Dashboard";
 import { TableView } from "../Reusable/TableView";
 
@@ -118,6 +118,23 @@ export const Shortlink: NextPage<IDashboardProps> = (props) => {
 		setTz(Intl.DateTimeFormat().resolvedOptions().timeZone);
 		fillDataPage({ api_url, perPage, curPageQ: curPage, setLoadingDataPage, setCurPage, setPages, setDataPage, token: props.token });
 		fillDataAll({ api_url, setLoadingDataAll, setDataAllPage, token: props.token });
+
+		const testF = async () => {
+			const test = await fetch(SERVER_V1 + "/" + api_url, {
+				method: "GET",
+				headers: {
+					"Content-Type": "application/json",
+					Cookie: "connect.sid=" + props.token,
+				},
+				credentials: "include",
+			});
+
+			console.log(test);
+			const data = await test.json();
+			console.log(data);
+		};
+		testF();
+
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
