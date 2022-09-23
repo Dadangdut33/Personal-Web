@@ -7,13 +7,20 @@ import { SERVER_V1 } from "../../helper";
 import { IProject } from "../../interfaces/db";
 import { PCard } from "./PCard";
 
+export interface ProjectPageProps {
+	success: boolean;
+	data: IProject[];
+	msg: string;
+}
+
 const title = "Projects - Dadangdut33",
 	desc = "Showcase of some of my projects or things that i have made on my free time";
 
-export const Project: NextPage = (props) => {
-	const [projects, setProjects] = useState<IProject[]>([]);
-	const [loading, setLoading] = useState(true);
-	const [loadFail, setLoadFail] = useState(false);
+export const Project: NextPage<ProjectPageProps> = (props) => {
+	const [useSSR, setUseSSR] = useState(true);
+	const [projectsCSR, setProjectsCSR] = useState<IProject[]>([]);
+	const [loading, setLoading] = useState(false);
+	const [successLoad, setSuccessLoad] = useState(true);
 	const [failMsg, setFailMsg] = useState("");
 	const [maxCol, setMaxCol] = useState(1);
 
@@ -31,12 +38,12 @@ export const Project: NextPage = (props) => {
 
 			if (req.status !== 200) {
 				setLoading(false);
-				setLoadFail(true);
 				setFailMsg(res.message);
+				setSuccessLoad(false);
 			} else {
 				setLoading(false);
-				setLoadFail(false);
-				setProjects(res.data);
+				setSuccessLoad(true);
+				setProjectsCSR(res.data);
 
 				if (res.data.length <= 1) setMaxCol(1);
 				else if (res.data.length % 2 === 0) setMaxCol(2);
@@ -44,13 +51,24 @@ export const Project: NextPage = (props) => {
 			}
 		} catch (error: any) {
 			setLoading(false);
-			setLoadFail(true);
+			setSuccessLoad(false);
 			setFailMsg(error.message);
 		}
 	};
 
 	useEffect(() => {
-		fetchData();
+		if (props.success) {
+			if (props.data.length <= 1) setMaxCol(1);
+			else if (props.data.length % 2 === 0) setMaxCol(2);
+			else setMaxCol(3);
+
+			setProjectsCSR(props.data);
+		} else {
+			setUseSSR(false);
+			setSuccessLoad(false);
+			setFailMsg(props.msg);
+		}
+
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -100,7 +118,7 @@ export const Project: NextPage = (props) => {
 						<Center className="relative" mt={"md"}>
 							<LoadingOverlay visible={loading} overlayBlur={3} />
 							<SimpleGrid
-								cols={loadFail ? 1 : maxCol}
+								cols={successLoad ? maxCol : 1}
 								sx={{ width: "95%" }}
 								breakpoints={[
 									{ maxWidth: "sm", cols: maxCol > 1 ? 2 : maxCol, spacing: "sm" },
@@ -108,16 +126,20 @@ export const Project: NextPage = (props) => {
 								]}
 								spacing="lg"
 							>
-								{projects.length > 0 ? (
-									projects.map((project) => <PCard key={project._id} title={project.title} desc={project.description} tags={project.tags} links={project.links} />)
+								{useSSR ? (
+									props.data.length > 0 ? (
+										props.data.map((project) => <PCard key={project._id} title={project.title} desc={project.description} tags={project.tags} links={project.links} />)
+									) : (
+										<PCard title="No Projects" desc="Projects have not been added yet" tags={[]} links={[]} />
+									)
+								) : successLoad ? (
+									projectsCSR.length > 0 ? (
+										projectsCSR.map((project) => <PCard key={project._id} title={project.title} desc={project.description} tags={project.tags} links={project.links} />)
+									) : (
+										<PCard title="No Projects" desc="Projects have not been added yet" tags={[]} links={[]} />
+									)
 								) : (
-									<>
-										{loadFail ? (
-											<PCard title="Fail to Load" desc={failMsg} tags={[]} links={[]} btnReloadFunction={() => fetchData()} />
-										) : (
-											<PCard title="No Projects" desc="Projects have not been added yet" tags={[]} links={[]} />
-										)}
-									</>
+									<PCard title="Fail to Load" desc={failMsg} tags={[]} links={[]} btnReloadFunction={() => fetchData()} />
 								)}
 							</SimpleGrid>
 						</Center>
