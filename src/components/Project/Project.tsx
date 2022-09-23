@@ -17,12 +17,22 @@ const title = "Projects - Dadangdut33",
 	desc = "Showcase of some of my projects or things that i have made on my free time";
 
 export const Project: NextPage<ProjectPageProps> = (props) => {
+	// Data
 	const [useSSR, setUseSSR] = useState(true);
 	const [projectsCSR, setProjectsCSR] = useState<IProject[]>([]);
-	const [loading, setLoading] = useState(false);
+
+	// Fetch
 	const [successLoad, setSuccessLoad] = useState(true);
+	const [loading, setLoading] = useState(false);
 	const [failMsg, setFailMsg] = useState("");
 	const [maxCol, setMaxCol] = useState(1);
+
+	// --------------------------------------------------
+	const maxColCheck = (len: number) => {
+		if (len <= 1) return 1;
+		else if (len % 2 === 0) return 2;
+		else return 3;
+	};
 
 	const fetchData = async () => {
 		setLoading(true);
@@ -38,16 +48,14 @@ export const Project: NextPage<ProjectPageProps> = (props) => {
 
 			if (req.status !== 200) {
 				setLoading(false);
-				setFailMsg(res.message);
 				setSuccessLoad(false);
+				setFailMsg(res.message);
 			} else {
 				setLoading(false);
 				setSuccessLoad(true);
 				setProjectsCSR(res.data);
 
-				if (res.data.length <= 1) setMaxCol(1);
-				else if (res.data.length % 2 === 0) setMaxCol(2);
-				else setMaxCol(3);
+				setMaxCol(maxColCheck(res.data.length));
 			}
 		} catch (error: any) {
 			setLoading(false);
@@ -58,10 +66,7 @@ export const Project: NextPage<ProjectPageProps> = (props) => {
 
 	useEffect(() => {
 		if (props.success) {
-			if (props.data.length <= 1) setMaxCol(1);
-			else if (props.data.length % 2 === 0) setMaxCol(2);
-			else setMaxCol(3);
-
+			setMaxCol(maxColCheck(props.data.length));
 			setProjectsCSR(props.data);
 		} else {
 			setUseSSR(false);
@@ -119,7 +124,7 @@ export const Project: NextPage<ProjectPageProps> = (props) => {
 							<LoadingOverlay visible={loading} overlayBlur={3} />
 							<SimpleGrid
 								cols={successLoad ? maxCol : 1}
-								sx={{ width: "95%" }}
+								className="mw-95"
 								breakpoints={[
 									{ maxWidth: "sm", cols: maxCol > 1 ? 2 : maxCol, spacing: "sm" },
 									{ maxWidth: "xs", cols: 1, spacing: "sm" },

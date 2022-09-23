@@ -13,13 +13,20 @@ import { useRouter } from "next/router";
 const title = "Blog - Dadangdut33",
 	desc = "Place where I share thoughts, ideas, and experiences that might be useful in your coding adventure";
 
-export const Blog: NextPage = (props) => {
+export interface BlogPageProps {
+	success: boolean;
+	data: IBlog[];
+	msg: string;
+}
+
+export const Blog: NextPage<BlogPageProps> = (props) => {
 	// data
-	const [posts, setPosts] = useState<IBlog[]>([]);
+	const [useSSR, setUseSSR] = useState(true);
+	const [postsCSR, setPostsCSR] = useState<IBlog[]>([]);
 
 	// fetch
-	const [loading, setLoading] = useState(true);
-	const [loadFail, setLoadFail] = useState(false);
+	const [successLoad, setSuccessLoad] = useState(true);
+	const [loading, setLoading] = useState(false);
 	const [failMsg, setFailMsg] = useState("");
 	const [maxCol, setMaxCol] = useState(1);
 
@@ -71,7 +78,7 @@ export const Blog: NextPage = (props) => {
 	const fetchData = async () => {
 		setLoading(true);
 		try {
-			const req = await fetch(SERVER_V1 + "/blog?visibility=public", {
+			const req = await fetch(SERVER_V1 + "/blog", {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
@@ -82,24 +89,32 @@ export const Blog: NextPage = (props) => {
 
 			if (req.status !== 200) {
 				setLoading(false);
-				setLoadFail(true);
+				setSuccessLoad(true);
 				setFailMsg(res.message);
 			} else {
 				setLoading(false);
-				setLoadFail(false);
-				setPosts(res.data);
+				setSuccessLoad(false);
+				setPostsCSR(res.data);
 
 				setMaxCol(maxColCheck(res.data.length));
 			}
 		} catch (error: any) {
 			setLoading(false);
-			setLoadFail(true);
+			setSuccessLoad(true);
 			setFailMsg(error.message);
 		}
 	};
 
 	useEffect(() => {
-		fetchData();
+		if (props.success) {
+			setMaxCol(maxColCheck(props.data.length));
+			setPostsCSR(props.data);
+		} else {
+			setUseSSR(false);
+			setSuccessLoad(false);
+			setFailMsg(props.msg);
+		}
+
 		setTz(Intl.DateTimeFormat().resolvedOptions().timeZone);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
@@ -169,7 +184,7 @@ export const Blog: NextPage = (props) => {
 						<Center className="relative" mt={"md"}>
 							<LoadingOverlay visible={loading} overlayBlur={3} />
 							<SimpleGrid
-								cols={loadFail ? 1 : search.length > 0 ? maxColCheck(searchHandler(posts, search).length) : maxCol}
+								cols={successLoad ? (search.length > 0 ? maxColCheck(searchHandler(postsCSR, search).length) : maxCol) : 1}
 								className="mw-95"
 								breakpoints={[
 									{ maxWidth: "sm", cols: maxCol > 1 ? 2 : maxCol, spacing: "sm" },
@@ -177,33 +192,54 @@ export const Blog: NextPage = (props) => {
 								]}
 								spacing="lg"
 							>
-								{posts && posts.length > 0 && searchHandler(posts, search).length > 0 ? (
-									searchHandler(posts, search).map((post) => (
-										<BlogCard
-											key={post._id}
-											_id={post._id}
-											image={post.thumbnail ? post.thumbnail : "/assets/no-image.png"}
-											title={post.title}
-											desc={post.description}
-											tags={post.tags ? post.tags : []}
-											createdAt={post.createdAt}
-											tz={tz}
-											views={0} // TODO: fetch views from analytics and add to the blog list...
-											search={search}
-											setSearching={setOpenSearch}
-											setSearchFunction={setSearch}
-										/>
-									))
+								{useSSR ? (
+									props.data.length > 0 && searchHandler(props.data, search).length > 0 ? (
+										searchHandler(props.data, search).map((post) => (
+											<BlogCard
+												key={post._id}
+												_id={post._id}
+												image={post.thumbnail ? post.thumbnail : "/assets/no-image.png"}
+												title={post.title}
+												desc={post.description}
+												tags={post.tags ? post.tags : []}
+												createdAt={post.createdAt}
+												tz={tz}
+												views={0} // TODO: fetch views from analytics and add to the blog list...
+												search={search}
+												setSearching={setOpenSearch}
+												setSearchFunction={setSearch}
+											/>
+										))
+									) : (
+										<Center>
+											<Text>No post found.</Text>
+										</Center>
+									)
+								) : successLoad ? (
+									postsCSR.length > 0 && searchHandler(postsCSR, search).length > 0 ? (
+										searchHandler(postsCSR, search).map((post) => (
+											<BlogCard
+												key={post._id}
+												_id={post._id}
+												image={post.thumbnail ? post.thumbnail : "/assets/no-image.png"}
+												title={post.title}
+												desc={post.description}
+												tags={post.tags ? post.tags : []}
+												createdAt={post.createdAt}
+												tz={tz}
+												views={0} // TODO: fetch views from analytics and add to the blog list...
+												search={search}
+												setSearching={setOpenSearch}
+												setSearchFunction={setSearch}
+											/>
+										))
+									) : (
+										<Center>
+											<Text>No post found.</Text>
+										</Center>
+									)
 								) : (
-									<>
-										{loadFail ? (
-											<BlogCard _id={failMsg} title="Fail to Load" desc={failMsg} tags={[]} tz={tz} image={"/assets/no-image.png"} btnReloadFunction={() => fetchData()} />
-										) : (
-											<Center>
-												<Text>No post found.</Text>
-											</Center>
-										)}
-									</>
+									<BlogCard _id={failMsg} title="Fail to Load" desc={failMsg} tags={[]} tz={tz} image={"/assets/no-image.png"} btnReloadFunction={() => fetchData()} />
 								)}
 							</SimpleGrid>
 						</Center>
