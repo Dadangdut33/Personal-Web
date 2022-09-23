@@ -82,8 +82,17 @@ export const TableView: NextPage<ITableView> = (props) => {
 								compact
 								leftIcon={<IconRefresh size={20} />}
 								onClick={() => {
-									fillDataPage(props.api_url, props.perPage, props.curPage, props.setLoadingDataPage, props.setCurPage, props.setPages, props.setDataPage);
-									fillDataAll(props.api_url, props.setLoadingDataAll, props.setDataAllPage);
+									fillDataPage({
+										api_url: props.api_url,
+										perPage: props.perPage,
+										curPageQ: props.curPage,
+										setLoadingDataPage: props.setLoadingDataPage,
+										setCurPage: props.setCurPage,
+										setPages: props.setPages,
+										setDataPage: props.setDataPage,
+										token: props.token,
+									});
+									fillDataAll({ api_url: props.api_url, setLoadingDataAll: props.setLoadingDataAll, setDataAllPage: props.setDataAllPage, token: props.token });
 								}}
 								mt={16}
 							>

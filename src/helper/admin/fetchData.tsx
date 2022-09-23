@@ -3,8 +3,8 @@ import { closeAllModals, openConfirmModal, openModal } from "@mantine/modals";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { IconCheck, IconX } from "@tabler/icons";
 import { SetStateAction } from "react";
-import { SERVER_V1 } from "../global/constants";
 import { randomBytes } from "crypto";
+import { SERVER_V1 } from "../global/constants";
 
 export type IDeleteData = (
 	_id: string,
@@ -29,23 +29,6 @@ interface IPromptParam {
 }
 export type IActionPrompt = (extraParam: IPromptParam) => Promise<void>;
 
-export type IFillDataAll = (
-	api_url: string,
-	setLoadingDataAll: (value: SetStateAction<boolean>) => void,
-	setDataAllPage: (value: SetStateAction<any[]>) => void,
-	extraCallback?: (data?: any) => void
-) => Promise<void>;
-
-export type IFillDataPage = (
-	api_url: string,
-	perPage: number,
-	curPageQ: number,
-	setLoadingDataPage: (value: SetStateAction<boolean>) => void,
-	setCurPage: (value: SetStateAction<number>) => void,
-	setPages: (value: SetStateAction<number>) => void,
-	setDataPage: (value: SetStateAction<any[]>) => void,
-	extraCallback?: (data?: any) => void
-) => Promise<void>;
 /**
  * @async
  * Modal prompts
@@ -113,7 +96,7 @@ export const actionPrompt: IActionPrompt = async ({
 
 						<TextInput mt={8} id={`action-input-${random}`} data-autofocus />
 						<Button fullWidth onClick={() => validateInput()} mt="md" color={"red"}>
-							Submit {isGeneric ? (genericTitle ? genericTitle : "Action") : "Delete"}
+							{isGeneric ? (genericTitle ? genericTitle : "Action") : "Delete"}
 						</Button>
 					</>
 				),
@@ -147,13 +130,28 @@ const actuallyDeleteTheData: IDeleteData = async (_id, api_url, setDataPage?, se
 	}
 };
 
-export const fillDataAll: IFillDataAll = async (api_url, setLoadingDataAll, setDataAllPage, extraCallback) => {
+export const fillDataAll = async ({
+	api_url,
+	setLoadingDataAll,
+	setDataAllPage,
+	extraCallback,
+	extraQuery,
+	token,
+}: {
+	api_url: string;
+	setLoadingDataAll: (value: SetStateAction<boolean>) => void;
+	setDataAllPage: (value: SetStateAction<any[]>) => void;
+	extraCallback?: (data?: any) => void;
+	extraQuery?: string;
+	token: string;
+}) => {
 	try {
 		setLoadingDataAll(true);
-		const req = await fetch(SERVER_V1 + `/${api_url}`, {
+		const req = await fetch(SERVER_V1 + `/${api_url}${extraQuery ? extraQuery : ""}`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
+				Cookie: "connect.sid=" + token,
 			},
 			credentials: "include",
 		});
@@ -173,13 +171,36 @@ export const fillDataAll: IFillDataAll = async (api_url, setLoadingDataAll, setD
 	}
 };
 
-export const fillDataPage: IFillDataPage = async (api_url, perPage, curPageQ, setLoadingDataPage, setCurPage, setPages, setDataPage, extraCallback) => {
+export const fillDataPage = async ({
+	api_url,
+	perPage,
+	curPageQ,
+	extraQuery,
+	setLoadingDataPage,
+	setCurPage,
+	setPages,
+	setDataPage,
+	extraCallback,
+	token,
+}: {
+	api_url: string;
+	perPage: number;
+	curPageQ: number;
+	extraQuery?: string;
+	setLoadingDataPage: (value: SetStateAction<boolean>) => void;
+	setCurPage: (value: SetStateAction<number>) => void;
+	setPages: (value: SetStateAction<number>) => void;
+	setDataPage: (value: SetStateAction<any[]>) => void;
+	extraCallback?: (data?: any) => void;
+	token: string;
+}) => {
 	try {
 		setLoadingDataPage(true);
-		const req = await fetch(SERVER_V1 + `/${api_url}?perPage=${perPage}&page=${curPageQ}`, {
+		const req = await fetch(SERVER_V1 + `/${api_url}?perPage=${perPage}&page=${curPageQ}${extraQuery ? extraQuery : ""}`, {
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
+				Cookie: "connect.sid=" + token,
 			},
 			credentials: "include",
 		});

@@ -72,6 +72,7 @@ export const IdAndCount: NextPage<IdCountProps> = (props) => {
 				method: "GET",
 				headers: {
 					"Content-Type": "application/json",
+					Cookie: "connect.sid=" + props.token,
 				},
 				credentials: "include",
 			});
