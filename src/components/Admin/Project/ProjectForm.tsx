@@ -256,19 +256,20 @@ export const ProjectForm: NextPage<IProjectFormProps> = (props) => {
 						placeholder="Links"
 						value={forms.values.links.map((link) => link.type + ":" + link.url)}
 						onChange={(value) => {
-							const valueGet = value
-								?.filter((v) => v.includes(":"))
-								.map((v) => {
+							const valueGet = value.map((v) => {
+								if (v && v.includes(":")) {
 									const link = {
 										type: v.split(":")[0],
 										url: v
 											.replace(/github:/g, "")
 											.replace(/link:/g, "")
-											.replace(/download:/g, ""),
+											.replace(/download:/g, "")
+											.replace(/blog:/g, ""),
 									};
 									return link;
-								});
-							forms.setFieldValue("links", valueGet);
+								}
+							});
+							forms.setFieldValue("links", valueGet.filter((v) => v !== undefined) as linkIcon[]);
 						}}
 						label="Project Links"
 						disabled={!editable}
@@ -277,10 +278,11 @@ export const ProjectForm: NextPage<IProjectFormProps> = (props) => {
 						getCreateLabel={(q) => `+ Add ${q}`}
 						// @ts-ignore
 						onCreate={async (q) => {
+							const item = { label: q.trim(), value: q.trim(), group: "Links" };
 							// must contain github: or link: or download: or blog:
 							if (!q.includes("github:") && !q.includes("link:") && !q.includes("download:") && !q.includes("blog:")) {
 								showNotification({ title: "Error", color: "red", message: "Links must contain prefix `github:` `link:` `download:` or `blog:`" });
-								return q;
+								return item;
 							}
 
 							// remove github: link: download: blog: from the string
@@ -292,10 +294,9 @@ export const ProjectForm: NextPage<IProjectFormProps> = (props) => {
 
 							if (!isURL(linkGet)) {
 								showNotification({ title: "Error", color: "red", message: "Invalid URL provided" });
-								return q;
+								return item;
 							}
 
-							const item = { label: q.trim(), value: q.trim(), group: "Links" };
 							setLinksData((prev) => [...prev, item]);
 							forms.setFieldValue("links", [...forms.values.links, { type: q.split(":")[0], url: linkGet }]);
 							return item;
