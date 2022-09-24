@@ -112,6 +112,7 @@ const actuallyDeleteTheData: IDeleteData = async (_id, api_url, setDataPage?, se
 			headers: {
 				"Content-Type": "application/json",
 			},
+			mode: "cors",
 			credentials: "include",
 		});
 
@@ -151,8 +152,8 @@ export const fillDataAll = async ({
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
-				Cookie: "connect.sid=" + token,
 			},
+			mode: "cors",
 			credentials: "include",
 		});
 
@@ -200,8 +201,8 @@ export const fillDataPage = async ({
 			method: "GET",
 			headers: {
 				"Content-Type": "application/json",
-				Cookie: "connect.sid=" + token,
 			},
+			mode: "cors",
 			credentials: "include",
 		});
 		console.log(token);
