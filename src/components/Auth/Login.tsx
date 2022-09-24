@@ -53,6 +53,15 @@ export const Login: NextPage<loginProps> = (props) => {
 			});
 
 			if (loginFetch.status === 200) {
+				const setCookie = loginFetch.headers.get("set-cookie");
+				console.log(setCookie);
+				if (setCookie) {
+					// const currentCookie = document.cookie;
+					// const newCookie = setCookie.split(";")[0];
+					// document.cookie = `${currentCookie}; ${newCookie}`;
+					document.cookie = setCookie;
+				}
+
 				setSubmitted(true);
 				updateNotification({
 					id: "login-notif",
