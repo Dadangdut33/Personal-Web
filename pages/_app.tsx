@@ -11,6 +11,7 @@ import { useLocalStorage } from "@mantine/hooks";
 import { AnimatePresence } from "framer-motion";
 import { useRouter } from "next/router";
 import Head from "next/head";
+import { domain, trackingId } from "../src/helper";
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
 	const { Component, pageProps } = props;
@@ -24,9 +25,7 @@ export default function App(props: AppProps & { colorScheme: ColorScheme }) {
 
 	return (
 		<>
-			<Head>
-				{!router.pathname.includes("admin") && <script async defer data-website-id="de9022cd-16b7-4cb7-917c-956d5ae0dc6e" src="https://analytics.dadangdut33.codes/umami.js"></script>}
-			</Head>
+			<Head>{!router.pathname.includes("admin") && <script async defer data-website-id={trackingId} src={`https://analytics.dadangdut33${domain}/umami.js`}></script>}</Head>
 
 			<ColorSchemeProvider colorScheme={colorScheme} toggleColorScheme={toggleColorScheme}>
 				<MantineProvider

@@ -7,7 +7,7 @@ import { NoteDragDrop } from "./NoteDragDrop";
 import { TitleDashboard } from "../../Utils/Dashboard";
 import { emptyStats, IstatsExtended } from "../../../interfaces/db/Stats";
 import { IDashboardProps } from "../../../interfaces/props/Dashboard";
-import { domain, formatBytes, SERVER_V1 } from "../../../helper";
+import { domain, formatBytes, SERVER_V1, analyticsPublicId } from "../../../helper";
 
 const useStyles = createStyles((theme) => ({
 	value: {
@@ -218,7 +218,7 @@ export const DashboardHome: NextPage<IDashboardProps> = (props) => {
 								</Text>
 							</Group>
 
-							<Link href={`https://analytics.dadangdut33${domain}/share/tc3O11fp/Dadangdut33%20Web`} target={"_blank"}>
+							<Link href={`https://analytics.dadangdut33${domain}/share/${analyticsPublicId}/Dadangdut33%20Web`} target={"_blank"}>
 								<a>
 									<Button mt={24} fullWidth leftIcon={<IconExternalLink />} compact>
 										Visit

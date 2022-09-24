@@ -1,7 +1,7 @@
 import { createStyles, Container, Group, ActionIcon, Text, Tooltip } from "@mantine/core";
 import { IconCoffee, IconBrandGithub, IconBrandLinkedin, IconMail, IconDeviceAnalytics } from "@tabler/icons";
 import Link from "next/link";
-import { domain } from "../../../helper";
+import { analyticsPublicId, domain } from "../../../helper";
 
 const useStyles = createStyles((theme) => ({
 	inner: {
@@ -70,7 +70,7 @@ export function FooterWeb() {
 					{/* analytics umami */}
 					<Tooltip label="See web analytics" position="top" color={"blue"} transition="skew-down" withArrow>
 						<span className="subtle-link">
-							<Link href={`https://analytics.dadangdut33${domain}/share/tc3O11fp/Dadangdut33%20Web`} passHref>
+							<Link href={`https://analytics.dadangdut33${domain}/share/${analyticsPublicId}/Dadangdut33%20Web`} passHref>
 								<ActionIcon size="lg" component="a" target="_blank" rel="noopener noreferrer">
 									<IconDeviceAnalytics stroke={1.5} />
 								</ActionIcon>
