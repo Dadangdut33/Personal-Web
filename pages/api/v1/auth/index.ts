@@ -28,8 +28,11 @@ const login = async (req: NextApiRequest, res: NextApiResponse<Data>) => {
 		}),
 	});
 
-	const setCookie = loginFetch.headers.get("set-cookie");
-	if (setCookie) res.setHeader("set-cookie", setCookie);
+	console.log(loginFetch);
+	console.log(loginFetch.headers);
+
+	const setCookie = loginFetch.headers.get("Set-Cookie");
+	if (setCookie) res.setHeader("Set-Cookie", setCookie);
 
 	const loginData = await loginFetch.json();
 	return res.status(loginFetch.status).json(loginData);

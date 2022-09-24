@@ -114,6 +114,7 @@ export const Shortlink: NextPage<IDashboardProps> = (props) => {
 	};
 
 	useEffect(() => {
+		console.log(document.cookie);
 		fetchUrlParams();
 		setTz(Intl.DateTimeFormat().resolvedOptions().timeZone);
 		fillDataPage({ api_url, perPage, curPageQ: curPage, setLoadingDataPage, setCurPage, setPages, setDataPage, token: props.token });
