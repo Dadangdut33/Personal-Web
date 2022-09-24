@@ -89,7 +89,6 @@ export const NoteDragDrop: NextPage<IDashboardProps> = (props) => {
 				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
-					Cookie: "connect.sid=" + props.token,
 				},
 				credentials: "include",
 				body: JSON.stringify({
