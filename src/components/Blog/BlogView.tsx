@@ -1,5 +1,5 @@
 import { Center, Stack, TypographyStylesProvider, Title, useMantineColorScheme, useMantineTheme, Group, Text, Button, Badge, Tooltip, CopyButton, ActionIcon, Divider } from "@mantine/core";
-import { IconCalendar, IconEye, IconHome, IconBrandReddit, IconBrandTwitter, IconBrandFacebook, IconCheck, IconLink } from "@tabler/icons";
+import { IconCalendar, IconEye, IconHome, IconBrandReddit, IconBrandTwitter, IconBrandFacebook, IconCheck, IconLink, IconThumbUp, IconHeart } from "@tabler/icons";
 import { RedditShareButton, TwitterShareButton, FacebookShareButton } from "react-share";
 import { NextPage } from "next";
 import Head from "next/head";
@@ -8,11 +8,12 @@ import { useEffect, useState } from "react";
 import { IBlog } from "../../interfaces/db";
 import { Wrapper } from "../Utils/Template/Wrapper";
 import { ReactMD } from "../Utils/Viewer/Markdown/ReactMD";
-import { formatDateWithTz } from "../../helper";
+import { formatDateWithTz, SERVER_V1 } from "../../helper";
 import { NoScrollLink } from "../Utils/Looks/NoScrollLink";
 // @ts-ignore
 import ProgressBar from "react-scroll-progress-bar";
 import Comment from "../Utils/Template/Comment";
+import { showNotification } from "@mantine/notifications";
 
 interface IBV {
 	post?: IBlog;
@@ -21,15 +22,38 @@ interface IBV {
 export const BlogView: NextPage<IBV> = ({ post }) => {
 	const { colorScheme } = useMantineColorScheme();
 	const theme = useMantineTheme();
-	const [views, setViews] = useState(0);
 	const [tz, setTz] = useState("UTC");
+	const [likes, setLikes] = useState(0);
 
-	const { asPath } = useRouter();
+	const router = useRouter();
 	const origin = typeof window !== "undefined" && window.location.origin ? window.location.origin : "";
-	const URL = `${origin}${asPath}`;
+	const URL = `${origin}${router.asPath}`;
+
+	const likePost = async () => {
+		try {
+			const res = await fetch(SERVER_V1 + `/blog/${post?._id}/like`, {
+				method: "PUT",
+				headers: {
+					"Content-Type": "application/json",
+				},
+			});
+			const data = await res.json();
+			if (data.success) setLikes((prev) => prev + 1);
+		} catch (e) {
+			// send notification error
+			showNotification({
+				title: "Error",
+				color: "red",
+				message: "Something went wrong",
+			});
+		}
+	};
 
 	useEffect(() => {
-		setTz(Intl.DateTimeFormat().resolvedOptions().timeZone);
+		// init
+		router.push(post?.title.replaceAll(" ", "-")! + "-" + post?._id, undefined, { shallow: true }); // absolute title
+		setLikes(post?.likes ? post?.likes : 0); // set likes
+		setTz(Intl.DateTimeFormat().resolvedOptions().timeZone); // set timezone
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
@@ -95,7 +119,13 @@ export const BlogView: NextPage<IBV> = ({ post }) => {
 								<Group spacing={2}>
 									<IconEye size={14} />
 									<Text color="dimmed" size={14}>
-										{views}
+										{post?.views! + 1}
+									</Text>
+								</Group>
+								<Group spacing={2}>
+									<IconThumbUp size={14} />
+									<Text color="dimmed" size={14}>
+										{likes}
 									</Text>
 								</Group>
 							</Group>
@@ -144,6 +174,13 @@ export const BlogView: NextPage<IBV> = ({ post }) => {
 								<FacebookShareButton url={URL} quote={post?.description} className="hover-effect">
 									<IconBrandFacebook />
 								</FacebookShareButton>
+							</Tooltip>
+						</Group>
+						<Group className="post-title-wrapper">
+							<Tooltip label="Love this post">
+								<Button color={"blue"} variant="subtle" leftIcon={<IconHeart size={20} />} onClick={() => likePost()}>
+									{likes}
+								</Button>
 							</Tooltip>
 						</Group>
 					</Stack>

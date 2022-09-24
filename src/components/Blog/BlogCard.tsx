@@ -1,5 +1,5 @@
 import { Card, Text, Button, createStyles, Badge, Image, Group } from "@mantine/core";
-import { IconEye, IconCalendar } from "@tabler/icons";
+import { IconEye, IconCalendar, IconThumbUp } from "@tabler/icons";
 import { NoScrollLink } from "../Utils/Looks/NoScrollLink";
 import { formatDateDayNameWithTz } from "../../helper";
 
@@ -21,6 +21,10 @@ const useStyles = createStyles((theme) => ({
 
 	like: {
 		color: theme.colors.red[6],
+	},
+
+	view: {
+		color: theme.colors.blue[6],
 	},
 
 	label: {
@@ -45,6 +49,7 @@ interface IProjectCardProps {
 	createdAt?: Date;
 	tz: string;
 	views?: number;
+	likes?: number;
 	search?: string;
 	btnReloadFunction?: () => void;
 	setSearchFunction?: (search: string) => void;
@@ -60,6 +65,7 @@ export const BlogCard = ({
 	createdAt,
 	tz,
 	views,
+	likes,
 	search = "",
 	btnReloadFunction,
 	setSearchFunction = (search: string) => {},
@@ -107,8 +113,16 @@ export const BlogCard = ({
 						{views !== undefined && (
 							<Badge size="sm" mt={"sm"} className="pointer">
 								<Group spacing={4}>
-									<IconEye size={13} />
+									<IconEye size={13} className={classes.view} />
 									<Text>{views}</Text>
+								</Group>
+							</Badge>
+						)}
+						{likes !== undefined && (
+							<Badge size="sm" mt={"sm"} className="pointer">
+								<Group spacing={4}>
+									<IconThumbUp size={13} className={classes.like} />
+									<Text>{likes}</Text>
 								</Group>
 							</Badge>
 						)}

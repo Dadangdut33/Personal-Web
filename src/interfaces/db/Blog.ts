@@ -6,6 +6,8 @@ export interface IBlog {
 	__v: number;
 	author: IUser[];
 	title: string;
+	likes: number;
+	views: number;
 	visibility: string;
 	description: string;
 	content: string;

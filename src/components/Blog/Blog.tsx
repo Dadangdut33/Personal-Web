@@ -205,7 +205,8 @@ export const Blog: NextPage<BlogPageProps> = (props) => {
 												tags={post.tags ? post.tags : []}
 												createdAt={post.createdAt}
 												tz={tz}
-												views={0} // TODO: fetch views from analytics and add to the blog list...
+												views={post.views}
+												likes={post.likes}
 												search={search}
 												setSearching={setOpenSearch}
 												setSearchFunction={setSearch}
@@ -228,7 +229,6 @@ export const Blog: NextPage<BlogPageProps> = (props) => {
 												tags={post.tags ? post.tags : []}
 												createdAt={post.createdAt}
 												tz={tz}
-												views={0} // TODO: fetch views from analytics and add to the blog list...
 												search={search}
 												setSearching={setOpenSearch}
 												setSearchFunction={setSearch}
