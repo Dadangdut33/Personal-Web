@@ -7,8 +7,7 @@ import { IconArrowLeft, IconAlertCircle, IconX, IconCheck } from "@tabler/icons"
 import { TextInput, PasswordInput, Center, Anchor, Paper, Container, Group, Button, Alert, LoadingOverlay, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { SERVER_LOCAL_V1, SERVER_V1 } from "../../helper/global/constants";
-import { getCookies, setCookie } from "cookies-next";
+import { SERVER_V1 } from "../../helper/global/constants";
 
 interface loginProps {
 	query?: any;
@@ -64,9 +63,9 @@ export const Login: NextPage<loginProps> = (props) => {
 					icon: <IconCheck size={16} />,
 				});
 
-				// setTimeout(() => {
-				// 	router.push("/admin");
-				// }, 1500);
+				setTimeout(() => {
+					router.push("/admin");
+				}, 1500);
 			} else {
 				setLoading(false);
 				const { message } = await loginFetch.json();
@@ -80,7 +79,6 @@ export const Login: NextPage<loginProps> = (props) => {
 	};
 
 	useEffect(() => {
-		getCookies();
 		// check query params
 		if (props.query.loggedout === "true") setAlertShown(true);
 		// eslint-disable-next-line react-hooks/exhaustive-deps

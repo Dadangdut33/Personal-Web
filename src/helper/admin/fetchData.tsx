@@ -91,7 +91,7 @@ export const actionPrompt: IActionPrompt = async ({
 				children: (
 					<>
 						<Text size={"sm"}>
-							Please type <Code>{random}</Code> to confirm {isGeneric ? (genericTitle ? genericTitle.toLowerCase() : "action") : "deletion"}.
+							Please type <Code>{random}</Code> to confirm {isGeneric ? (genericTitle ? genericTitle.toLowerCase() : "confirm action") : "confirm deletion"}.
 						</Text>
 
 						<TextInput mt={8} id={`action-input-${random}`} data-autofocus />
@@ -112,7 +112,6 @@ const actuallyDeleteTheData: IDeleteData = async (_id, api_url, setDataPage?, se
 			headers: {
 				"Content-Type": "application/json",
 			},
-			mode: "cors",
 			credentials: "include",
 		});
 
@@ -153,7 +152,6 @@ export const fillDataAll = async ({
 			headers: {
 				"Content-Type": "application/json",
 			},
-			mode: "cors",
 			credentials: "include",
 		});
 
@@ -202,7 +200,6 @@ export const fillDataPage = async ({
 			headers: {
 				"Content-Type": "application/json",
 			},
-			mode: "cors",
 			credentials: "include",
 		});
 		console.log(token);
