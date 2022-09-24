@@ -7,7 +7,7 @@ import { IconArrowLeft, IconAlertCircle, IconX, IconCheck } from "@tabler/icons"
 import { TextInput, PasswordInput, Center, Anchor, Paper, Container, Group, Button, Alert, LoadingOverlay, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
-import { SERVER_V1 } from "../../helper/global/constants";
+import { SERVER_LOCAL_V1 } from "../../helper/global/constants";
 
 interface loginProps {
 	query?: any;
@@ -40,7 +40,7 @@ export const Login: NextPage<loginProps> = (props) => {
 		const { username, password } = form.values;
 		showNotification({ id: "login-notif", title: "Loading", message: "Logging in...", loading: true, disallowClose: true, autoClose: false });
 		try {
-			const loginFetch = await fetch(`${SERVER_V1}/auth`, {
+			const loginFetch = await fetch(`${SERVER_LOCAL_V1}/auth`, {
 				method: "POST",
 				credentials: "include",
 				headers: {
