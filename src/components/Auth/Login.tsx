@@ -41,7 +41,6 @@ export const Login: NextPage<loginProps> = (props) => {
 		const { username, password } = form.values;
 		showNotification({ id: "login-notif", title: "Loading", message: "Logging in...", loading: true, disallowClose: true, autoClose: false });
 		try {
-			setCookie("test", new Date().toString());
 			const loginFetch = await fetch(`${SERVER_V1}/auth`, {
 				method: "POST",
 				credentials: "include",
@@ -55,13 +54,6 @@ export const Login: NextPage<loginProps> = (props) => {
 			});
 
 			if (loginFetch.status === 200) {
-				getCookies();
-				console.log(loginFetch.headers);
-				const cookieGet = loginFetch.headers.get("set-cookie");
-				console.log(cookieGet);
-				setCookie("connect.sid", cookieGet, { path: "/", sameSite: "none", secure: true });
-				getCookies();
-
 				setSubmitted(true);
 				updateNotification({
 					id: "login-notif",
