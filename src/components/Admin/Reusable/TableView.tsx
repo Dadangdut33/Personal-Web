@@ -90,9 +90,8 @@ export const TableView: NextPage<ITableView> = (props) => {
 										setCurPage: props.setCurPage,
 										setPages: props.setPages,
 										setDataPage: props.setDataPage,
-										token: props.token,
 									});
-									fillDataAll({ api_url: props.api_url, setLoadingDataAll: props.setLoadingDataAll, setDataAllPage: props.setDataAllPage, token: props.token });
+									fillDataAll({ api_url: props.api_url, setLoadingDataAll: props.setLoadingDataAll, setDataAllPage: props.setDataAllPage });
 								}}
 								mt={16}
 							>

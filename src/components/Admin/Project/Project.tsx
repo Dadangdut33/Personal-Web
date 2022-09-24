@@ -132,8 +132,8 @@ export const Project: NextPage<IDashboardProps> = (props) => {
 	useEffect(() => {
 		fetchUrlParams();
 		setTz(Intl.DateTimeFormat().resolvedOptions().timeZone);
-		fillDataPage({ api_url, perPage, curPageQ: curPage, setLoadingDataPage, setCurPage, setPages, setDataPage, token: props.token });
-		fillDataAll({ api_url, setLoadingDataAll, setDataAllPage, token: props.token });
+		fillDataPage({ api_url, perPage, curPageQ: curPage, setLoadingDataPage, setCurPage, setPages, setDataPage });
+		fillDataAll({ api_url, setLoadingDataAll, setDataAllPage });
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 

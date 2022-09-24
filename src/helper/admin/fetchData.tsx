@@ -136,14 +136,12 @@ export const fillDataAll = async ({
 	setDataAllPage,
 	extraCallback,
 	extraQuery,
-	token,
 }: {
 	api_url: string;
 	setLoadingDataAll: (value: SetStateAction<boolean>) => void;
 	setDataAllPage: (value: SetStateAction<any[]>) => void;
 	extraCallback?: (data?: any) => void;
 	extraQuery?: string;
-	token: string;
 }) => {
 	try {
 		setLoadingDataAll(true);
@@ -180,7 +178,6 @@ export const fillDataPage = async ({
 	setPages,
 	setDataPage,
 	extraCallback,
-	token,
 }: {
 	api_url: string;
 	perPage: number;
@@ -191,7 +188,6 @@ export const fillDataPage = async ({
 	setPages: (value: SetStateAction<number>) => void;
 	setDataPage: (value: SetStateAction<any[]>) => void;
 	extraCallback?: (data?: any) => void;
-	token?: string;
 }) => {
 	try {
 		setLoadingDataPage(true);
@@ -202,8 +198,6 @@ export const fillDataPage = async ({
 			},
 			credentials: "include",
 		});
-		console.log(token);
-		console.log(req);
 
 		const { data, success, message, page, pages }: { data: any; success: boolean; message: string; page: number; pages: number } = await req.json();
 		if (req.status === 200 && success) {

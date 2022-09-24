@@ -118,34 +118,8 @@ export const Shortlink: NextPage<IDashboardProps> = (props) => {
 		console.log(document.cookie);
 		fetchUrlParams();
 		setTz(Intl.DateTimeFormat().resolvedOptions().timeZone);
-		fillDataPage({ api_url, perPage, curPageQ: curPage, setLoadingDataPage, setCurPage, setPages, setDataPage, token: props.token });
-		fillDataAll({ api_url, setLoadingDataAll, setDataAllPage, token: props.token });
-
-		const testF = async () => {
-			const test = await fetch(SERVER_V1 + "/" + api_url, {
-				method: "GET",
-				headers: {
-					"Content-Type": "application/json",
-					Cookie: "connect.sid=" + props.token,
-				},
-				credentials: "include",
-			});
-
-			console.log(test);
-			const data = await test.json();
-			console.log(data);
-
-			const axiosTest = await axios.get(SERVER_V1 + "/" + api_url, {
-				headers: {
-					"Content-Type": "application/json",
-					Cookie: "connect.sid=" + props.token,
-				},
-				withCredentials: true,
-			});
-
-			console.log(axiosTest);
-		};
-		testF();
+		fillDataPage({ api_url, perPage, curPageQ: curPage, setLoadingDataPage, setCurPage, setPages, setDataPage });
+		fillDataAll({ api_url, setLoadingDataAll, setDataAllPage });
 
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
