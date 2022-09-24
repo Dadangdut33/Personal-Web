@@ -1,10 +1,15 @@
-# Frontend
+<p align="center">
+  <a href="https://github.com/Dadangdut33/Personal-Web/issues"><img alt="GitHub issues" src="https://img.shields.io/github/issues/Dadangdut33/Personal-Web"></a>
+  <a href="https://github.com/Dadangdut33/Personal-Web/pulls"><img alt="GitHub pull requests" src="https://img.shields.io/github/issues-pr/Dadangdut33/Personal-Web"></a>
+  <br />
+  <a href="https://github.com/Dadangdut33/Personal-Web/stargazers"><img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/Dadangdut33/Personal-Web?style=social"></a>
+  <a href="https://github.com/Dadangdut33/Personal-Web/network/members"><img alt="GitHub forks" src="https://img.shields.io/github/forks/Dadangdut33/Personal-Web?style=social"></a>
+</p>
 
-Front end of my personal web. Made using next.js. Take a look at [backend](../backend/) for server code.
+Frontend of my personal web. Made using next.js. Take a look at [backend](https://github.com/Dadangdut33/Personal-Web-Backend) for server code.
 
 # Table of Contents
 
-- [Frontend](#frontend)
 - [Table of Contents](#table-of-contents)
 - [Getting started](#getting-started)
   - [Getting Started](#getting-started-1)
