@@ -3,7 +3,7 @@ import Head from "next/head";
 import { useState, useEffect } from "react";
 import { Center, Title, Stack, SimpleGrid, LoadingOverlay, Text } from "@mantine/core";
 import { Wrapper } from "../Utils/Template/Wrapper";
-import { SERVER_V1 } from "../../helper";
+import { domain, SERVER_V1 } from "../../helper";
 import { IProject } from "../../interfaces/db";
 import { PCard } from "./PCard";
 
@@ -96,7 +96,7 @@ export const Project: NextPage<ProjectPageProps> = (props) => {
 				<meta property="og:title" content={title} />
 				<meta property="og:description" content={desc} />
 				<meta property="og:image" content="/assets/preview.png" />
-				<meta property="og:url" content="https://dadangdut33.codes/project" />
+				<meta property="og:url" content={`https://dadangdut33${domain}/project`} />
 				<meta property="og:type" content="website" />
 				<meta property="og:site_name" content="Dadangdut33" />
 				<meta property="og:locale" content="en_US" />
@@ -104,10 +104,9 @@ export const Project: NextPage<ProjectPageProps> = (props) => {
 				<meta property="twitter:card" content="summary" />
 				<meta property="twitter:creator" content="@dadangdut33" />
 				<meta property="twitter:title" content={title} />
-				<meta property="twitter:url" content="https://dadangdut33.codes/" />
+				<meta property="twitter:url" content={`https://dadangdut33${domain}/`} />
 				<meta property="twitter:description" content={desc} />
 				<meta property="twitter:image" content="/assets/preview.png" />
-				<script async defer data-website-id="cfb71c71-fdeb-47e0-b985-32661e1279c5" src="https://analytics.dadangdut33.codes/umami.js"></script>
 			</Head>
 
 			<Wrapper>

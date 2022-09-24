@@ -5,7 +5,7 @@ import { IconSearch, IconChevronDown, IconChevronUp } from "@tabler/icons";
 import { Center, Title, Stack, SimpleGrid, LoadingOverlay, Text, Collapse, TextInput, ActionIcon } from "@mantine/core";
 import { keys } from "@mantine/utils";
 import { Wrapper } from "../Utils/Template/Wrapper";
-import { formatDateWithTz, handleInputQueryChange, SERVER_V1 } from "../../helper";
+import { domain, formatDateWithTz, handleInputQueryChange, SERVER_V1 } from "../../helper";
 import { IBlog } from "../../interfaces/db";
 import { BlogCard } from "./BlogCard";
 import { useRouter } from "next/router";
@@ -138,7 +138,7 @@ export const Blog: NextPage<BlogPageProps> = (props) => {
 				<meta property="og:title" content={title} />
 				<meta property="og:description" content={desc} />
 				<meta property="og:image" content="/assets/preview.png" />
-				<meta property="og:url" content="https://dadangdut33.codes/blog" />
+				<meta property="og:url" content={`https://dadangdut33${domain}/blog`} />
 				<meta property="og:type" content="website" />
 				<meta property="og:site_name" content="Dadangdut33" />
 				<meta property="og:locale" content="en_US" />
@@ -146,10 +146,9 @@ export const Blog: NextPage<BlogPageProps> = (props) => {
 				<meta property="twitter:card" content="summary" />
 				<meta property="twitter:creator" content="@dadangdut33" />
 				<meta property="twitter:title" content={title} />
-				<meta property="twitter:url" content="https://dadangdut33.codes/blog" />
+				<meta property="twitter:url" content={`https://dadangdut33${domain}/blog`} />
 				<meta property="twitter:description" content={desc} />
 				<meta property="twitter:image" content="/assets/preview.png" />
-				<script async defer data-website-id="cfb71c71-fdeb-47e0-b985-32661e1279c5" src="https://analytics.dadangdut33.codes/umami.js"></script>
 			</Head>
 
 			<Wrapper>

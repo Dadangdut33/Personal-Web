@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { IBlog } from "../../interfaces/db";
 import { Wrapper } from "../Utils/Template/Wrapper";
 import { ReactMD } from "../Utils/Viewer/Markdown/ReactMD";
-import { formatDateWithTz, SERVER_V1 } from "../../helper";
+import { domain, formatDateWithTz, SERVER_V1 } from "../../helper";
 import { NoScrollLink } from "../Utils/Looks/NoScrollLink";
 // @ts-ignore
 import ProgressBar from "react-scroll-progress-bar";
@@ -77,7 +77,7 @@ export const BlogView: NextPage<IBV> = ({ post }) => {
 				<meta property="og:title" content={pTitle} />
 				<meta property="og:description" content={post?.description} />
 				<meta property="og:image" content={post?.thumbnail} />
-				<meta property="og:url" content="https://dadangdut33.codes/[pId]" />
+				<meta property="og:url" content={`https://dadangdut33${domain}/[pId]`} />
 				<meta property="og:type" content="website" />
 				<meta property="og:site_name" content="Dadangdut33" />
 				<meta property="og:locale" content="en_US" />
@@ -86,10 +86,9 @@ export const BlogView: NextPage<IBV> = ({ post }) => {
 				<meta property="twitter:card" content="summary" />
 				<meta property="twitter:creator" content="@dadangdut33" />
 				<meta property="twitter:title" content={pTitle} />
-				<meta property="twitter:url" content="https://dadangdut33.codes/[pId]" />
+				<meta property="twitter:url" content={`https://dadangdut33${domain}/[pId]`} />
 				<meta property="twitter:description" content={post?.description} />
 				<meta property="twitter:image" content={post?.thumbnail} />
-				<script async defer data-website-id="cfb71c71-fdeb-47e0-b985-32661e1279c5" src="https://analytics.dadangdut33.codes/umami.js"></script>
 			</Head>
 
 			<Wrapper activeLinkProp="/blog">

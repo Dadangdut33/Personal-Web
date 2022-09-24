@@ -1,6 +1,7 @@
-import { createStyles, Container, Group, ActionIcon, Text } from "@mantine/core";
-import { IconCoffee, IconBrandGithub, IconBrandLinkedin, IconMail } from "@tabler/icons";
+import { createStyles, Container, Group, ActionIcon, Text, Tooltip } from "@mantine/core";
+import { IconCoffee, IconBrandGithub, IconBrandLinkedin, IconMail, IconDeviceAnalytics } from "@tabler/icons";
 import Link from "next/link";
+import { domain } from "../../../helper";
 
 const useStyles = createStyles((theme) => ({
 	inner: {
@@ -30,42 +31,62 @@ export function FooterWeb() {
 		<footer className={"footer"}>
 			<Container className={classes.inner}>
 				<Group spacing={8} className={classes.links}>
-					<span className="subtle-link">
-						<Link href={"https://www.linkedin.com/in/fauzan-farhan-antoro/"} passHref>
-							<ActionIcon size="lg" component="a" target="_blank" rel="noopener noreferrer">
-								<IconBrandLinkedin stroke={1.5} />
-							</ActionIcon>
-						</Link>
-					</span>
-					<span className="subtle-link">
-						<Link href={"https://github.com/Dadangdut33/"} passHref>
-							<ActionIcon size="lg" component="a" target="_blank" rel="noopener noreferrer">
-								<IconBrandGithub stroke={1.5} />
-							</ActionIcon>
-						</Link>
-					</span>
-					<span className="subtle-link">
-						<Link href={"mailto:contact@dadangdut33.codes"} passHref>
-							<ActionIcon size="lg" component="a">
-								<IconMail stroke={1.5} />
-							</ActionIcon>
-						</Link>
-					</span>
-					<span className="subtle-link">
-						<Link href={"https://ko-fi.com/dadangdut33"} passHref>
-							<ActionIcon size="lg" component="a" target="_blank" rel="noopener noreferrer">
-								<IconCoffee stroke={1.5} />
-							</ActionIcon>
-						</Link>
-					</span>
+					<Tooltip label="See my profile at Linkedin" position="top" color={"blue"} transition="skew-down" withArrow>
+						<span className="subtle-link">
+							<Link href={"https://www.linkedin.com/in/fauzan-farhan-antoro/"} passHref>
+								<ActionIcon size="lg" component="a" target="_blank" rel="noopener noreferrer">
+									<IconBrandLinkedin stroke={1.5} />
+								</ActionIcon>
+							</Link>
+						</span>
+					</Tooltip>
+					<Tooltip label="Follow me on Github" position="top" color={"blue"} transition="skew-down" withArrow>
+						<span className="subtle-link">
+							<Link href={"https://github.com/Dadangdut33/"} passHref>
+								<ActionIcon size="lg" component="a" target="_blank" rel="noopener noreferrer">
+									<IconBrandGithub stroke={1.5} />
+								</ActionIcon>
+							</Link>
+						</span>
+					</Tooltip>
+					<Tooltip label="Contact me via email" position="top" color={"blue"} transition="skew-down" withArrow>
+						<span className="subtle-link">
+							<Link href={`mailto:contact@dadangdut33${domain}`} passHref>
+								<ActionIcon size="lg" component="a">
+									<IconMail stroke={1.5} />
+								</ActionIcon>
+							</Link>
+						</span>
+					</Tooltip>
+					<Tooltip label="Buy me a coffee" position="top" color={"blue"} transition="skew-down" withArrow>
+						<span className="subtle-link">
+							<Link href={"https://ko-fi.com/dadangdut33"} passHref>
+								<ActionIcon size="lg" component="a" target="_blank" rel="noopener noreferrer">
+									<IconCoffee stroke={1.5} />
+								</ActionIcon>
+							</Link>
+						</span>
+					</Tooltip>
+					{/* analytics umami */}
+					<Tooltip label="See web analytics" position="top" color={"blue"} transition="skew-down" withArrow>
+						<span className="subtle-link">
+							<Link href={`https://analytics.dadangdut33${domain}/share/tc3O11fp/Dadangdut33%20Web`} passHref>
+								<ActionIcon size="lg" component="a" target="_blank" rel="noopener noreferrer">
+									<IconDeviceAnalytics stroke={1.5} />
+								</ActionIcon>
+							</Link>
+						</span>
+					</Tooltip>
 				</Group>
-				<span style={{ marginTop: "1rem" }}>
-					<Link href={"https://github.com/Dadangdut33/Personal-Web"} passHref>
-						<Text component="a" color={"#2978b5"} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }} weight={550} size={16}>
-							© 2022 Dadangdut33
-						</Text>
-					</Link>
-				</span>
+				<Tooltip label="Made with ❤️ by Dadangdut33" color={"blue"} transition="pop" withArrow>
+					<span style={{ marginTop: "1rem" }}>
+						<Link href={"https://github.com/Dadangdut33/Personal-Web"} passHref>
+							<Text component="a" color={"#2978b5"} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }} weight={550} size={16}>
+								© 2022 Dadangdut33
+							</Text>
+						</Link>
+					</span>
+				</Tooltip>
 			</Container>
 		</footer>
 	);

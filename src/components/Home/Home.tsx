@@ -4,6 +4,7 @@ import Typewriter from "typewriter-effect";
 import { Center, createStyles, Title, Text, Group, Stack, Button } from "@mantine/core";
 import { Wrapper } from "../Utils/Template/Wrapper";
 import { NoScrollLink } from "../Utils/Looks/NoScrollLink";
+import { domain } from "../../helper";
 
 const useStyles = createStyles((theme) => ({
 	contentWrap: {
@@ -44,7 +45,7 @@ export const Home: NextPage = (props) => {
 				<meta property="og:title" content={title} />
 				<meta property="og:description" content={desc} />
 				<meta property="og:image" content="/assets/preview.png" />
-				<meta property="og:url" content="https://dadangdut33.codes/" />
+				<meta property="og:url" content={`https://dadangdut33${domain}/`} />
 				<meta property="og:type" content="website" />
 				<meta property="og:site_name" content="Dadangdut33" />
 				<meta property="og:locale" content="en_US" />
@@ -52,10 +53,9 @@ export const Home: NextPage = (props) => {
 				<meta property="twitter:card" content="summary" />
 				<meta property="twitter:creator" content="@dadangdut33" />
 				<meta property="twitter:title" content={title} />
-				<meta property="twitter:url" content="https://dadangdut33.codes/" />
+				<meta property="twitter:url" content={`https://dadangdut33${domain}/`} />
 				<meta property="twitter:description" content={desc} />
 				<meta property="twitter:image" content="/assets/preview.png" />
-				<script async defer data-website-id="cfb71c71-fdeb-47e0-b985-32661e1279c5" src="https://analytics.dadangdut33.codes/umami.js"></script>
 			</Head>
 
 			<Wrapper>
