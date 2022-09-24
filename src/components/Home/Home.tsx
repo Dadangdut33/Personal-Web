@@ -55,6 +55,7 @@ export const Home: NextPage = (props) => {
 				<meta property="twitter:url" content="https://dadangdut33.codes/" />
 				<meta property="twitter:description" content={desc} />
 				<meta property="twitter:image" content="/assets/preview.png" />
+				<script async defer data-website-id="de9022cd-16b7-4cb7-917c-956d5ae0dc6e" src="https://analytics.dadangdut33.codes/umami.js"></script>
 			</Head>
 
 			<Wrapper>
