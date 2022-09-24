@@ -8,14 +8,12 @@ import { TextInput, PasswordInput, Center, Anchor, Paper, Container, Group, Butt
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { SERVER_V1 } from "../../helper/global/constants";
-import Cookies from "universal-cookie";
 
 interface loginProps {
 	query?: any;
 }
 
 export const Login: NextPage<loginProps> = (props) => {
-	const cookies = new Cookies();
 	const [alertShown, setAlertShown] = useState<boolean>(false);
 	const [submitted, setSubmitted] = useState<boolean>(false);
 	const [loading, setLoading] = useState<boolean>(false);
@@ -53,15 +51,8 @@ export const Login: NextPage<loginProps> = (props) => {
 					password,
 				}),
 			});
-			console.log(loginFetch.headers);
-			console.log(cookies.getAll());
 
 			if (loginFetch.status === 200) {
-				// set cookie
-				const setCookie = loginFetch.headers.get("Set-Cookie");
-				if (setCookie) cookies.set("connect.sid", setCookie, { path: "/" });
-				console.log(cookies.getAll());
-
 				setSubmitted(true);
 				updateNotification({
 					id: "login-notif",

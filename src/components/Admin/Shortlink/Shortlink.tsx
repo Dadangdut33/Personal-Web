@@ -12,6 +12,7 @@ import { actionPrompt, fillDataPage, fillDataAll, handleAdminTabChange, handleIn
 import { formatDateWithTz, addQueryParam, removeQueryParam, SERVER_V1 } from "../../../helper/global";
 import { Th, useTableStyles } from "../../Utils/Dashboard";
 import { TableView } from "../Reusable/TableView";
+import axios from "axios";
 
 export const Shortlink: NextPage<IDashboardProps> = (props) => {
 	const { classes } = useTableStyles();
@@ -133,6 +134,16 @@ export const Shortlink: NextPage<IDashboardProps> = (props) => {
 			console.log(test);
 			const data = await test.json();
 			console.log(data);
+
+			const axiosTest = await axios.get(SERVER_V1 + "/" + api_url, {
+				headers: {
+					"Content-Type": "application/json",
+					Cookie: "connect.sid=" + props.token,
+				},
+				withCredentials: true,
+			});
+
+			console.log(axiosTest);
 		};
 		testF();
 
