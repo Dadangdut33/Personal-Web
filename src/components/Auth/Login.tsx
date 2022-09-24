@@ -8,6 +8,7 @@ import { TextInput, PasswordInput, Center, Anchor, Paper, Container, Group, Butt
 import { useForm } from "@mantine/form";
 import { showNotification, updateNotification } from "@mantine/notifications";
 import { SERVER_LOCAL_V1, SERVER_V1 } from "../../helper/global/constants";
+import { getCookies, setCookie } from "cookies-next";
 
 interface loginProps {
 	query?: any;
@@ -40,6 +41,7 @@ export const Login: NextPage<loginProps> = (props) => {
 		const { username, password } = form.values;
 		showNotification({ id: "login-notif", title: "Loading", message: "Logging in...", loading: true, disallowClose: true, autoClose: false });
 		try {
+			setCookie("test", new Date().toString());
 			const loginFetch = await fetch(`${SERVER_V1}/auth`, {
 				method: "POST",
 				credentials: "include",
@@ -53,14 +55,12 @@ export const Login: NextPage<loginProps> = (props) => {
 			});
 
 			if (loginFetch.status === 200) {
-				const setCookie = loginFetch.headers.get("set-cookie");
-				console.log(setCookie);
-				if (setCookie) {
-					// const currentCookie = document.cookie;
-					// const newCookie = setCookie.split(";")[0];
-					// document.cookie = `${currentCookie}; ${newCookie}`;
-					document.cookie = setCookie;
-				}
+				getCookies();
+				console.log(loginFetch.headers);
+				const cookieGet = loginFetch.headers.get("set-cookie");
+				console.log(cookieGet);
+				setCookie("connect.sid", cookieGet, { path: "/", sameSite: "none", secure: true });
+				getCookies();
 
 				setSubmitted(true);
 				updateNotification({
@@ -88,6 +88,7 @@ export const Login: NextPage<loginProps> = (props) => {
 	};
 
 	useEffect(() => {
+		getCookies();
 		// check query params
 		if (props.query.loggedout === "true") setAlertShown(true);
 		// eslint-disable-next-line react-hooks/exhaustive-deps
