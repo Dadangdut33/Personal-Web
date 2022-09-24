@@ -9,10 +9,9 @@ import { IconSearch, IconEdit, IconTrash, IconLego, IconLink, IconExternalLink, 
 import { IDashboardProps } from "../../../interfaces/props/Dashboard";
 import { IShortlink, validShortlinkSort, ShortlinkSort } from "../../../interfaces/db";
 import { actionPrompt, fillDataPage, fillDataAll, handleAdminTabChange, handleInputQueryChange } from "../../../helper/admin";
-import { formatDateWithTz, addQueryParam, removeQueryParam, SERVER_V1 } from "../../../helper/global";
+import { formatDateWithTz, addQueryParam, removeQueryParam } from "../../../helper/global";
 import { Th, useTableStyles } from "../../Utils/Dashboard";
 import { TableView } from "../Reusable/TableView";
-import axios from "axios";
 
 export const Shortlink: NextPage<IDashboardProps> = (props) => {
 	const { classes } = useTableStyles();
@@ -115,7 +114,6 @@ export const Shortlink: NextPage<IDashboardProps> = (props) => {
 	};
 
 	useEffect(() => {
-		console.log(document.cookie);
 		fetchUrlParams();
 		setTz(Intl.DateTimeFormat().resolvedOptions().timeZone);
 		fillDataPage({ api_url, perPage, curPageQ: curPage, setLoadingDataPage, setCurPage, setPages, setDataPage });
