@@ -26,6 +26,7 @@ const useStyles = createStyles((theme) => ({
 
 export function FooterWeb() {
 	const { classes } = useStyles();
+	const currentYear = new Date().getFullYear();
 
 	return (
 		<footer className={"footer"}>
@@ -70,7 +71,7 @@ export function FooterWeb() {
 					{/* analytics umami */}
 					<Tooltip label="See web analytics" position="top" color={"blue"} transition="skew-down" withArrow>
 						<span className="subtle-link">
-							<Link href={`https://analytics.dadangdut33${domain}/share/${analyticsPublicId}/Dadangdut33%20Web`} passHref>
+							<Link href={`https://eu.umami.is/share/SLXdXO38GBsN0RAy/dadangdut33.vercel.app`} passHref>
 								<ActionIcon size="lg" component="a" target="_blank" rel="noopener noreferrer">
 									<IconDeviceAnalytics stroke={1.5} />
 								</ActionIcon>
@@ -82,7 +83,7 @@ export function FooterWeb() {
 					<span style={{ marginTop: "1rem" }}>
 						<Link href={"https://github.com/Dadangdut33/Personal-Web"} passHref>
 							<Text component="a" color={"#2978b5"} target="_blank" rel="noopener noreferrer" style={{ textDecoration: "none" }} weight={550} size={16}>
-								© 2022 Dadangdut33
+								© 2022 - {currentYear} Dadangdut33
 							</Text>
 						</Link>
 					</span>

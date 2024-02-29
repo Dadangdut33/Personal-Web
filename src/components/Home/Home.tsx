@@ -5,6 +5,7 @@ import { Center, createStyles, Title, Text, Group, Stack, Button } from "@mantin
 import { Wrapper } from "../Utils/Template/Wrapper";
 import { NoScrollLink } from "../Utils/Looks/NoScrollLink";
 import { domain } from "../../helper";
+import { CodeIcon } from "@radix-ui/react-icons";
 
 const useStyles = createStyles((theme) => ({
 	contentWrap: {
@@ -64,7 +65,8 @@ export const Home: NextPage = (props) => {
 						<Stack spacing={0}>
 							<Center>
 								<picture>
-									<img src="/logo512.png" alt="Logo" className="logo-main" />
+									{/* <img src="/logo512.png" alt="Logo" className="logo-main" /> */}
+									<CodeIcon style={{ width: "100px", height: "200px" }} />
 								</picture>
 							</Center>
 							<Center>
@@ -96,8 +98,8 @@ export const Home: NextPage = (props) => {
 						<Stack spacing={8} mt={"xl"}>
 							<Center>
 								<Group className={classes.contentWrap + " center-text"}>
-									I&apos;m currently pursuing my bachelor degree as an Informatics Engineering Student at UIN Jakarta. I like to learn new things and do some coding for side projects on my
-									free time.
+									I&apos;m a fresh graduate with a degree in Informatics Engineering from UIN Jakarta. 
+									I like to learn new things and code for side projects on my free time.
 								</Group>
 							</Center>
 						</Stack>

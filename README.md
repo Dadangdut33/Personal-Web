@@ -6,6 +6,8 @@
   <a href="https://github.com/Dadangdut33/Personal-Web/network/members"><img alt="GitHub forks" src="https://img.shields.io/github/forks/Dadangdut33/Personal-Web?style=social"></a>
 </p>
 
+(packages is a little outdated, so it's currently in rebuild process)
+
 Frontend of my personal web. Made using next.js. Take a look at [backend](https://github.com/Dadangdut33/Personal-Web-Backend) for server code.
 
 # Table of Contents
