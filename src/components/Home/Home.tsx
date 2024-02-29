@@ -84,7 +84,7 @@ export const Home: NextPage = (props) => {
 											<Text size={"xl"} variant="gradient" gradient={{ from: "blue", to: "cyan", deg: 30 }}>
 												<Typewriter
 													options={{
-														strings: ["Full Stack Developer", "Student", "Leaner"],
+														strings: ["Full Stack Developer", "Learner", "Fresh Graduate", "Coder", "Tech Enthusiast"],
 														autoStart: true,
 														loop: true,
 													}}
