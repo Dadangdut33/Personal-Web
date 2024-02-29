@@ -138,7 +138,7 @@ export const Blog: NextPage<BlogPageProps> = (props) => {
 				<meta property="og:title" content={title} />
 				<meta property="og:description" content={desc} />
 				<meta property="og:image" content="/assets/preview.png" />
-				<meta property="og:url" content={`https://dadangdut33${domain}/blog`} />
+				<meta property="og:url" content={`https://${domain}/blog`} />
 				<meta property="og:type" content="website" />
 				<meta property="og:site_name" content="Dadangdut33" />
 				<meta property="og:locale" content="en_US" />
@@ -146,7 +146,7 @@ export const Blog: NextPage<BlogPageProps> = (props) => {
 				<meta property="twitter:card" content="summary" />
 				<meta property="twitter:creator" content="@dadangdut33" />
 				<meta property="twitter:title" content={title} />
-				<meta property="twitter:url" content={`https://dadangdut33${domain}/blog`} />
+				<meta property="twitter:url" content={`https://${domain}/blog`} />
 				<meta property="twitter:description" content={desc} />
 				<meta property="twitter:image" content="/assets/preview.png" />
 			</Head>

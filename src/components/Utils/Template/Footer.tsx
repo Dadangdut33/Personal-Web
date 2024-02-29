@@ -1,7 +1,7 @@
 import { createStyles, Container, Group, ActionIcon, Text, Tooltip } from "@mantine/core";
 import { IconCoffee, IconBrandGithub, IconBrandLinkedin, IconMail, IconDeviceAnalytics } from "@tabler/icons";
 import Link from "next/link";
-import { analyticsPublicId, domain } from "../../../helper";
+import { analyticsPublicId, domain, umami_public_link } from "../../../helper";
 
 const useStyles = createStyles((theme) => ({
 	inner: {
@@ -52,7 +52,7 @@ export function FooterWeb() {
 					</Tooltip>
 					<Tooltip label="Contact me via email" position="top" color={"blue"} transition="skew-down" withArrow>
 						<span className="subtle-link">
-							<Link href={`mailto:contact@dadangdut33${domain}`} passHref>
+							<Link href={`mailto:dadang.contact@gmail.com`} passHref>
 								<ActionIcon size="lg" component="a">
 									<IconMail stroke={1.5} />
 								</ActionIcon>
@@ -71,7 +71,7 @@ export function FooterWeb() {
 					{/* analytics umami */}
 					<Tooltip label="See web analytics" position="top" color={"blue"} transition="skew-down" withArrow>
 						<span className="subtle-link">
-							<Link href={`https://eu.umami.is/share/SLXdXO38GBsN0RAy/dadangdut33.vercel.app`} passHref>
+							<Link href={umami_public_link} passHref>
 								<ActionIcon size="lg" component="a" target="_blank" rel="noopener noreferrer">
 									<IconDeviceAnalytics stroke={1.5} />
 								</ActionIcon>

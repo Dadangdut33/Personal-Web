@@ -11,7 +11,7 @@ import { useLocalStorage } from "@mantine/hooks";
 import { AnimatePresence } from "framer-motion";
 import { useRouter } from "next/router";
 import Head from "next/head";
-import { domain, trackingId } from "../src/helper";
+import { trackingId } from "../src/helper";
 
 export default function App(props: AppProps & { colorScheme: ColorScheme }) {
 	const { Component, pageProps } = props;
