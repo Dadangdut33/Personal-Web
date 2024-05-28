@@ -1,0 +1,13 @@
+{
+  "version": "6",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "6",
+      "when": 1716919356656,
+      "tag": "0000_wet_speedball",
+      "breakpoints": true
+    }
+  ]
+}

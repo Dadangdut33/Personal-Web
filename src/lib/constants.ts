@@ -1,26 +1,42 @@
-/**
- * Environment
- */
-export const ___prod___ = process.env.NODE_ENV === "production";
+import { PaperProps } from "@mantine/core";
 
-/**
- * Links
- */
-export const ___issue___ = "https://github.com/Dadangdut33/Personal-Web/issues";
-export const analyticsLink = "https://eu.umami.is/share/SLXdXO38GBsN0RAy/dadangdut33.vercel.app";
-
-/**
- * Sever
- */
-export const ___server___ = ___prod___ ? "https://dadangdut33.vercel.app" : "http://localhost:3000";
-export const api_v1 = ___server___ + "/api/v1";
-
-/**
- * Collection name
- */
-export const colUser = "users";
-export const colProject = "projects";
-export const colShortLink = "shortlinks";
-export const colBlog = "blogs";
-export const colBlogRevision = "blog_revisions";
-export const colNote = "notes";
+export const ID_LENGTH = 36;
+export const ERR_GENERIC = {
+  success: false,
+  message: "An error occured, try again later or contact site owner!",
+};
+export const ERR_AUTH_EXPIRED = {
+  success: 0,
+  data: { needsReAuth: true },
+  message: "Your session has expired! Please re-authenticate!",
+};
+export const ERR_TOO_MANY_REQUESTS = {
+  success: false,
+  message: "Too many requests, please try again later!",
+};
+export const ERR_UNAUTHORIZED = { success: false, message: "Unauthorized access!" };
+export const ERR_INVALID_AUTH = {
+  success: false,
+  message: "Username or password is incorrect!",
+};
+export const WEB_NAME = "Dadangdut33";
+export const PASS_REGEX = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[$&+,:;=?@#|'<>.^*()%!-])/;
+export const PASS_REQ = [
+  { re: /[0-9]/, label: "Must contain at least one number" },
+  { re: /[a-z]/, label: "Must contain at least one lowercase letter" },
+  { re: /[A-Z]/, label: "Must contain at least one uppercase letter" },
+  { re: /[$&+,:;=?@#|'<>.^*()%!-]/, label: "Must contain at least one special character" },
+];
+export const MATCH_MOBILE_MQ = "(max-width: 992px)";
+export const DASHBOARD_PAPER_PROPS: PaperProps = {
+  p: "md",
+  shadow: "md",
+  radius: "md",
+};
+export const _MB = 1024 * 1024;
+export const _GB = _MB * 1024;
+export const FILE_SIZE_LIMIT = 20 * _MB;
+export const TEMP_SESSION_AGE = 1000 * 60 * 60 * 1; // 1 hours
+export const MAX_SESSION_AGE = 1000 * 60 * 60 * 24 * 7; // 7 days
+export const XATA_STRING_LEN = 2048;
+export const MAX_SAVED_REVISIONS = 10;
