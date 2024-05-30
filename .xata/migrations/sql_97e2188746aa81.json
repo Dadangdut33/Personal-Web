@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_97e2188746aa81",
+    "operations": [
+      {
+        "sql": {
+          "up": "CREATE TABLE IF NOT EXISTS user_profile  (id uuid   primary key   default (gen_random_uuid () )  not null  , \"userId\" uuid   not null  , \"avatarId\" uuid  , name varchar (2048)  not null  , title varchar (2048) , description text  )"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_97e2188746aa81",
+  "parent": "sql_e8cd5840516685",
+  "startedAt": "2024-05-30T11:37:18.713816Z"
+}

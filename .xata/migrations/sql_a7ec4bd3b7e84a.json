@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_a7ec4bd3b7e84a",
+    "operations": [
+      {
+        "sql": {
+          "up": "CREATE TYPE role  AS ENUM ('user', 'admin', 'super_admin')"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_a7ec4bd3b7e84a",
+  "parent": "sql_0d888ccc74a122",
+  "startedAt": "2024-05-30T11:37:18.424616Z"
+}

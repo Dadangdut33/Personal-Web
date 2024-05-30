@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_59153eaf74c579",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE blog_like  ADD  CONSTRAINT \"blog_like_blogId_blog_id_fk\"  foreign key (\"blogId\") REFERENCES blog  (id)  ON DELETE cascade ON UPDATE no action"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_59153eaf74c579",
+  "parent": "sql_9fa56e1aef7d7f",
+  "startedAt": "2024-05-30T11:37:19.516816Z"
+}

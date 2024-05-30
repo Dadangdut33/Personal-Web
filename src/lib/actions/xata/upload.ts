@@ -2,7 +2,8 @@
 
 import { ERR_AUTH_EXPIRED, FILE_SIZE_LIMIT } from "@/lib/constants";
 import { db, xata } from "@/lib/db";
-import { FileCategoryType, XataFileType } from "@/lib/db/schema/file";
+import { FileCategoryType } from "@/lib/db/schema/enum";
+import { XataFileType } from "@/lib/db/schema/xata/file";
 import { stringSchema } from "@/lib/db/zod/utils";
 import { logger } from "@/lib/logger";
 import { getUserAuth, isAdmin } from "@/lib/lucia/utils";
@@ -83,16 +84,15 @@ export async function uploadFile_xata(form: FormData, category: FileCategoryType
     return {
       success: 1,
       file: {
-        id: xata_record.id,
+        id: xata_record.xata_id,
         name: xata_record.file!.name ?? fileName,
         mediaType: xata_record.file!.mediaType ?? extension,
         enablePublicUrl: xata_record.file!.enablePublicUrl,
         size: xata_record.file!.size ?? file.size,
-        version: xata_record.xata!.version,
         url: xata_record.file!.url,
         attributes: xata_record.file!.attributes ?? {},
       },
-      id: xata_record.id,
+      id: xata_record.xata_id,
     };
   } catch (error) {
     logger.error(error, "Error uploading file");

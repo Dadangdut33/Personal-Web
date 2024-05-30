@@ -1,10 +1,10 @@
-import { RoleType } from "./db/schema/user";
+import { RoleType } from "./db/schema/enum";
 
 export interface DatabaseUserAttributes {
   id: string;
   username: string;
   twoFactorSecret: string | null;
-  role: RoleType;
+  role: RoleType[];
 }
 export interface AuthSessionUser extends Omit<DatabaseUserAttributes, "twoFactorSecret"> {
   setupTwoFactor: boolean;

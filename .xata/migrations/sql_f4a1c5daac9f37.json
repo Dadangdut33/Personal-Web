@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_f4a1c5daac9f37",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE user_profile  ADD  CONSTRAINT \"user_profile_avatarId_file_id_fk\"  foreign key (\"avatarId\") REFERENCES file  (id)  ON DELETE set null ON UPDATE no action"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_f4a1c5daac9f37",
+  "parent": "sql_4e860da6b8a9e4",
+  "startedAt": "2024-05-30T11:37:19.61354Z"
+}

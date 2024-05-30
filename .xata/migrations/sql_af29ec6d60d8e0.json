@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_af29ec6d60d8e0",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE blog_revision  ADD  CONSTRAINT \"blog_revision_thumbnailId_file_id_fk\"  foreign key (\"thumbnailId\") REFERENCES file  (id)  ON DELETE set null ON UPDATE no action"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_af29ec6d60d8e0",
+  "parent": "sql_d91de61461c5cb",
+  "startedAt": "2024-05-30T11:37:19.338956Z"
+}

@@ -1,14 +1,26 @@
-CREATE TABLE IF NOT EXISTS "session" (
-	"id" text PRIMARY KEY NOT NULL,
-	"userId" uuid NOT NULL,
-	"expiresAt" timestamp with time zone NOT NULL
-);
+DO $$ BEGIN
+ CREATE TYPE "public"."type" AS ENUM('blog', 'portofolio');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
 --> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "session_temp" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"sessionId" text NOT NULL,
-	"expiresAt" timestamp with time zone NOT NULL
-);
+DO $$ BEGIN
+ CREATE TYPE "public"."file_category" AS ENUM('project_thumbnail', 'blog_thumbnail', 'blog_content', 'store', 'uncategorized');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "public"."role" AS ENUM('user', 'admin', 'super_admin');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ CREATE TYPE "public"."visibility" AS ENUM('draft', 'private', 'published');
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "blog" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
@@ -20,7 +32,7 @@ CREATE TABLE IF NOT EXISTS "blog" (
 	"thumbnailId" uuid,
 	"authorId" uuid NOT NULL,
 	"lastEditorId" uuid,
-	"visibility" "visibility" DEFAULT 'DRAFT' NOT NULL,
+	"visibility" "visibility" DEFAULT 'draft' NOT NULL,
 	"pinned" boolean DEFAULT false NOT NULL
 );
 --> statement-breakpoint
@@ -34,15 +46,10 @@ CREATE TABLE IF NOT EXISTS "blog_revision" (
 	"thumbnailId" uuid,
 	"authorId" uuid NOT NULL,
 	"lastEditorId" uuid,
-	"visibility" "visibility" DEFAULT 'DRAFT' NOT NULL,
+	"visibility" "visibility" DEFAULT 'draft' NOT NULL,
 	"pinned" boolean DEFAULT false NOT NULL,
 	"revision" integer NOT NULL,
 	"blogId" uuid
-);
---> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "blog_like" (
-	"blogId" uuid PRIMARY KEY NOT NULL,
-	"likes" bigint DEFAULT 0 NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "category" (
@@ -56,8 +63,13 @@ CREATE TABLE IF NOT EXISTS "file" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"originalHash" varchar(2048) NOT NULL,
 	"file" json NOT NULL,
-	"category" "category" NOT NULL,
+	"category" "file_category" DEFAULT 'store',
 	CONSTRAINT "file_originalHash_unique" UNIQUE("originalHash")
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "blog_like" (
+	"blogId" uuid PRIMARY KEY NOT NULL,
+	"likes" bigint DEFAULT 0 NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "user_profile" (
@@ -78,22 +90,7 @@ CREATE TABLE IF NOT EXISTS "project" (
 	"position" integer DEFAULT 0 NOT NULL,
 	"categoryId" uuid,
 	"thumbnailId" uuid,
-	"visibility" "visibility" DEFAULT 'DRAFT' NOT NULL
-);
---> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "user" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"username" varchar(2048) NOT NULL,
-	"hashedPassword" varchar(2048) NOT NULL,
-	"twoFactorSecret" varchar(2048),
-	"role" "role" DEFAULT 'USER' NOT NULL,
-	CONSTRAINT "user_username_unique" UNIQUE("username")
-);
---> statement-breakpoint
-CREATE TABLE IF NOT EXISTS "user_two_factor_backup_codes" (
-	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
-	"userId" uuid NOT NULL,
-	"codes" varchar(2048) NOT NULL
+	"visibility" "visibility" DEFAULT 'draft' NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE IF NOT EXISTS "shortlink" (
@@ -103,17 +100,32 @@ CREATE TABLE IF NOT EXISTS "shortlink" (
 	CONSTRAINT "shortlink_shorten_unique" UNIQUE("shorten")
 );
 --> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
+CREATE TABLE IF NOT EXISTS "user" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"username" varchar(2048) NOT NULL,
+	"hashedPassword" varchar(2048) NOT NULL,
+	"twoFactorSecret" varchar(2048),
+	"role" role[] DEFAULT ARRAY['user']::role[] NOT NULL,
+	CONSTRAINT "user_username_unique" UNIQUE("username")
+);
 --> statement-breakpoint
-DO $$ BEGIN
- ALTER TABLE "session_temp" ADD CONSTRAINT "session_temp_sessionId_session_id_fk" FOREIGN KEY ("sessionId") REFERENCES "public"."session"("id") ON DELETE no action ON UPDATE no action;
-EXCEPTION
- WHEN duplicate_object THEN null;
-END $$;
+CREATE TABLE IF NOT EXISTS "user_two_factor_backup_codes" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"userId" uuid NOT NULL,
+	"codes" varchar(2048) NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "session" (
+	"id" text PRIMARY KEY NOT NULL,
+	"userId" uuid NOT NULL,
+	"expiresAt" timestamp with time zone NOT NULL
+);
+--> statement-breakpoint
+CREATE TABLE IF NOT EXISTS "session_temp" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"sessionId" text NOT NULL,
+	"expiresAt" timestamp with time zone NOT NULL
+);
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "blog" ADD CONSTRAINT "blog_categoryId_category_id_fk" FOREIGN KEY ("categoryId") REFERENCES "public"."category"("id") ON DELETE set null ON UPDATE no action;
@@ -201,6 +213,18 @@ END $$;
 --> statement-breakpoint
 DO $$ BEGIN
  ALTER TABLE "user_two_factor_backup_codes" ADD CONSTRAINT "user_two_factor_backup_codes_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE cascade ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "session" ADD CONSTRAINT "session_userId_user_id_fk" FOREIGN KEY ("userId") REFERENCES "public"."user"("id") ON DELETE no action ON UPDATE no action;
+EXCEPTION
+ WHEN duplicate_object THEN null;
+END $$;
+--> statement-breakpoint
+DO $$ BEGIN
+ ALTER TABLE "session_temp" ADD CONSTRAINT "session_temp_sessionId_session_id_fk" FOREIGN KEY ("sessionId") REFERENCES "public"."session"("id") ON DELETE cascade ON UPDATE no action;
 EXCEPTION
  WHEN duplicate_object THEN null;
 END $$;

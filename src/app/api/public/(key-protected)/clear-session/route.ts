@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { Session, SessionTemp } from "@/lib/db/schema";
+import { Session, SessionTemp } from "@/lib/db/schema/drizzle";
 import { env } from "@/lib/env.mjs";
 import { logger } from "@/lib/logger";
 import { lucia } from "@/lib/lucia/auth";

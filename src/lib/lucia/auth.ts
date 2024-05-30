@@ -1,6 +1,6 @@
 import { db } from "@/lib/db/index";
-import { Session } from "@/lib/db/schema/auth";
-import { M_User } from "@/lib/db/schema/user";
+import { Session } from "@/lib/db/schema/drizzle/auth";
+import { M_User } from "@/lib/db/schema/drizzle/user";
 import { isProd } from "@/lib/env.mjs";
 import { DatabaseUserAttributes } from "@/lib/types";
 import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";

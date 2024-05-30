@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_8860cc15004cc6",
+    "operations": [
+      {
+        "sql": {
+          "up": "CREATE TABLE IF NOT EXISTS \"user\"  (id uuid   primary key   default (gen_random_uuid () )  not null  , username varchar (2048)  not null  , \"hashedPassword\" varchar (2048)  not null  , \"twoFactorSecret\" varchar (2048) , role role []  default ((ARRAY[('user')])::role [])  not null  , CONSTRAINT user_username_unique  unique (username)  )"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_8860cc15004cc6",
+  "parent": "sql_56b04d68eecf18",
+  "startedAt": "2024-05-30T11:37:18.873204Z"
+}

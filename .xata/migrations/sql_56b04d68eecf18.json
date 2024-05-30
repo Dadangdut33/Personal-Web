@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_56b04d68eecf18",
+    "operations": [
+      {
+        "sql": {
+          "up": "CREATE TABLE IF NOT EXISTS shortlink  (id uuid   primary key   default (gen_random_uuid () )  not null  , url text   not null  , shorten text   not null  , CONSTRAINT shortlink_shorten_unique  unique (shorten)  )"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_56b04d68eecf18",
+  "parent": "sql_7fec6f339e2765",
+  "startedAt": "2024-05-30T11:37:18.810806Z"
+}

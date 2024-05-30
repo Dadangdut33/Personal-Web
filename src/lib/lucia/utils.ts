@@ -6,8 +6,8 @@ import { notFound, redirect } from "next/navigation";
 import { validateSignedIn } from "./auth";
 
 export const allowedAdminRoles = ["SUPER_ADMIN", "ADMIN"];
-export const roleIsSuperAdmin = (role: string) => role === "SUPER_ADMIN";
-export const roleIsAdmin = (role: string) => allowedAdminRoles.includes(role);
+export const roleIsSuperAdmin = (role: string[]) => role.includes("SUPER_ADMIN");
+export const roleIsAdmin = (role: string[]) => role.some((r) => allowedAdminRoles.includes(r));
 
 // mendapatkan informasi user yang sedang login
 export const getUserAuth = async (): Promise<AuthSession> => {

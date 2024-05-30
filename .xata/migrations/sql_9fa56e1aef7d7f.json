@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_9fa56e1aef7d7f",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE blog_revision  ADD  CONSTRAINT \"blog_revision_blogId_blog_id_fk\"  foreign key (\"blogId\") REFERENCES blog  (id)  ON DELETE cascade ON UPDATE no action"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_9fa56e1aef7d7f",
+  "parent": "sql_7c44b7c6fde6b5",
+  "startedAt": "2024-05-30T11:37:19.462774Z"
+}

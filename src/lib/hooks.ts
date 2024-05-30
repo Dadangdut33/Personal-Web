@@ -21,7 +21,7 @@ import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react"
 import { fetchProfileData } from "./actions/user";
 import { ProfileComplete } from "./db/types";
 import { ApiReturn } from "./types";
-import { mapFormErrorsToMessage } from "./utils";
+import { formErrorToString, mapFormErrorsToMessage } from "./utils";
 
 export function useCSRFToken() {
   const [csrfToken, setCsrfToken] = useState("");
@@ -91,6 +91,7 @@ export const useBaseFormMutation = <T extends ApiReturn>({
         const { hasErrors, errors } = form.validate();
         if (hasErrors) {
           NotifyError("Form Tidak Valid", `${mapFormErrorsToMessage(errors)}`);
+          if (setReturnState) setReturnState({ success: false, message: `${formErrorToString(errors)}` });
           return;
         }
 

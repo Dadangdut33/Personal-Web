@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_c2fc66181b9bf0",
+    "operations": [
+      {
+        "sql": {
+          "up": "ALTER TABLE project  ADD  CONSTRAINT \"project_categoryId_category_id_fk\"  foreign key (\"categoryId\") REFERENCES category  (id)  ON DELETE no action ON UPDATE no action"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_c2fc66181b9bf0",
+  "parent": "sql_f4a1c5daac9f37",
+  "startedAt": "2024-05-30T11:37:19.656284Z"
+}

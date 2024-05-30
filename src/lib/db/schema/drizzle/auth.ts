@@ -21,7 +21,7 @@ export const SessionTemp = pgTable("session_temp", {
   id: uuid("id").defaultRandom().primaryKey(),
   sessionId: text("sessionId")
     .notNull()
-    .references(() => Session.id),
+    .references(() => Session.id, { onDelete: "cascade" }),
   expiresAt: timestamp("expiresAt", {
     withTimezone: true,
     mode: "date",

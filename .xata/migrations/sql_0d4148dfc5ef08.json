@@ -1,0 +1,17 @@
+{
+  "done": true,
+  "migration": {
+    "name": "sql_0d4148dfc5ef08",
+    "operations": [
+      {
+        "sql": {
+          "up": "CREATE TABLE IF NOT EXISTS blog_revision  (id uuid   primary key   default (gen_random_uuid () )  not null  , title varchar (2048)  not null  , description text   not null  , content json   not null  , tags json   default (('[]')::json )  not null  , \"categoryId\" uuid  , \"thumbnailId\" uuid  , \"authorId\" uuid   not null  , \"lastEditorId\" uuid  , visibility \"visibility\"   default ('draft')  not null  , pinned boolean   default (false)  not null  , revision integer   not null  , \"blogId\" uuid  )"
+        }
+      }
+    ]
+  },
+  "migrationType": "inferred",
+  "name": "sql_0d4148dfc5ef08",
+  "parent": "sql_1e90a08a0e701b",
+  "startedAt": "2024-05-30T11:37:18.528164Z"
+}

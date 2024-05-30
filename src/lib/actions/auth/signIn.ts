@@ -3,8 +3,8 @@
 import { ERR_GENERIC, ERR_INVALID_AUTH, ERR_TOO_MANY_REQUESTS, TEMP_SESSION_AGE } from "@/lib/constants";
 import { setRedirectMsgCookie } from "@/lib/cookies";
 import { db } from "@/lib/db/index";
-import { SessionTemp } from "@/lib/db/schema";
-import { M_User, M_UserTwoFactorBackupCodes } from "@/lib/db/schema/user";
+import { SessionTemp } from "@/lib/db/schema/drizzle";
+import { M_User, M_UserTwoFactorBackupCodes } from "@/lib/db/schema/drizzle/user";
 import { logger } from "@/lib/logger";
 import { lucia } from "@/lib/lucia/auth";
 import { validateAuthFormData } from "@/lib/lucia/form";

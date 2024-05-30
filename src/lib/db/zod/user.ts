@@ -1,21 +1,23 @@
-import { RoleOption } from "@/lib/db/schema/user";
+import { RoleOption } from "@/lib/db/schema/enum";
 import { z } from "zod";
 
 import { passValidation, stringSchema } from "./utils";
 
-export const createUserSchema = z.object({
+const baseUserZod = {
   username: stringSchema,
-  password: passValidation,
-  role: z.enum(RoleOption),
+  role: z.enum(RoleOption).array(),
   name: stringSchema,
   description: stringSchema.optional(),
+  title: stringSchema.optional(),
+};
+
+export const createUserSchema = z.object({
+  ...baseUserZod,
+  password: passValidation,
 });
 
 export const updateUserSchema = z.object({
-  username: stringSchema.length(10),
-  role: z.enum(RoleOption),
-  name: stringSchema,
-  description: stringSchema.optional(),
+  ...baseUserZod,
 });
 
 export const updatePasswordSchema = z.object({

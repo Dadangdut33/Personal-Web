@@ -2,14 +2,15 @@
 
 import { ERR_AUTH_EXPIRED, ERR_TOO_MANY_REQUESTS, ERR_UNAUTHORIZED } from "@/lib/constants";
 import { db } from "@/lib/db/index";
-import { M_File } from "@/lib/db/schema";
-import { M_Profile, M_User } from "@/lib/db/schema/user";
+import { M_Profile, M_User } from "@/lib/db/schema/drizzle/user";
+import { M_File } from "@/lib/db/schema/xata/file";
 import { ProfileComplete, UserComplete } from "@/lib/db/types";
+import { BASE_XATA_RETURN } from "@/lib/db/utils";
 import { createUserSchema, updatePasswordSchema, updateUserSchema } from "@/lib/db/zod/user";
 import { passValidation, stringSchema } from "@/lib/db/zod/utils";
 import { logger } from "@/lib/logger";
 import { lucia } from "@/lib/lucia/auth";
-import { isAdmin, isLoggedIn, roleIsAdmin } from "@/lib/lucia/utils";
+import { isAdmin, isLoggedIn, roleIsAdmin, roleIsSuperAdmin } from "@/lib/lucia/utils";
 import rateLimit from "@/lib/rateLimit";
 import { ApiReturn, NeedsReAuth } from "@/lib/types";
 import { getTimeMs } from "@/lib/utils";
@@ -28,18 +29,25 @@ const limiter = rateLimit({
   interval: getTimeMs(15, "minute"),
 });
 
-export const fetchProfileData = cache(async (_csrf: string, userId: string): Promise<ProfileComplete | null> => {
+export const fetchProfileData = cache(async (_csrf: string, userId: string): Promise<ApiReturn<ProfileComplete>> => {
   try {
     const [result] = (await db
-      .select({ ...profile, avatar })
+      .select({ ...BASE_XATA_RETURN, ...profile, avatar })
       .from(M_Profile)
       .where(eq(M_Profile.userId, userId))
       .leftJoin(M_File, eq(M_File.id, M_Profile.avatarId))) as ProfileComplete[];
 
-    return result || null;
+    return {
+      success: true,
+      data: result,
+      message: "Successfully fetched profile data",
+    };
   } catch (error) {
     logger.error(error, "Error fetching profile data");
-    return null;
+    return {
+      success: false,
+      message: `An error occured while fetching profile data ${error}`,
+    };
   }
 });
 
@@ -47,7 +55,7 @@ export const getAllUsers = cache(async (): Promise<ApiReturn<UserComplete[]>> =>
   await isAdmin(); // make sure user is admin
   try {
     const result = (await db
-      .select({ ...rest, profile })
+      .select({ ...BASE_XATA_RETURN, ...rest, profile })
       .from(M_User)
       .leftJoin(M_Profile, eq(M_Profile.userId, M_User.id))
       .leftJoin(M_File, eq(M_File.id, M_Profile.avatarId))) as UserComplete[];
@@ -67,7 +75,7 @@ export const getAllUsers = cache(async (): Promise<ApiReturn<UserComplete[]>> =>
 });
 
 export const createUser = async (form: FormData): Promise<ApiReturn<NeedsReAuth>> => {
-  const { session } = await isAdmin(false);
+  const { session, user } = await isAdmin(false);
   if (!session) return ERR_AUTH_EXPIRED;
 
   try {
@@ -77,11 +85,15 @@ export const createUser = async (form: FormData): Promise<ApiReturn<NeedsReAuth>
       password: password,
       role: form.get("role"),
       name: form.get("name"),
-      position: form.get("position"),
+      description: form.get("description"),
+      title: form.get("title"),
     });
     const hashedPassword = await new Argon2id().hash(password);
 
-    // buat tabel user
+    // make sure that only super_admin can create super_admin
+    if (!roleIsSuperAdmin(user!.role) && data.role.includes("super_admin")) return ERR_UNAUTHORIZED;
+
+    // create user
     const [createdUser] = await db
       .insert(M_User)
       .values({
@@ -91,10 +103,11 @@ export const createUser = async (form: FormData): Promise<ApiReturn<NeedsReAuth>
       })
       .returning({ insertedId: M_User.id });
 
-    // buat tabel profile
     await db.insert(M_Profile).values({
-      name: data.name,
       userId: createdUser.insertedId,
+      name: data.name,
+      description: data.description,
+      title: data.title,
     });
 
     revalidatePath("/dashboard/user");
@@ -116,6 +129,7 @@ export const updateUser = async (form: FormData): Promise<ApiReturn<NeedsReAuth>
       role: form.get("role"),
       name: form.get("name"),
       description: form.get("description"),
+      title: form.get("title"),
     });
 
     await db
@@ -131,6 +145,7 @@ export const updateUser = async (form: FormData): Promise<ApiReturn<NeedsReAuth>
       .set({
         name: data.name,
         description: data.description,
+        title: data.title,
       })
       .where(eq(M_Profile.userId, id));
 

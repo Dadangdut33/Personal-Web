@@ -1,13 +1,11 @@
 import { XATA_STRING_LEN } from "@/lib/constants";
 import { PartialBlock } from "@blocknote/core";
-import { bigint, boolean, integer, json, pgEnum, pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
+import { bigint, boolean, integer, json, pgTable, text, uuid, varchar } from "drizzle-orm/pg-core";
 
+import { visibilityEnum } from "../enum";
+import { M_File } from "../xata/file";
 import { M_Category } from "./category";
-import { M_File } from "./file";
 import { M_User } from "./user";
-
-export const VisibilityOption = ["DRAFT", "PRIVATE", "PUBLISHED"] as const;
-export type VisibilityType = (typeof VisibilityOption)[number];
 
 const schema = {
   id: uuid("id").defaultRandom().primaryKey(),
@@ -21,7 +19,7 @@ const schema = {
     .notNull()
     .references(() => M_User.id, { onDelete: "set null" }),
   lastEditorId: uuid("lastEditorId").references(() => M_User.id, { onDelete: "set null" }),
-  visibility: pgEnum("visibility", VisibilityOption)("visibility").notNull().default("DRAFT"),
+  visibility: visibilityEnum("visibility").default("draft").notNull(),
   pinned: boolean("pinned").notNull().default(false),
 };
 

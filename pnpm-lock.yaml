@@ -62,15 +62,18 @@ importers:
       '@tanstack/react-query':
         specifier: ^5.37.1
         version: 5.37.1(react@18.2.0)
+      '@types/pg':
+        specifier: ^8.11.6
+        version: 8.11.6
       '@types/validator':
         specifier: ^13.11.9
         version: 13.11.9
       '@xata.io/client':
-        specifier: 0.29.4
-        version: 0.29.4(typescript@5.2.2)
+        specifier: 0.0.0-next.v0b9131efdfa1340c28d4ce9bd73d6c4854e7c140
+        version: 0.0.0-next.v0b9131efdfa1340c28d4ce9bd73d6c4854e7c140(typescript@5.2.2)
       '@xata.io/drizzle':
-        specifier: ^0.0.21
-        version: 0.0.21(drizzle-orm@0.30.10(@types/react@18.2.36)(@xata.io/client@0.29.4(typescript@5.2.2))(pg@8.11.5)(react@18.2.0))(typescript@5.2.2)
+        specifier: 0.0.0-next.v0b9131efdfa1340c28d4ce9bd73d6c4854e7c140
+        version: 0.0.0-next.v0b9131efdfa1340c28d4ce9bd73d6c4854e7c140(drizzle-orm@0.30.10(@types/pg@8.11.6)(@types/react@18.2.36)(@xata.io/client@0.0.0-next.v0b9131efdfa1340c28d4ce9bd73d6c4854e7c140(typescript@5.2.2))(pg@8.11.5)(react@18.2.0))(typescript@5.2.2)
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
@@ -82,7 +85,7 @@ importers:
         version: 16.4.5
       drizzle-orm:
         specifier: ^0.30.10
-        version: 0.30.10(@types/react@18.2.36)(@xata.io/client@0.29.4(typescript@5.2.2))(pg@8.11.5)(react@18.2.0)
+        version: 0.30.10(@types/pg@8.11.6)(@types/react@18.2.36)(@xata.io/client@0.0.0-next.v0b9131efdfa1340c28d4ce9bd73d6c4854e7c140(typescript@5.2.2))(pg@8.11.5)(react@18.2.0)
       lodash:
         specifier: ^4.17.21
         version: 4.17.21
@@ -107,6 +110,9 @@ importers:
       oslo:
         specifier: ^1.2.0
         version: 1.2.0
+      pg:
+        specifier: ^8.11.5
+        version: 8.11.5
       pino:
         specifier: ^9.1.0
         version: 9.1.0
@@ -1367,6 +1373,9 @@ packages:
   '@types/parse5@6.0.3':
     resolution: {integrity: sha512-SuT16Q1K51EAVPz1K29DJ/sXjhSQ0zjvsypYJ6tlwVsRV9jwW5Adq2ch8Dq8kDBCkYnELS7N7VNCSB5nC56t/g==}
 
+  '@types/pg@8.11.6':
+    resolution: {integrity: sha512-/2WmmBXHLsfRqzfHW7BNZ8SbYzE8OSk7i3WjFYvfgRHj7S1xj+16Je5fUKv3lVdVzk/zn9TXOqf+avFCFIE0yQ==}
+
   '@types/prop-types@15.7.11':
     resolution: {integrity: sha512-ga8y9v9uyeiLdpKddhxYQkxNDrfvuPrlFb0N1qnZZByvcElJaXthF1UhvCh9TLWJBEHeNtdnbysW7Y6Uq8CVng==}
 
@@ -1428,13 +1437,13 @@ packages:
   '@ungap/structured-clone@1.2.0':
     resolution: {integrity: sha512-zuVdFrMJiuCDQUMCzQaD6KL28MjnqqN8XnAqiEq9PNm/hCPTSGfrXCOfwj1ow4LFb/tNymJPwsNbVePc1xFqrQ==}
 
-  '@xata.io/client@0.29.4':
-    resolution: {integrity: sha512-dRff4E/wINr0SYIlOHwApo0h8jzpAHVf2RcbGMkK9Xrddbe90KmCEx/gue9hLhBOoCCp6qUht2h9BsuVPruymw==}
+  '@xata.io/client@0.0.0-next.v0b9131efdfa1340c28d4ce9bd73d6c4854e7c140':
+    resolution: {integrity: sha512-hRtO1hPRW/OLpGuW8rp4XSe/p9IBNbpRjIA+d5YOhFA7usE4T0aiGhZNTKKAk9CJ7sLAfmxkpO1LHinJl5G2NA==}
     peerDependencies:
       typescript: '>=4.5'
 
-  '@xata.io/drizzle@0.0.21':
-    resolution: {integrity: sha512-wRjUbT9u4oMmFAuykBphQUWVAa4ReiMZYeUEivLBMdRN/6zg5ZjX/eH6eddQFBXW+wIUKErEOxZi3QpjmzVg0w==}
+  '@xata.io/drizzle@0.0.0-next.v0b9131efdfa1340c28d4ce9bd73d6c4854e7c140':
+    resolution: {integrity: sha512-y8TxbeUdmdboBX/nWftqzKm4Y66KEkwLw1nnSXidz+QLrqsxG8ShR5oTU8i8G/X4tg7Lk0wJcADGWkp9JxyYPA==}
     peerDependencies:
       drizzle-orm: '*'
 
@@ -2295,6 +2304,7 @@ packages:
   glob@8.1.0:
     resolution: {integrity: sha512-r8hpEjiQEYlF2QU0df3dS+nxxSIreXQS1qRhMJM0Q5NDdR386C7jb7Hwwod8Fgiuex+k0GFjgft18yvxm5XoCQ==}
     engines: {node: '>=12'}
+    deprecated: Glob versions prior to v9 are no longer supported
 
   globals@11.12.0:
     resolution: {integrity: sha512-WOBp/EEGUiIsJSp7wcv/y6MO+lV9UoncWqxuFfm8eBwzWNgyfBd6Gz+IeKQ9jCmyhoH99g15M3T+QaVHFjizVA==}
@@ -3038,6 +3048,9 @@ packages:
     resolution: {integrity: sha512-aU6xnDFYT3x17e/f0IiiwlGPTy2jzMySGfUB4fq6z7CV8l85CWHDk5ErhyhpfDHhrOMwGFhSQkhMGHaIotA6Ng==}
     engines: {node: '>= 0.4'}
 
+  obuf@1.1.2:
+    resolution: {integrity: sha512-PX1wu0AmAdPqOL1mWhqmlOd8kOIZQwGZw6rh7uby9fTc5lhaOWFLX3I6R1hrF9k3zUY40e6igsLGkDXK92LJNg==}
+
   on-exit-leak-free@2.1.2:
     resolution: {integrity: sha512-0eJJY6hXLGf1udHwfNftBqH+g73EU4B504nZeKpz1sYRKafAghwxEJunB2O7rDZkL4PGfsMVnTXZ2EjibbqcsA==}
     engines: {node: '>=14.0.0'}
@@ -3106,6 +3119,10 @@ packages:
     resolution: {integrity: sha512-WCtabS6t3c8SkpDBUlb1kjOs7l66xsGdKpIPZsg4wR+B3+u9UAum2odSsF9tnvxg80h4ZxLWMy4pRjOsFIqQpw==}
     engines: {node: '>=4.0.0'}
 
+  pg-numeric@1.0.2:
+    resolution: {integrity: sha512-BM/Thnrw5jm2kKLE5uJkXqqExRUY/toLHda65XgFTBTFYZyopbKjBe29Ii3RbkvlsMoFwD+tHeGaCjjv0gHlyw==}
+    engines: {node: '>=4'}
+
   pg-pool@3.6.2:
     resolution: {integrity: sha512-Htjbg8BlwXqSBQ9V8Vjtc+vzf/6fVUuak/3/XXKA9oxZprwW3IMDQTGHP+KDmVL7rtd+R1QjbnCFPuTHm3G4hg==}
     peerDependencies:
@@ -3117,6 +3134,10 @@ packages:
   pg-types@2.2.0:
     resolution: {integrity: sha512-qTAAlrEsl8s4OiEQY69wDvcMIdQN6wdz5ojQiOy6YRMuynxenON0O5oCpJI6lshc6scgAY8qvJ2On/p+CXY0GA==}
     engines: {node: '>=4'}
+
+  pg-types@4.0.2:
+    resolution: {integrity: sha512-cRL3JpS3lKMGsKaWndugWQoLOCoP+Cic8oseVcbr0qhPzYD5DWXK+RZ9LY9wxRf7RQia4SCwQlXk0q6FCPrVng==}
+    engines: {node: '>=10'}
 
   pg@8.11.5:
     resolution: {integrity: sha512-jqgNHSKL5cbDjFlHyYsCXmQDrfIX/3RsNwYqpd4N0Kt8niLuNoRNH+aazv6cOd43gPh9Y4DjQCtb+X0MH0Hvnw==}
@@ -3244,17 +3265,36 @@ packages:
     resolution: {integrity: sha512-VpZrUqU5A69eQyW2c5CA1jtLecCsN2U/bD6VilrFDWq5+5UIEVO7nazS3TEcHf1zuPYO/sqGvUvW62g86RXZuA==}
     engines: {node: '>=4'}
 
+  postgres-array@3.0.2:
+    resolution: {integrity: sha512-6faShkdFugNQCLwucjPcY5ARoW1SlbnrZjmGl0IrrqewpvxvhSLHimCVzqeuULCbG0fQv7Dtk1yDbG3xv7Veog==}
+    engines: {node: '>=12'}
+
   postgres-bytea@1.0.0:
     resolution: {integrity: sha512-xy3pmLuQqRBZBXDULy7KbaitYqLcmxigw14Q5sj8QBVLqEwXfeybIKVWiqAXTlcvdvb0+xkOtDbfQMOf4lST1w==}
     engines: {node: '>=0.10.0'}
+
+  postgres-bytea@3.0.0:
+    resolution: {integrity: sha512-CNd4jim9RFPkObHSjVHlVrxoVQXz7quwNFpz7RY1okNNme49+sVyiTvTRobiLV548Hx/hb1BG+iE7h9493WzFw==}
+    engines: {node: '>= 6'}
 
   postgres-date@1.0.7:
     resolution: {integrity: sha512-suDmjLVQg78nMK2UZ454hAG+OAW+HQPZ6n++TNDUX+L0+uUlLywnoxJKDou51Zm+zTCjrCl0Nq6J9C5hP9vK/Q==}
     engines: {node: '>=0.10.0'}
 
+  postgres-date@2.1.0:
+    resolution: {integrity: sha512-K7Juri8gtgXVcDfZttFKVmhglp7epKb1K4pgrkLxehjqkrgPhfG6OO8LHLkfaqkbpjNRnra018XwAr1yQFWGcA==}
+    engines: {node: '>=12'}
+
   postgres-interval@1.2.0:
     resolution: {integrity: sha512-9ZhXKM/rw350N1ovuWHbGxnGh/SNJ4cnxHiM0rxE4VN41wsg8P8zWn9hv/buK00RP4WvlOyr/RBDiptyxVbkZQ==}
     engines: {node: '>=0.10.0'}
+
+  postgres-interval@3.0.0:
+    resolution: {integrity: sha512-BSNDnbyZCXSxgA+1f5UU2GmwhoI0aU5yMxRGO8CdFEcY2BQF9xm/7MqKnYoM1nJDk8nONNWDk9WeSmePFhQdlw==}
+    engines: {node: '>=12'}
+
+  postgres-range@1.1.4:
+    resolution: {integrity: sha512-i/hbxIE9803Alj/6ytL7UHQxRvZkI9O4Sy+J3HGc4F4oo/2eQAjTSNJ0bfxyse3bH0nuVesCk+3IRLaMtG3H6w==}
 
   prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
@@ -5084,6 +5124,12 @@ snapshots:
 
   '@types/parse5@6.0.3': {}
 
+  '@types/pg@8.11.6':
+    dependencies:
+      '@types/node': 20.8.10
+      pg-protocol: 1.6.1
+      pg-types: 4.0.2
+
   '@types/prop-types@15.7.11': {}
 
   '@types/react-dom@18.2.14':
@@ -5150,14 +5196,14 @@ snapshots:
 
   '@ungap/structured-clone@1.2.0': {}
 
-  '@xata.io/client@0.29.4(typescript@5.2.2)':
+  '@xata.io/client@0.0.0-next.v0b9131efdfa1340c28d4ce9bd73d6c4854e7c140(typescript@5.2.2)':
     dependencies:
       typescript: 5.2.2
 
-  '@xata.io/drizzle@0.0.21(drizzle-orm@0.30.10(@types/react@18.2.36)(@xata.io/client@0.29.4(typescript@5.2.2))(pg@8.11.5)(react@18.2.0))(typescript@5.2.2)':
+  '@xata.io/drizzle@0.0.0-next.v0b9131efdfa1340c28d4ce9bd73d6c4854e7c140(drizzle-orm@0.30.10(@types/pg@8.11.6)(@types/react@18.2.36)(@xata.io/client@0.0.0-next.v0b9131efdfa1340c28d4ce9bd73d6c4854e7c140(typescript@5.2.2))(pg@8.11.5)(react@18.2.0))(typescript@5.2.2)':
     dependencies:
-      '@xata.io/client': 0.29.4(typescript@5.2.2)
-      drizzle-orm: 0.30.10(@types/react@18.2.36)(@xata.io/client@0.29.4(typescript@5.2.2))(pg@8.11.5)(react@18.2.0)
+      '@xata.io/client': 0.0.0-next.v0b9131efdfa1340c28d4ce9bd73d6c4854e7c140(typescript@5.2.2)
+      drizzle-orm: 0.30.10(@types/pg@8.11.6)(@types/react@18.2.36)(@xata.io/client@0.0.0-next.v0b9131efdfa1340c28d4ce9bd73d6c4854e7c140(typescript@5.2.2))(pg@8.11.5)(react@18.2.0)
     transitivePeerDependencies:
       - typescript
 
@@ -5568,10 +5614,11 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
-  drizzle-orm@0.30.10(@types/react@18.2.36)(@xata.io/client@0.29.4(typescript@5.2.2))(pg@8.11.5)(react@18.2.0):
+  drizzle-orm@0.30.10(@types/pg@8.11.6)(@types/react@18.2.36)(@xata.io/client@0.0.0-next.v0b9131efdfa1340c28d4ce9bd73d6c4854e7c140(typescript@5.2.2))(pg@8.11.5)(react@18.2.0):
     optionalDependencies:
+      '@types/pg': 8.11.6
       '@types/react': 18.2.36
-      '@xata.io/client': 0.29.4(typescript@5.2.2)
+      '@xata.io/client': 0.0.0-next.v0b9131efdfa1340c28d4ce9bd73d6c4854e7c140(typescript@5.2.2)
       pg: 8.11.5
       react: 18.2.0
 
@@ -7203,6 +7250,8 @@ snapshots:
       define-properties: 1.2.1
       es-abstract: 1.22.4
 
+  obuf@1.1.2: {}
+
   on-exit-leak-free@2.1.2: {}
 
   once@1.4.0:
@@ -7261,19 +7310,17 @@ snapshots:
   pg-cloudflare@1.1.1:
     optional: true
 
-  pg-connection-string@2.6.4:
-    optional: true
+  pg-connection-string@2.6.4: {}
 
-  pg-int8@1.0.1:
-    optional: true
+  pg-int8@1.0.1: {}
+
+  pg-numeric@1.0.2: {}
 
   pg-pool@3.6.2(pg@8.11.5):
     dependencies:
       pg: 8.11.5
-    optional: true
 
-  pg-protocol@1.6.1:
-    optional: true
+  pg-protocol@1.6.1: {}
 
   pg-types@2.2.0:
     dependencies:
@@ -7282,7 +7329,16 @@ snapshots:
       postgres-bytea: 1.0.0
       postgres-date: 1.0.7
       postgres-interval: 1.2.0
-    optional: true
+
+  pg-types@4.0.2:
+    dependencies:
+      pg-int8: 1.0.1
+      pg-numeric: 1.0.2
+      postgres-array: 3.0.2
+      postgres-bytea: 3.0.0
+      postgres-date: 2.1.0
+      postgres-interval: 3.0.0
+      postgres-range: 1.1.4
 
   pg@8.11.5:
     dependencies:
@@ -7293,12 +7349,10 @@ snapshots:
       pgpass: 1.0.5
     optionalDependencies:
       pg-cloudflare: 1.1.1
-    optional: true
 
   pgpass@1.0.5:
     dependencies:
       split2: 4.2.0
-    optional: true
 
   picocolors@1.0.0: {}
 
@@ -7434,19 +7488,27 @@ snapshots:
       picocolors: 1.0.0
       source-map-js: 1.0.2
 
-  postgres-array@2.0.0:
-    optional: true
+  postgres-array@2.0.0: {}
 
-  postgres-bytea@1.0.0:
-    optional: true
+  postgres-array@3.0.2: {}
 
-  postgres-date@1.0.7:
-    optional: true
+  postgres-bytea@1.0.0: {}
+
+  postgres-bytea@3.0.0:
+    dependencies:
+      obuf: 1.1.2
+
+  postgres-date@1.0.7: {}
+
+  postgres-date@2.1.0: {}
 
   postgres-interval@1.2.0:
     dependencies:
       xtend: 4.0.2
-    optional: true
+
+  postgres-interval@3.0.0: {}
+
+  postgres-range@1.1.4: {}
 
   prelude-ls@1.2.1: {}
 
@@ -8422,8 +8484,7 @@ snapshots:
 
   wrappy@1.0.2: {}
 
-  xtend@4.0.2:
-    optional: true
+  xtend@4.0.2: {}
 
   y-prosemirror@1.2.1(prosemirror-model@1.19.4)(prosemirror-state@1.4.3)(prosemirror-view@1.33.1)(y-protocols@1.0.6(yjs@13.6.15))(yjs@13.6.15):
     dependencies:
