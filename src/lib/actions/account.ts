@@ -1,10 +1,10 @@
 import { ERR_AUTH_EXPIRED } from "@/lib/constants";
 import { db } from "@/lib/db";
-import { M_User, M_UserTwoFactorBackupCodes } from "@/lib/db/schema/drizzle";
-import { passValidation, stringSchema } from "@/lib/db/zod/utils";
+import { M_User, M_UserTwoFactorBackupCodes } from "@/lib/db/schema";
+import { passValidation, stringTrimmed } from "@/lib/db/zod/utils";
 import { logger } from "@/lib/logger";
 import { getUserAuth } from "@/lib/lucia/utils";
-import { ApiReturn } from "@/lib/types";
+import { ApiReturn, TypedFormData } from "@/lib/types";
 import { and, eq } from "drizzle-orm";
 import { TimeSpan } from "lucia";
 import { revalidatePath } from "next/cache";
@@ -33,13 +33,13 @@ export async function getTwoFactorURI(_csrf: string): Promise<ApiReturn> {
   }
 }
 
-export async function verifyTwoFactor(form: FormData): Promise<ApiReturn> {
+export async function verifyTwoFactor(form: TypedFormData<{ token: string; secret: string }>): Promise<ApiReturn> {
   const { session } = await getUserAuth();
   if (!session) return ERR_AUTH_EXPIRED;
 
   try {
-    const token = stringSchema.parse(form.get("token"));
-    const secret = stringSchema.parse(form.get("secret"));
+    const token = stringTrimmed.parse(form.get("token"));
+    const secret = stringTrimmed.parse(form.get("secret"));
     const validOTP = await new TOTPController().verify(token, decodeHex(secret));
     if (!validOTP) return { success: 0, message: "Invalid token" };
 
@@ -64,7 +64,7 @@ export async function verifyTwoFactor(form: FormData): Promise<ApiReturn> {
   }
 }
 
-export async function loginToSeeBackupCodes(form: FormData): Promise<ApiReturn> {
+export async function loginToSeeBackupCodes(form: TypedFormData<{ password: string }>): Promise<ApiReturn> {
   const { session } = await getUserAuth();
   if (!session) return ERR_AUTH_EXPIRED;
 
@@ -109,7 +109,7 @@ export async function regenerateBackupCodes(_csrf: string): Promise<ApiReturn> {
   }
 }
 
-export async function disableTwoFactor(form: FormData): Promise<ApiReturn> {
+export async function disableTwoFactor(form: TypedFormData<{ password: string; token: string }>): Promise<ApiReturn> {
   const { session } = await getUserAuth();
   if (!session) return ERR_AUTH_EXPIRED;
 
@@ -119,7 +119,7 @@ export async function disableTwoFactor(form: FormData): Promise<ApiReturn> {
     const validPassword = await new Argon2id().verify(user!.hashedPassword, password);
     if (!validPassword) return { success: 0, message: "Invalid password" };
 
-    const token = stringSchema.parse(form.get("token"));
+    const token = stringTrimmed.parse(form.get("token"));
     const validOTP = await new TOTPController().verify(token, decodeHex(user.twoFactorSecret!));
     if (!validOTP) {
       // check backup codes
@@ -145,7 +145,8 @@ export async function disableTwoFactor(form: FormData): Promise<ApiReturn> {
   }
 }
 
-export async function deleteAccount(form: FormData): Promise<ApiReturn> {
+export async function deleteAccount(form: TypedFormData<{ password: string }>): Promise<ApiReturn> {
+  // this is used in the reauth component so the two factor will also get checked before this if enabled by user
   const { session } = await getUserAuth();
   if (!session) return ERR_AUTH_EXPIRED;
 

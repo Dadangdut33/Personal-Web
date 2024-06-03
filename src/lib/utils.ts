@@ -1,6 +1,8 @@
 import { FormErrors } from "@mantine/form";
 import moment from "moment";
 
+import { TypedFormData, TypedFormDataValue } from "./types";
+
 export function getTimeMs(amount: number, type: "second" | "minute" | "hour" | "day" | "week") {
   // Utilitas untuk mengubah waktu dalam satuan tertentu menjadi milidetik
   if (type == "second") return amount * 1000;
@@ -81,4 +83,10 @@ export function getExtension(fName: string) {
     return null; //  `.` not found (-1) or comes first (0)
 
   return basename.slice(pos + 1); // extract extension ignoring `.`
+}
+
+export function getTypedFormData<T extends Record<string, TypedFormDataValue>>(
+  form?: HTMLFormElement | null
+): TypedFormData<T> {
+  return new FormData(form || undefined) as unknown as TypedFormData<T>;
 }

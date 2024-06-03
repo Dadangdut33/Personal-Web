@@ -1,5 +1,5 @@
 import * as schema from "@/lib/db/schema";
-import { getXataClient } from "@/lib/db/xata";
+import { dbConfig } from "@/lib/db/utils";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Argon2id } from "oslo/password";
 import { Pool } from "pg";
@@ -13,9 +13,8 @@ let generatePassword = (
     .join("");
 
 const run = async () => {
-  const xata = getXataClient();
-  const pg_client = new Pool({ connectionString: xata.sql.connectionString, max: 1 });
-  const db = drizzle(pg_client, { schema });
+  const client = new Pool({ ...dbConfig, max: 1 });
+  const db = drizzle(client, { schema });
 
   console.log("⏳ Seeding...");
 

@@ -8,16 +8,17 @@ import {
   M_Project,
   M_Shortlink,
   M_User,
-} from "./schema";
-import { XataMetaType } from "./utils";
+} from "@/lib/db/schema";
+import { ProjectLinkIcon } from "@/lib/db/schema/project";
+import { Modify } from "@/lib/types";
 
 // ----- Category -----
-export type QCategory = typeof M_Category.$inferSelect & XataMetaType;
+export type QCategory = typeof M_Category.$inferSelect;
 
 // ----- Blog -----
-export type QBlog = typeof M_Blog.$inferSelect & XataMetaType;
-export type QBlogRevision = typeof M_BlogRevision.$inferSelect & XataMetaType;
-export type QLike = typeof M_Like.$inferSelect & XataMetaType;
+export type QBlog = typeof M_Blog.$inferSelect;
+export type QBlogRevision = typeof M_BlogRevision.$inferSelect;
+export type QLike = typeof M_Like.$inferSelect;
 export interface BlogComplete extends QBlog {
   thumbnail: QFile | null;
   category: QCategory | null;
@@ -30,21 +31,21 @@ export interface BlogWithRevision extends QBlog {
 }
 
 // ----- File -----
-export type QFile = typeof M_File.$inferSelect & XataMetaType;
+export type QFile = typeof M_File.$inferSelect;
 
 // ----- Projects -----
-export type QProject = typeof M_Project.$inferSelect & XataMetaType;
+export type QProject = Modify<typeof M_Project.$inferSelect, { links: ProjectLinkIcon[] }>;
 export interface ProjectComplete extends QProject {
   thumbnail: string | null;
   category: string | null;
 }
 
 // ----- Shortlink -----
-export type QShortlink = typeof M_Shortlink.$inferSelect & XataMetaType;
+export type QShortlink = typeof M_Shortlink.$inferSelect;
 
 // ----- User -----
-export type QUser = typeof M_User.$inferSelect & XataMetaType;
-export type QProfile = typeof M_Profile.$inferSelect & XataMetaType;
+export type QUser = typeof M_User.$inferSelect;
+export type QProfile = typeof M_Profile.$inferSelect;
 export interface ProfileComplete extends QProfile {
   avatar: QFile | null;
 }

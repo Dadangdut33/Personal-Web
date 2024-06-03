@@ -18,7 +18,7 @@ import {
 import { usePathname, useSearchParams } from "next/navigation";
 import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
 
-import { fetchProfileData } from "./actions/user";
+import { getProfileDataById } from "./actions/user";
 import { ProfileComplete } from "./db/types";
 import { ApiReturn } from "./types";
 import { formErrorToString, mapFormErrorsToMessage } from "./utils";
@@ -127,8 +127,12 @@ export const useProfile = (userId: string) => {
   const csrf_token = useCSRFToken();
   useEffect(() => {
     async function fetchProfile() {
-      const res = await fetchProfileData(csrf_token, userId);
-      if (res) setProfile(res);
+      const res = await getProfileDataById(csrf_token, userId);
+      if (res.success) {
+        setProfile(res.data);
+      } else {
+        NotifyError("Error Fetching Profile", res.message);
+      }
     }
 
     fetchProfile();

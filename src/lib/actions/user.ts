@@ -2,17 +2,26 @@
 
 import { ERR_AUTH_EXPIRED, ERR_TOO_MANY_REQUESTS, ERR_UNAUTHORIZED } from "@/lib/constants";
 import { db } from "@/lib/db/index";
-import { M_Profile, M_User } from "@/lib/db/schema/drizzle/user";
-import { M_File } from "@/lib/db/schema/xata/file";
+import { M_File } from "@/lib/db/schema/file";
+import { M_Profile, M_User } from "@/lib/db/schema/user";
 import { ProfileComplete, UserComplete } from "@/lib/db/types";
-import { BASE_XATA_RETURN } from "@/lib/db/utils";
-import { createUserSchema, updatePasswordSchema, updateUserSchema } from "@/lib/db/zod/user";
-import { passValidation, stringSchema } from "@/lib/db/zod/utils";
+import {
+  CreateUser,
+  CreateUserZod,
+  UpdatePassword,
+  UpdatePasswordZod,
+  UpdateUser,
+  UpdateUserZod,
+  createUserSchema,
+  updatePasswordSchema,
+  updateUserSchema,
+} from "@/lib/db/zod/user";
+import { passValidation, stringTrimmed } from "@/lib/db/zod/utils";
 import { logger } from "@/lib/logger";
 import { lucia } from "@/lib/lucia/auth";
 import { isAdmin, isLoggedIn, roleIsAdmin, roleIsSuperAdmin } from "@/lib/lucia/utils";
 import rateLimit from "@/lib/rateLimit";
-import { ApiReturn, NeedsReAuth } from "@/lib/types";
+import { ApiReturn, NeedsReAuth, TypedFormData } from "@/lib/types";
 import { getTimeMs } from "@/lib/utils";
 import { eq, getTableColumns, inArray } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -29,10 +38,10 @@ const limiter = rateLimit({
   interval: getTimeMs(15, "minute"),
 });
 
-export const fetchProfileData = cache(async (_csrf: string, userId: string): Promise<ApiReturn<ProfileComplete>> => {
+export const getProfileDataById = cache(async (_csrf: string, userId: string): Promise<ApiReturn<ProfileComplete>> => {
   try {
     const [result] = (await db
-      .select({ ...BASE_XATA_RETURN, ...profile, avatar })
+      .select({ ...profile, avatar })
       .from(M_Profile)
       .where(eq(M_Profile.userId, userId))
       .leftJoin(M_File, eq(M_File.id, M_Profile.avatarId))) as ProfileComplete[];
@@ -55,7 +64,7 @@ export const getAllUsers = cache(async (): Promise<ApiReturn<UserComplete[]>> =>
   await isAdmin(); // make sure user is admin
   try {
     const result = (await db
-      .select({ ...BASE_XATA_RETURN, ...rest, profile })
+      .select({ ...rest, profile })
       .from(M_User)
       .leftJoin(M_Profile, eq(M_Profile.userId, M_User.id))
       .leftJoin(M_File, eq(M_File.id, M_Profile.avatarId))) as UserComplete[];
@@ -74,21 +83,20 @@ export const getAllUsers = cache(async (): Promise<ApiReturn<UserComplete[]>> =>
   }
 });
 
-export const createUser = async (form: FormData): Promise<ApiReturn<NeedsReAuth>> => {
+export const addUser = async (form: TypedFormData<CreateUser>): Promise<ApiReturn<NeedsReAuth>> => {
   const { session, user } = await isAdmin(false);
   if (!session) return ERR_AUTH_EXPIRED;
 
   try {
-    const password = stringSchema.parse(form.get("password"));
     const data = createUserSchema.parse({
-      username: form.get("username"),
-      password: password,
-      role: form.get("role"),
-      name: form.get("name"),
-      description: form.get("description"),
-      title: form.get("title"),
-    });
-    const hashedPassword = await new Argon2id().hash(password);
+      username: form.get("username")!,
+      password: form.get("password")!,
+      role: JSON.parse(form.get("role") as string),
+      name: form.get("name")!,
+      description: form.get("description")!,
+      title: form.get("title")!,
+    } satisfies CreateUserZod);
+    const hashedPassword = await new Argon2id().hash(data.password);
 
     // make sure that only super_admin can create super_admin
     if (!roleIsSuperAdmin(user!.role) && data.role.includes("super_admin")) return ERR_UNAUTHORIZED;
@@ -118,19 +126,19 @@ export const createUser = async (form: FormData): Promise<ApiReturn<NeedsReAuth>
   }
 };
 
-export const updateUser = async (form: FormData): Promise<ApiReturn<NeedsReAuth>> => {
+export const updateUser = async (form: TypedFormData<UpdateUser & { id: string }>): Promise<ApiReturn<NeedsReAuth>> => {
   const { session } = await isAdmin(false);
   if (!session) return ERR_AUTH_EXPIRED;
 
   try {
-    const id = stringSchema.parse(form.get("id"));
+    const id = stringTrimmed.parse(form.get("id"));
     const data = updateUserSchema.parse({
-      username: form.get("username"),
-      role: form.get("role"),
-      name: form.get("name"),
+      username: form.get("username")!,
+      role: JSON.parse(form.get("role")!),
+      name: form.get("name")!,
       description: form.get("description"),
       title: form.get("title"),
-    });
+    } satisfies UpdateUserZod);
 
     await db
       .update(M_User)
@@ -157,18 +165,20 @@ export const updateUser = async (form: FormData): Promise<ApiReturn<NeedsReAuth>
   }
 };
 
-export const updateUserPassword = async (form: FormData): Promise<ApiReturn<NeedsReAuth>> => {
+export const admin_UpdateUserPassword = async (
+  form: TypedFormData<UpdatePassword & { id: string }>
+): Promise<ApiReturn<NeedsReAuth>> => {
   const { session, user } = await isLoggedIn(false);
   if (!session) return ERR_AUTH_EXPIRED;
 
   try {
-    const id = stringSchema.parse(form.get("id"));
+    const id = stringTrimmed.parse(form.get("id"));
     if (!roleIsAdmin(user!.role) && user!.id !== id) return ERR_UNAUTHORIZED;
 
-    const { oldPassword: pass, newPassword: passConfirm } = updatePasswordSchema.parse({
-      oldPassword: form.get("password"),
-      newPassword: form.get("passwordConfirmation"),
-    });
+    const { passwordOld: pass, passwordNew: passConfirm } = updatePasswordSchema.parse({
+      passwordOld: form.get("passwordOld")!,
+      passwordNew: form.get("passwordNew")!,
+    } satisfies UpdatePasswordZod);
     if (pass !== passConfirm) return { success: 0, message: "Password confirmation does not match!" };
 
     const hashedPassword = await new Argon2id().hash(passConfirm);
@@ -183,7 +193,10 @@ export const updateUserPassword = async (form: FormData): Promise<ApiReturn<Need
   }
 };
 
-export const changePassword = async (form: FormData): Promise<ApiReturn<NeedsReAuth>> => {
+// For user
+export const user_ChangePassword = async (
+  form: TypedFormData<UpdatePassword & { passwordConfirmation: string }>
+): Promise<ApiReturn<NeedsReAuth>> => {
   const { session, user } = await isLoggedIn(false);
   if (!session) return ERR_AUTH_EXPIRED;
 
@@ -197,23 +210,18 @@ export const changePassword = async (form: FormData): Promise<ApiReturn<NeedsReA
   }
 
   try {
-    const id = stringSchema.parse(form.get("id"));
-
-    if (!roleIsAdmin(user!.role) && user!.id !== id) return ERR_UNAUTHORIZED;
-
     // Verify old password
-    const oldPassword = stringSchema.parse(form.get("passwordOld"));
-    const [qUser] = await db.select().from(M_User).where(eq(M_User.id, id));
-    const isMatch = await new Argon2id().verify(qUser.hashedPassword, oldPassword);
+    const [qUser] = await db.select().from(M_User).where(eq(M_User.id, user?.id!));
+    const isMatch = await new Argon2id().verify(qUser.hashedPassword, form.get("passwordOld")!);
     if (!isMatch) return { success: 0, message: "Incorrect old password!" };
 
-    const newPassword = passValidation.parse(form.get("password"));
+    const newPassword = passValidation.parse(form.get("passwordNew"));
     const newPasswordConfirmation = passValidation.parse(form.get("passwordConfirmation"));
     if (newPassword !== newPasswordConfirmation)
       return { success: 0, message: "Password confirmation does not match!" };
 
     const hashedPassword = await new Argon2id().hash(newPassword);
-    await db.update(M_User).set({ hashedPassword }).where(eq(M_User.id, id));
+    await db.update(M_User).set({ hashedPassword }).where(eq(M_User.id, user?.id!));
     await lucia.invalidateUserSessions(session.userId); // Logout all sessions
 
     revalidatePath("/dashboard/user");

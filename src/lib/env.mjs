@@ -7,17 +7,23 @@ dotenv.config();
 export const env = createEnv({
   server: {
     NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
-    DATABASE_URL: z.string().min(1),
-    XATA_BRANCH: z.enum(["main", "dev", "test"]).default("main"),
-    XATA_API_KEY: z.string().min(1),
+    CLOUDINARY_NAME: z.string().min(1),
+    CLOUDINARY_API_KEY: z.string().min(1),
+    CLOUDINARY_API_SECRET: z.string().min(1),
+    DB_HOST: z.string().min(1),
+    DB_NAME: z.string().min(1),
+    DB_USER: z.string().min(1),
+    DB_PASS: z.string().min(1),
+    DB_PORT: z.string().min(),
+    DB_CA: z.string().min(1),
     LOGFLARE_API_KEY: z.string().min(1),
     LOGFLARE_SOURCE_TOKEN: z.string().min(1),
     CLEAN_SESSIONS_SECRET: z.string().min(1),
   },
   client: {
     // NEXT_PUBLIC_PUBLISHABLE_KEY: z.string().min(1),
-    ANALYTICS_KEY: z.string().nullable(),
-    ANALYTICS_PUBLIC_LINK: z.string().nullable(),
+    UMAMI_ID: z.string().nullable(),
+    UMAMI_SHARE_URL: z.string().nullable(),
   },
   // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
   // runtimeEnv: {

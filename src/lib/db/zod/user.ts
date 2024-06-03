@@ -1,14 +1,15 @@
-import { RoleOption } from "@/lib/db/schema/enum";
+import { RoleOption } from "@/lib/db/schema/_enum";
+import { Modify, csrf } from "@/lib/types";
 import { z } from "zod";
 
-import { passValidation, stringSchema } from "./utils";
+import { passValidation, stringTrimmed } from "./utils";
 
 const baseUserZod = {
-  username: stringSchema,
-  role: z.enum(RoleOption).array(),
-  name: stringSchema,
-  description: stringSchema.optional(),
-  title: stringSchema.optional(),
+  username: stringTrimmed.toLowerCase().min(3, { message: "Must be at least 3 characters" }),
+  role: z.enum(RoleOption, { message: "Not a valid role enum" }).array(),
+  name: stringTrimmed.min(1, { message: "Name is required" }),
+  description: stringTrimmed.optional().nullable(),
+  title: stringTrimmed.optional().nullable(),
 };
 
 export const createUserSchema = z.object({
@@ -21,10 +22,18 @@ export const updateUserSchema = z.object({
 });
 
 export const updatePasswordSchema = z.object({
-  oldPassword: passValidation,
-  newPassword: passValidation,
+  passwordOld: passValidation,
+  passwordNew: passValidation,
 });
 
-export type CreateUser = z.infer<typeof createUserSchema>;
-export type UpdateUser = z.infer<typeof updateUserSchema>;
-export type UpdatePassword = z.infer<typeof updatePasswordSchema>;
+type stringified = {
+  role: string;
+  description: string;
+  title: string;
+};
+export type CreateUserZod = z.infer<typeof createUserSchema>;
+export type CreateUser = Modify<CreateUserZod, stringified> & csrf;
+export type UpdateUserZod = z.infer<typeof updateUserSchema>;
+export type UpdateUser = Modify<UpdateUserZod, stringified> & csrf;
+export type UpdatePasswordZod = z.infer<typeof updatePasswordSchema>;
+export type UpdatePassword = UpdatePasswordZod & csrf;

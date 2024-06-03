@@ -38,5 +38,5 @@ export const _GB = _MB * 1024;
 export const FILE_SIZE_LIMIT = 20 * _MB;
 export const TEMP_SESSION_AGE = 1000 * 60 * 60 * 1; // 1 hours
 export const MAX_SESSION_AGE = 1000 * 60 * 60 * 24 * 7; // 7 days
-export const XATA_STRING_LEN = 2048;
-export const MAX_SAVED_REVISIONS = 10;
+export const MAX_VARCHAR = 2048;
+export const MAX_SAVED_REVISIONS = 5;

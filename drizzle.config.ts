@@ -1,16 +1,10 @@
-import { env } from "@/lib/env.mjs";
+import { dbConfig } from "@/lib/db/utils";
 import { defineConfig } from "drizzle-kit";
 
-/*
-For now, pushing does not work when using Xata postgres beta.
-Use this only for generate command. Read more about this in the drizzle folder readme.
- */
 export default defineConfig({
   schema: "./src/lib/db/schema",
   out: "./drizzle/generated",
   dialect: "postgresql",
-  dbCredentials: {
-    url: (env.DATABASE_URL as string) ?? "",
-  },
+  dbCredentials: dbConfig as any, // it match but the type is not compatible
   verbose: true,
 });

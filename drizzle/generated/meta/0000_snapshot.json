@@ -1,9 +1,94 @@
 {
-  "id": "32d0a7c7-b670-4fb0-bfee-2c4a3dc13e01",
+  "id": "fbd76b8d-eb10-46e2-9b0c-43f84821bcfa",
   "prevId": "00000000-0000-0000-0000-000000000000",
-  "version": "6",
+  "version": "7",
   "dialect": "postgresql",
   "tables": {
+    "public.session": {
+      "name": "session",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "text",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "userId": {
+          "name": "userId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "session_userId_user_id_fk": {
+          "name": "session_userId_user_id_fk",
+          "tableFrom": "session",
+          "tableTo": "user",
+          "columnsFrom": [
+            "userId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "no action",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
+    "public.session_temp": {
+      "name": "session_temp",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "sessionId": {
+          "name": "sessionId",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "expiresAt": {
+          "name": "expiresAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "session_temp_sessionId_session_id_fk": {
+          "name": "session_temp_sessionId_session_id_fk",
+          "tableFrom": "session_temp",
+          "tableTo": "session",
+          "columnsFrom": [
+            "sessionId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "public.blog": {
       "name": "blog",
       "schema": "",
@@ -35,10 +120,10 @@
         },
         "tags": {
           "name": "tags",
-          "type": "json",
+          "type": "text[]",
           "primaryKey": false,
           "notNull": true,
-          "default": "'[]'::json"
+          "default": "ARRAY[]::text[]"
         },
         "categoryId": {
           "name": "categoryId",
@@ -56,7 +141,7 @@
           "name": "authorId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "lastEditorId": {
           "name": "lastEditorId",
@@ -78,6 +163,20 @@
           "primaryKey": false,
           "notNull": true,
           "default": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -169,10 +268,10 @@
         },
         "tags": {
           "name": "tags",
-          "type": "json",
+          "type": "text[]",
           "primaryKey": false,
           "notNull": true,
-          "default": "'[]'::json"
+          "default": "ARRAY[]::text[]"
         },
         "categoryId": {
           "name": "categoryId",
@@ -190,7 +289,7 @@
           "name": "authorId",
           "type": "uuid",
           "primaryKey": false,
-          "notNull": true
+          "notNull": false
         },
         "lastEditorId": {
           "name": "lastEditorId",
@@ -213,11 +312,26 @@
           "notNull": true,
           "default": false
         },
-        "revision": {
-          "name": "revision",
-          "type": "integer",
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
           "primaryKey": false,
-          "notNull": true
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "revisionDate": {
+          "name": "revisionDate",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         },
         "blogId": {
           "name": "blogId",
@@ -297,6 +411,57 @@
       "compositePrimaryKeys": {},
       "uniqueConstraints": {}
     },
+    "public.blog_like": {
+      "name": "blog_like",
+      "schema": "",
+      "columns": {
+        "blogId": {
+          "name": "blogId",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true
+        },
+        "likes": {
+          "name": "likes",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {
+        "blog_like_blogId_blog_id_fk": {
+          "name": "blog_like_blogId_blog_id_fk",
+          "tableFrom": "blog_like",
+          "tableTo": "blog",
+          "columnsFrom": [
+            "blogId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "cascade",
+          "onUpdate": "no action"
+        }
+      },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {}
+    },
     "public.category": {
       "name": "category",
       "schema": "",
@@ -318,7 +483,7 @@
           "name": "description",
           "type": "text",
           "primaryKey": false,
-          "notNull": false
+          "notNull": true
         },
         "type": {
           "name": "type",
@@ -326,6 +491,20 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -362,11 +541,64 @@
           "typeSchema": "public",
           "primaryKey": false,
           "notNull": false,
-          "default": "'store'"
+          "default": "'uncategorized'"
+        },
+        "uploaderId": {
+          "name": "uploaderId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "lastEditorId": {
+          "name": "lastEditorId",
+          "type": "uuid",
+          "primaryKey": false,
+          "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
-      "foreignKeys": {},
+      "foreignKeys": {
+        "file_uploaderId_user_id_fk": {
+          "name": "file_uploaderId_user_id_fk",
+          "tableFrom": "file",
+          "tableTo": "user",
+          "columnsFrom": [
+            "uploaderId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        },
+        "file_lastEditorId_user_id_fk": {
+          "name": "file_lastEditorId_user_id_fk",
+          "tableFrom": "file",
+          "tableTo": "user",
+          "columnsFrom": [
+            "lastEditorId"
+          ],
+          "columnsTo": [
+            "id"
+          ],
+          "onDelete": "set null",
+          "onUpdate": "no action"
+        }
+      },
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
         "file_originalHash_unique": {
@@ -377,43 +609,6 @@
           ]
         }
       }
-    },
-    "public.blog_like": {
-      "name": "blog_like",
-      "schema": "",
-      "columns": {
-        "blogId": {
-          "name": "blogId",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "likes": {
-          "name": "likes",
-          "type": "bigint",
-          "primaryKey": false,
-          "notNull": true,
-          "default": 0
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "blog_like_blogId_blog_id_fk": {
-          "name": "blog_like_blogId_blog_id_fk",
-          "tableFrom": "blog_like",
-          "tableTo": "blog",
-          "columnsFrom": [
-            "blogId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
     },
     "public.user_profile": {
       "name": "user_profile",
@@ -455,6 +650,20 @@
           "type": "text",
           "primaryKey": false,
           "notNull": false
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -514,17 +723,17 @@
         },
         "tags": {
           "name": "tags",
-          "type": "json",
+          "type": "text[]",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'[]'::json"
+          "notNull": true,
+          "default": "ARRAY[]::text[]"
         },
         "links": {
           "name": "links",
-          "type": "json",
+          "type": "json[]",
           "primaryKey": false,
-          "notNull": false,
-          "default": "'[]'::json"
+          "notNull": true,
+          "default": "'{}'::json[]"
         },
         "position": {
           "name": "position",
@@ -552,6 +761,20 @@
           "primaryKey": false,
           "notNull": true,
           "default": "'draft'"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -566,7 +789,7 @@
           "columnsTo": [
             "id"
           ],
-          "onDelete": "no action",
+          "onDelete": "set null",
           "onUpdate": "no action"
         },
         "project_thumbnailId_file_id_fk": {
@@ -608,6 +831,27 @@
           "type": "text",
           "primaryKey": false,
           "notNull": true
+        },
+        "clicks": {
+          "name": "clicks",
+          "type": "bigint",
+          "primaryKey": false,
+          "notNull": true,
+          "default": 0
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -658,6 +902,20 @@
           "primaryKey": false,
           "notNull": true,
           "default": "ARRAY['user']::role[]"
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -695,6 +953,20 @@
           "type": "varchar(2048)",
           "primaryKey": false,
           "notNull": true
+        },
+        "createdAt": {
+          "name": "createdAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "updatedAt": {
+          "name": "updatedAt",
+          "type": "timestamp with time zone",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
         }
       },
       "indexes": {},
@@ -705,91 +977,6 @@
           "tableTo": "user",
           "columnsFrom": [
             "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "cascade",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.session": {
-      "name": "session",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "text",
-          "primaryKey": true,
-          "notNull": true
-        },
-        "userId": {
-          "name": "userId",
-          "type": "uuid",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expiresAt": {
-          "name": "expiresAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "session_userId_user_id_fk": {
-          "name": "session_userId_user_id_fk",
-          "tableFrom": "session",
-          "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
-          "onDelete": "no action",
-          "onUpdate": "no action"
-        }
-      },
-      "compositePrimaryKeys": {},
-      "uniqueConstraints": {}
-    },
-    "public.session_temp": {
-      "name": "session_temp",
-      "schema": "",
-      "columns": {
-        "id": {
-          "name": "id",
-          "type": "uuid",
-          "primaryKey": true,
-          "notNull": true,
-          "default": "gen_random_uuid()"
-        },
-        "sessionId": {
-          "name": "sessionId",
-          "type": "text",
-          "primaryKey": false,
-          "notNull": true
-        },
-        "expiresAt": {
-          "name": "expiresAt",
-          "type": "timestamp with time zone",
-          "primaryKey": false,
-          "notNull": true
-        }
-      },
-      "indexes": {},
-      "foreignKeys": {
-        "session_temp_sessionId_session_id_fk": {
-          "name": "session_temp_sessionId_session_id_fk",
-          "tableFrom": "session_temp",
-          "tableTo": "session",
-          "columnsFrom": [
-            "sessionId"
           ],
           "columnsTo": [
             "id"
@@ -818,7 +1005,6 @@
         "project_thumbnail",
         "blog_thumbnail",
         "blog_content",
-        "store",
         "uncategorized"
       ]
     },

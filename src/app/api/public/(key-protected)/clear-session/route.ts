@@ -1,5 +1,5 @@
 import { db } from "@/lib/db";
-import { Session, SessionTemp } from "@/lib/db/schema/drizzle";
+import { Session, SessionTemp } from "@/lib/db/schema";
 import { env } from "@/lib/env.mjs";
 import { logger } from "@/lib/logger";
 import { lucia } from "@/lib/lucia/auth";
@@ -14,7 +14,7 @@ const limiter = rateLimit({
 });
 
 // clean db session protected with a simple API_KEY set in the environment
-export async function POST(req: NextRequest) {
+export async function GET(req: NextRequest) {
   try {
     await limiter.check(req.headers, 10, "CLEAN_SESSION"); // 10 requests per minute
   } catch (error) {

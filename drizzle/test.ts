@@ -1,15 +1,14 @@
 import * as schema from "@/lib/db/schema";
-import { BASE_XATA_RETURN } from "@/lib/db/utils";
-import { getXataClient } from "@/lib/db/xata";
-import { getTableColumns } from "drizzle-orm";
+import { dbConfig } from "@/lib/db/utils";
 import { drizzle } from "drizzle-orm/node-postgres";
 import { Pool } from "pg";
 
-const userCol = getTableColumns(schema.M_User);
 const run = async () => {
-  const xata = getXataClient();
-  const pg_client = new Pool({ connectionString: xata.sql.connectionString, max: 1 });
-  const db = drizzle(pg_client, { schema });
+  console.log("🚀 Connecting to database...");
+  console.log("config:");
+  console.log(dbConfig);
+  const client = new Pool({ ...dbConfig, max: 1 });
+  const db = drizzle(client, { schema });
 
   console.log("⏳ Testing...");
 
@@ -17,13 +16,8 @@ const run = async () => {
 
   // Test
   // to be added in detail later...
-  const user = await db
-    .select({
-      ...userCol,
-      ...BASE_XATA_RETURN,
-    })
-    .from(schema.M_User);
-  console.log(user);
+  const result = await client.query("SELECT VERSION()");
+  console.log(result.rows[0].version);
 
   const end = Date.now();
 
