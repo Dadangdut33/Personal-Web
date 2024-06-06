@@ -23,11 +23,8 @@ export async function GET(req: NextRequest) {
 
   const reqData = await req.json();
   // if the request does not contain the API_KEY, return an error
-  if (!reqData.API_KEY) {
-    return NextResponse.json({ success: 0, message: "Invalid request" }, { status: 400 });
-  }
 
-  if (reqData.API_KEY !== env.CLEAN_SESSIONS_SECRET) {
+  if (req.headers.get("Authorization") !== `Bearer ${env.CRON_SECRET}`) {
     return NextResponse.json({ success: 0, message: "Invalid API_KEY" }, { status: 403 });
   }
 
