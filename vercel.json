@@ -1,6 +1,6 @@
 {
   "crons": [{
-    "path": "/api/public/clear-session?key=${CLEAN_SESSIONS_SECRET}",
-    "schedule": "*/15 * * * *"
+    "path": "/api/public/clear-session",
+    "schedule": "0 0 * * *"
   }]
 }

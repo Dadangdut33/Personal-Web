@@ -18,7 +18,7 @@ export const env = createEnv({
     DB_CA: z.string().min(1),
     LOGFLARE_API_KEY: z.string().min(1),
     LOGFLARE_SOURCE_TOKEN: z.string().min(1),
-    CLEAN_SESSIONS_SECRET: z.string().min(1),
+    CRON_SECRET: z.string().min(1),
   },
   client: {
     // NEXT_PUBLIC_PUBLISHABLE_KEY: z.string().min(1),
