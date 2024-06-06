@@ -1,5 +1,6 @@
 import { Image, Text } from "@mantine/core";
 import DotPattern from "@/components/ui/DotPattern";
+import { Link } from "../Router";
 
 export default function Home() {
   return (
@@ -30,15 +31,16 @@ export default function Home() {
         <br />
         <Text className="text-justify">
           While you&apos;re here, feel free to check out my{" "}
-          <a target="_blank" className="font-heading underline" href="/projects">
+          <Link className="font-heading underline" href="/project">
             projects showcase
-          </a>{" "}
+          </Link>{" "}
           and{" "}
-          <a target="_blank" className="font-heading underline" href="/blog">
+          <Link className="font-heading underline" href="/blog">
             blog posts
-          </a>{" "}
-          I hope you enjoy your visit. Thanks for stopping by!
+          </Link>
+          .
         </Text>
+        <Text className="text-justify">I hope you enjoy your visit here :D Thanks for stopping by!</Text>
       </div>
     </main>
   );
