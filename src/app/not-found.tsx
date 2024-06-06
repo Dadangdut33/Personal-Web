@@ -1,7 +1,5 @@
-import BtnGoBack from "@/components/Button/BtnGoBack";
-import { Button, Center, Group, Stack, Text, Title } from "@mantine/core";
-import { IconHome2 } from "@tabler/icons-react";
-import Link from "next/link";
+import BtnGoBack, { BtnGoHome } from "@/components/Button/BtnGoBack";
+import { Center, Group, Image, Stack, Text, Title } from "@mantine/core";
 
 import classes from "./error.module.css";
 
@@ -12,7 +10,7 @@ export default function NotFound() {
         <title>404 - Page Not Found</title>
         <meta
           name="description"
-          content="Halaman tidak ditemukan. Anda mungkin salah mengetik alamat, atau halaman telah dipindahkan ke URL lain."
+          content="Page not found. You may have mistyped the address, or the page may have been moved to a different URL."
         />
       </>
       <Center
@@ -22,17 +20,14 @@ export default function NotFound() {
         }}
       >
         <Stack>
-          <div className={classes.label}>404</div>
-          <Title className={classes.title}>Halaman tidak ditemukan</Title>
+          <Image src={"/kawaii/404.png"} alt="not found" w={500} />
+          <Title className={classes.title}>Page Not Found </Title>
           <Text fz="md" ta="center" className={classes.description}>
-            Sepertinya halaman yang Anda cari tidak ada. Anda mungkin salah mengetik alamat, atau halaman yang anda tuju
-            telah dipindahkan ke URL lain.
+            It seems that the page you are looking for does not exist.
           </Text>
           <Group justify="center" mt="md">
             <BtnGoBack />
-            <Button size="md" variant="subtle" leftSection={<IconHome2 size={18} />} component={Link} href={"/"}>
-              Ke halaman utama
-            </Button>
+            <BtnGoHome />
           </Group>
         </Stack>
       </Center>

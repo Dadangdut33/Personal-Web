@@ -44,7 +44,7 @@ export default function BtnUpdateGroup({
               {...propsRemove}
               onClick={onRemove}
             >
-              Kosongkan
+              Clear
             </Button>
           )}
           <Button
@@ -57,7 +57,7 @@ export default function BtnUpdateGroup({
             Cancel
           </Button>
           <Button loading={loadingSave} leftSection={<Save />} {...propsSave} onClick={onSave}>
-            Simpan
+            Save
           </Button>
         </>
       ) : (

@@ -1,5 +1,7 @@
 import { FormErrors } from "@mantine/form";
+import { type ClassValue, clsx } from "clsx";
 import moment from "moment";
+import { twMerge } from "tailwind-merge";
 
 import { TypedFormData, TypedFormDataValue } from "./types";
 
@@ -89,4 +91,8 @@ export function getTypedFormData<T extends Record<string, TypedFormDataValue>>(
   form?: HTMLFormElement | null
 ): TypedFormData<T> {
   return new FormData(form || undefined) as unknown as TypedFormData<T>;
+}
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs));
 }

@@ -1,11 +1,12 @@
 "use client";
 
-import { Button, Center, Group, Stack, Text, Title } from "@mantine/core";
+import { Button as MantineButton, Center, Group, Stack, Text, Title, Image } from "@mantine/core";
 import { IconHome2, IconRefresh } from "@tabler/icons-react";
 import { useRouter } from "next/navigation";
 import { useEffect } from "react";
 
 import classes from "./error.module.css";
+import { BaseButton } from "@/components/ui/Button";
 
 function Error({ error, reset }: { error: Error & { digest?: string }; reset: () => void }) {
   const router = useRouter();
@@ -21,7 +22,7 @@ function Error({ error, reset }: { error: Error & { digest?: string }; reset: ()
         <title>Server Error</title>
         <meta
           name="description"
-          content="Halaman gagal dimuat karena terjadi kesalahan yang tidak terduga. Silakan coba muat ulang halaman ini."
+          content="An unexpected error occurred. Please try again later or contact site owner if the problem persists."
         />
       </>
       <Center
@@ -31,23 +32,29 @@ function Error({ error, reset }: { error: Error & { digest?: string }; reset: ()
         }}
       >
         <Stack>
-          <div className={classes.label}>500</div>
-          <Title className={classes.title}>Maaf, terjadi kesalahan yang tidak terduga..</Title>
+          <Image src={"/kawaii/500.png"} alt="not found" w={500} />
+          <Title className={classes.title}>Sorry, an unexpected error occurred</Title>
           <Text fz="md" ta="center" className={classes.description}>
             {error.toString()}
           </Text>
           <Group justify="center" mt="md">
-            <Button
+            <MantineButton
               size="md"
               leftSection={<IconRefresh size={18} />}
-              variant="subtle"
+              component={BaseButton}
               onClick={() => window.location.reload()}
             >
-              Muat ulang halaman
-            </Button>
-            <Button size="md" variant="subtle" leftSection={<IconHome2 size={18} />} onClick={() => router.push("/")}>
-              Ke halaman utama
-            </Button>
+              Refresh
+            </MantineButton>
+            <MantineButton
+              size="md"
+              variant="default"
+              leftSection={<IconHome2 size={18} />}
+              component={BaseButton}
+              onClick={() => router.push("/")}
+            >
+              Back to Home
+            </MantineButton>
           </Group>
         </Stack>
       </Center>

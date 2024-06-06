@@ -23,7 +23,6 @@ export const env = createEnv({
   client: {
     // NEXT_PUBLIC_PUBLISHABLE_KEY: z.string().min(1),
     UMAMI_ID: z.string().nullable(),
-    UMAMI_SHARE_URL: z.string().nullable(),
   },
   // If you're using Next.js < 13.4.4, you'll need to specify the runtimeEnv manually
   // runtimeEnv: {

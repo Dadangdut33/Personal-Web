@@ -1,11 +1,11 @@
 import { useBaseFormMutation } from "@/lib/hooks";
-import { Button, Group, MantineSpacing, Modal, ModalBaseProps, ScrollArea } from "@mantine/core";
+import { Button, Group, LoadingOverlay, MantineSpacing, Modal, ModalBaseProps, ScrollArea } from "@mantine/core";
 import { Box, Code, Input, PinInput, Text } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { generateId } from "lucia";
 import { useEffect, useState } from "react";
 
-import { BaseLoadingOverlay } from "../Form/Loading";
+import { LoadingOverlayConfig } from "../Form/utils";
 import { ConfirmModal } from "./Confirm";
 
 export function BaseFormModal({
@@ -45,7 +45,7 @@ export function BaseFormModalBtn({
   pending,
   justify = "flex-end",
   mt = "lg",
-  editText = "Ubah",
+  editText = "save",
   disabledOk = false,
 }: {
   closeFn: () => void;
@@ -56,18 +56,14 @@ export function BaseFormModalBtn({
   editText?: string;
   disabledOk?: boolean;
 }) {
-  const doModal = ConfirmModal(
-    `Apakah anda yakin ingin ${editText === "Ubah" ? "Menyimpan" : editText} data ini?`,
-    () => {},
-    doFn
-  );
-  const cancelModal = ConfirmModal("Apakah anda yakin ingin membatalkan perubahan?", () => {}, closeFn, {
+  const doModal = ConfirmModal(`Are you sure you want to ${editText} this data?`, () => {}, doFn);
+  const cancelModal = ConfirmModal("Apakah you sure you want to cancel any changes?", () => {}, closeFn, {
     confirmProps: { color: "red" },
   });
   return (
     <Group mt={mt} justify={justify}>
       <Button variant="outline" color="red" onClick={cancelModal} loading={pending}>
-        Batal
+        Cancel
       </Button>
       <Button variant="filled" color="blue" onClick={doModal} loading={pending} disabled={disabledOk}>
         {editText}
@@ -99,7 +95,7 @@ export default function DeleteModal({
     },
 
     validate: {
-      code: (value: string) => (value === randomId ? null : "Kode tidak valid"),
+      code: (value: string) => (value === randomId ? null : "Invalid Code"),
     },
   });
 
@@ -121,14 +117,14 @@ export default function DeleteModal({
   return (
     <BaseFormModal opened={opened} onClose={closeModal} title={`Hapus ${title}`}>
       <Box pos={"relative"}>
-        <BaseLoadingOverlay loading={mutation.isPending} />
+        <LoadingOverlay visible={mutation.isPending} {...LoadingOverlayConfig} />
         <Text ta={"justify"} size="sm" mb={"md"}>
-          Tindakan ini bersifat permanen, data yang dihapus tidak dapat dikembalikan. {description}
+          This action is permanent, deleted data cannot be restored. {description}
         </Text>
         <Input.Wrapper mt={"md"} required>
-          <Input.Label>Kode Verifikasi</Input.Label>
+          <Input.Label>Verification Code</Input.Label>
           <Input.Description>
-            Masukkan kode berikut: <Code>{randomId}</Code>
+            Enter this code: <Code>{randomId}</Code>
           </Input.Description>
           <PinInput
             mt={"sm"}
@@ -145,7 +141,7 @@ export default function DeleteModal({
         closeFn={closeModal}
         doFn={() => mutation.mutate(form)}
         pending={mutation.isPending}
-        editText="Hapus"
+        editText="Delete"
       />
     </BaseFormModal>
   );

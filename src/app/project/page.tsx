@@ -1,10 +1,10 @@
-import Home from "@/components/app/Home";
+import Project from "@/components/app/Project";
 import HomeLayout from "@/layouts/Home";
 
 export default function Page() {
   return (
     <HomeLayout>
-      <Home />
+      <Project />
     </HomeLayout>
   );
 }

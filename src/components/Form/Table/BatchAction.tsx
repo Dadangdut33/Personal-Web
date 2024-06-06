@@ -32,5 +32,5 @@ export default function BatchAction({
 }
 
 export function BatchDelete({ disabled, doFn, doText }: { disabled: boolean; doFn: () => void; doText: string }) {
-  return <BatchAction disabled={disabled} doFn={doFn} doText={"Hapus " + doText} icon={<IconTrash />} color="red" />;
+  return <BatchAction disabled={disabled} doFn={doFn} doText={"Delete " + doText} icon={<IconTrash />} color="red" />;
 }

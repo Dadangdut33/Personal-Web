@@ -2,15 +2,15 @@ import BtnUpdateGroup from "@/components/Button/BtnUpdateGroup";
 import { ConfirmAddModal, ConfirmDeleteModal, ConfirmResetModal } from "@/components/Modals/Confirm";
 import { useBaseFormMutation } from "@/lib/hooks";
 import { ApiReturn, UpdateCardFn } from "@/lib/types";
-import { PasswordInput, Stack, TextInput, Textarea } from "@mantine/core";
+import { LoadingOverlay, PasswordInput, Stack, TextInput, Textarea } from "@mantine/core";
 import { UseFormReturnType } from "@mantine/form";
 import { useTimeout } from "@mantine/hooks";
 import { IconLock } from "@tabler/icons-react";
 import { useState } from "react";
 
 import { CardInput, CardInputBody, CardInputFooter } from "./CardInput";
-import { BaseLoadingOverlay } from "./Loading";
 import { PasswordStrengthWithConfirmation } from "./PasswordWithStrength";
+import { LoadingOverlayConfig } from "./utils";
 
 export default function UpdateCard({
   header,
@@ -127,7 +127,7 @@ export function UpdateCardWithAction({
       subDesc={subDesc}
       InputElement={
         <Stack gap={"md"} pos={"relative"}>
-          <BaseLoadingOverlay loading={false} />
+          <LoadingOverlay visible={mutation.isPending || deleteMutation.isPending} {...LoadingOverlayConfig} />
           {useTextarea ? (
             <Textarea {...form.getInputProps(formField)} radius={"md"} disabled={!edit} minRows={4} autosize />
           ) : usePasswordFields ? (
@@ -135,8 +135,8 @@ export function UpdateCardWithAction({
               {withOldPassword && (
                 <PasswordInput
                   {...form.getInputProps(`${formField}Old`)}
-                  placeholder="Password Lama"
-                  label="Password Lama"
+                  placeholder="Old Password"
+                  label="Old Password"
                   radius={"md"}
                   disabled={!edit}
                 />

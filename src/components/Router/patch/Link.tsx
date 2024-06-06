@@ -1,4 +1,4 @@
-import NextLink from "next/link";
+import { Link as NVTLink } from "next-view-transitions";
 import { forwardRef } from "react";
 
 import { onStart } from "../events";
@@ -12,7 +12,7 @@ export const Link = forwardRef<HTMLAnchorElement, React.ComponentProps<"a">>(fun
   if (!useLink) return <a href={href} onClick={onClick} {...rest} />;
 
   return (
-    <NextLink
+    <NVTLink
       href={href}
       onClick={(event) => {
         if (shouldTriggerStartEvent(href, event)) onStart();

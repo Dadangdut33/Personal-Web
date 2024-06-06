@@ -102,7 +102,7 @@ export function PasswordStrengthWithConfirmation(props: {
   const [visiblePass, { toggle: togglePass }] = useDisclosure(false);
   const extraCheck = (
     <PasswordRequirement
-      label="Konfirmasi password sama dengan password"
+      label="Password and confirmation must match"
       meets={props.valuePass === props.valuePassConfirmation}
     />
   );

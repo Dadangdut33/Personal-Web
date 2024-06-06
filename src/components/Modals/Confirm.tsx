@@ -4,11 +4,11 @@ import { modals } from "@mantine/modals";
 export function ConfirmModal(text: string | JSX.Element, onCancel: () => void, onConfirm: () => void, other?: any) {
   const modal = () =>
     modals.openConfirmModal({
-      title: "Konfirmasi Tindakan Anda",
+      title: "Confirm Your Action",
       centered: true,
       withCloseButton: false,
       children: <Text size="sm">{text}</Text>,
-      labels: { confirm: "Iya", cancel: "Cancel" },
+      labels: { confirm: "Yes", cancel: "Cancel" },
       onCancel,
       onConfirm,
       ...other,
@@ -18,21 +18,21 @@ export function ConfirmModal(text: string | JSX.Element, onCancel: () => void, o
 }
 
 export function ConfirmAddModal(onCancel: () => void, onConfirm: () => void, data?: string) {
-  return ConfirmModal(`Apakah anda yakin ingin menyimpan ${data || "data ini"}?`, onCancel, onConfirm);
+  return ConfirmModal(`Are you sure you want to save ${data || "this data"}?`, onCancel, onConfirm);
 }
 
 export function ConfirmResetModal(onCancel: () => void, onConfirm: () => void, data?: string) {
-  return ConfirmModal(`Apakah anda yakin ingin mereset ${data || "data ini"}?`, onCancel, onConfirm);
+  return ConfirmModal(`Are you sure you want to reset ${data || "this data"}?`, onCancel, onConfirm);
 }
 
 export function ConfirmDeleteModal(onCancel: () => void, onConfirm: () => void, data?: string, extra?: string) {
-  return ConfirmModal(`Apakah anda yakin ingin menghapus 🗑️ ${data || "data ini"}?${extra}`, onCancel, onConfirm, {
+  return ConfirmModal(`Are you sure you want to delete 🗑️ ${data || "this data"}?${extra}`, onCancel, onConfirm, {
     confirmProps: { color: "red" },
   });
 }
 
 export function ConfirmLogoutModal(onCancel: () => void, onConfirm: () => void) {
-  return ConfirmModal("Apakah anda yakin ingin keluar?", onCancel, onConfirm, {
+  return ConfirmModal("Are you sure you want to logout?", onCancel, onConfirm, {
     confirmProps: { color: "red" },
   });
 }

@@ -1,51 +1,84 @@
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: ["class", '[data-mantine-color-scheme="dark"]'],
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/app/**/*.{js,ts,jsx,tsx,mdx}",
+    "./src/layouts/**/*.{js,ts,jsx,tsx,mdx}",
   ],
   theme: {
     extend: {
       colors: {
-        border: "hsl(var(--border))",
-        input: "hsl(var(--input))",
-        ring: "hsl(var(--ring))",
-        background: "hsl(var(--background))",
-        foreground: "hsl(var(--foreground))",
-        primary: {
-          DEFAULT: "hsl(var(--primary))",
-          foreground: "hsl(var(--primary-foreground))",
+        bg: "var(--bg)",
+        main: "var(--main)",
+        "main-dark": "var(--main-dark)",
+        mainAccent: "var(--main-accent)",
+        "main-accent-dark": "var(--main-accent-dark)",
+      },
+      borderRadius: {
+        base: "var(--border-radius)",
+      },
+      boxShadow: {
+        base: "var(--horizontal-box-shadow) var(--vertical-box-shadow) 0px 0px rgba(0,0,0,1)",
+      },
+      translate: {
+        boxShadowX: "var(--horizontal-box-shadow)",
+        boxShadowY: "var(--vertical-box-shadow)",
+      },
+      fontWeight: {
+        heading: "var(--heading-font-weight)",
+        base: "var(--base-font-weight)",
+      },
+      keyframes: {
+        marquee: {
+          "0%": { transform: "translateX(0%)" },
+          "100%": { transform: "translateX(-100%)" },
         },
-        secondary: {
-          DEFAULT: "hsl(var(--secondary))",
-          foreground: "hsl(var(--secondary-foreground))",
+        marquee2: {
+          "0%": { transform: "translateX(100%)" },
+          "100%": { transform: "translateX(0%)" },
         },
-        destructive: {
-          DEFAULT: "hsl(var(--destructive))",
-          foreground: "hsl(var(--destructive-foreground))",
+        "accordion-down": {
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
-        muted: {
-          DEFAULT: "hsl(var(--muted))",
-          foreground: "hsl(var(--muted-foreground))",
+        "accordion-up": {
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
         },
-        accent: {
-          DEFAULT: "hsl(var(--accent))",
-          foreground: "hsl(var(--accent-foreground))",
-        },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
-        card: {
-          DEFAULT: "hsl(var(--card))",
-          foreground: "hsl(var(--card-foreground))",
+        "caret-blink": {
+          "0%,70%,100%": { opacity: "1" },
+          "20%,50%": { opacity: "0" },
         },
       },
-      backgroundImage: {
-        "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
-        "gradient-conic": "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      animation: {
+        marquee: "marquee 5s linear infinite",
+        marquee2: "marquee2 5s linear infinite",
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        "caret-blink": "caret-blink 1.25s ease-out infinite",
+      },
+      screens: {
+        w900: { raw: "(max-width: 900px)" },
+        w500: { raw: "(max-width: 500px)" },
+        m1500: { raw: "(max-width: 1500px)" },
+        m1300: { raw: "(max-width: 1300px)" },
+        m1100: { raw: "(max-width: 1100px)" },
+        m1000: { raw: "(max-width: 1000px)" },
+        m900: { raw: "(max-width: 900px)" },
+        m850: { raw: "(max-width: 850px)" },
+        m800: { raw: "(max-width: 800px)" },
+        m750: { raw: "(max-width: 750px)" },
+        m700: { raw: "(max-width: 700px)" },
+        m650: { raw: "(max-width: 650px)" },
+        m600: { raw: "(max-width: 600px)" },
+        m550: { raw: "(max-width: 550px)" },
+        m500: { raw: "(max-width: 500px)" },
+        m450: { raw: "(max-width: 450px)" },
+        m400: { raw: "(max-width: 400px)" },
+        m350: { raw: "(max-width: 350px)" },
       },
     },
   },
