@@ -37,7 +37,7 @@ export default function MobileDrawer() {
 
   return (
     <>
-      <div className="hidden m900:block ">
+      <div className="hidden m900:block">
         <Button className="p-2 bg-transparent" onClick={() => setIsDrawerActive(true)}>
           <FaBars className="h-6 w-6 m500:h-4 m500:w-4" />
         </Button>
@@ -59,8 +59,8 @@ export default function MobileDrawer() {
                 onClick={() => {
                   handleLinkClick(item.href);
                 }}
-                className={`block w-full border-b-4 border-r-4 border-black p-4 pl-7 text-left text-lg font-base text-black/90 hover:bg-main
-                  m800:p-4 m800:pl-6 m800:text-base ${pathName === item.href ? "bg-main" : ""}`}
+                className={`block w-full border-b-4 border-r-4 border-black p-4 pl-7 text-left text-lg font-base hover:bg-main m800:p-4 m800:pl-6
+                  m800:text-base ${pathName === item.href ? "bg-main dark:text-black/90" : ""}`}
               >
                 <FiCornerDownRight className="inline-block" /> {item.text}
               </button>

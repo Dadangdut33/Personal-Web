@@ -11,6 +11,7 @@ type Props = {
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   size?: "default" | "lg" | "sm" | "icon";
   disabled?: boolean;
+  ref?: React.ForwardedRef<HTMLButtonElement>;
 };
 
 const sizeMap = {
@@ -20,9 +21,18 @@ const sizeMap = {
   icon: "btn-size-icon",
 };
 
-export const BaseButton = ({ className, children, onClick, size = "default", disabled = false, ...others }: Props) => {
+export const BaseButton = ({
+  className,
+  children,
+  onClick,
+  size = "default",
+  disabled = false,
+  ref,
+  ...others
+}: Props) => {
   return (
     <Box
+      ref={ref}
       component="button"
       aria-label="Click to perform an action"
       onClick={(e) => onClick && onClick(e)}
@@ -45,7 +55,7 @@ export const BaseButton = ({ className, children, onClick, size = "default", dis
 export const BtnActiveClass: ClassValue = "btn-active shadow-none bg-main dark:bg-main-dark";
 const Button = createPolymorphicComponent<"button", Props>(
   // eslint-disable-next-line react/display-name
-  forwardRef<HTMLButtonElement, Props>((parameters) => <BaseButton {...parameters} />)
+  forwardRef<HTMLButtonElement, Props>((parameters, ref) => <BaseButton {...parameters} ref={ref} />)
 );
 Button.displayName = "Button";
 

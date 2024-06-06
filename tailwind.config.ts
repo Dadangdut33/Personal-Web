@@ -12,6 +12,7 @@ const config: Config = {
     extend: {
       colors: {
         bg: "var(--bg)",
+        "bg-dark": "var(--bg-dark)",
         main: "var(--main)",
         "main-dark": "var(--main-dark)",
         mainAccent: "var(--main-accent)",
