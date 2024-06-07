@@ -11,7 +11,7 @@ function Navbar() {
   const pathName = usePathname();
   return (
     <nav
-      className="fixed left-0 top-0 z-9 mx-auto flex h-[88px] w-full items-center border-b-4 border-black px-5 m500:h-16 bg-white
+      className="fixed left-0 top-0 z-20 mx-auto flex h-[88px] w-full items-center border-b-4 border-black px-5 m500:h-16 bg-white
         dark:bg-gray-700"
     >
       <div className="mx-auto flex w-[1300px] max-w-full items-center justify-between">
