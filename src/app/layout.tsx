@@ -12,7 +12,7 @@ import "@mantine/notifications/styles.css";
 import { NavigationProgress } from "@mantine/nprogress";
 import "@mantine/nprogress/styles.css";
 import "mantine-react-table/styles.css";
-
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import Analytics from "./analytics";
 import "./globals.css";
 import { AppProvider } from "./provider";
@@ -41,6 +41,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <AppProvider>{children}</AppProvider>
             </ModalsProvider>
             <HandleOnComplete />
+            <SpeedInsights />
           </MantineProvider>
         </body>
       </html>

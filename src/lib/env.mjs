@@ -15,7 +15,7 @@ export const env = createEnv({
     DB_USER: z.string().min(1),
     DB_PASS: z.string().min(1),
     DB_PORT: z.string().min(),
-    DB_CA: z.string().min(1),
+    DB_CA: z.string().optional(),
     LOGFLARE_API_KEY: z.string().min(1),
     LOGFLARE_SOURCE_TOKEN: z.string().min(1),
     CRON_SECRET: z.string().min(1),
