@@ -39,7 +39,7 @@ const run = async () => {
   });
 
   console.log("**NOTES** ");
-  console.log("Create default user admin");
+  console.log("Created default user admin");
   console.log("Password:", randomPass);
 
   const end = Date.now();

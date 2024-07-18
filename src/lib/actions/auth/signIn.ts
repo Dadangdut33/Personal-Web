@@ -25,6 +25,7 @@ const limiter = rateLimit({
 });
 
 export async function signInAction(formData: FormData): Promise<ApiReturn<NeedsTwoFactor>> {
+  logger.debug(formData, "Sign in data 0");
   const reAuth = formData.get("reAuth") === "true";
   try {
     const readOnlyHeader = headers();
@@ -69,7 +70,7 @@ export async function signInAction(formData: FormData): Promise<ApiReturn<NeedsT
 
   if (!reAuth) {
     setRedirectMsgCookie("Welcome!");
-    return redirect("/dashboard");
+    return redirect(decodeURIComponent(data.redirect || "/dashboard"));
   } else {
     return { success: true, data: { needsTwoFactor: false }, message: "Reauthenticated!" };
   }
@@ -132,7 +133,7 @@ export async function verifyTwoFactorToken(formData: FormData): Promise<ApiRetur
 
   if (!reAuth) {
     setRedirectMsgCookie("Welcome!");
-    return redirect("/dashboard");
+    return redirect(decodeURIComponent(data.redirect || "/dashboard"));
   } else {
     return { success: true, message: "Reauthenticated successfully!" };
   }

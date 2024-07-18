@@ -12,7 +12,13 @@ const csrfProtect = createCsrfProtect({
 
 // Next.js middleware function
 export const middleware = async (request: NextRequest) => {
-  const response = NextResponse.next();
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set("x-next-pathname", request.nextUrl.pathname);
+  const response = NextResponse.next({
+    request: {
+      headers: requestHeaders,
+    },
+  });
 
   // csrf protection
   try {
@@ -25,10 +31,9 @@ export const middleware = async (request: NextRequest) => {
     throw err;
   }
 
-  // return token (for use in static-optimized-example)
-  if (request.nextUrl.pathname === "/csrf-token") {
+  // return token
+  if (request.nextUrl.pathname === "/csrf-token")
     return NextResponse.json({ csrfToken: response.headers.get("X-CSRF-Token") || "missing" });
-  }
 
   return response;
 };

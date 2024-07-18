@@ -7,6 +7,7 @@ export const authenticationSchema = z.object({
   password: passValidation,
   rememberMe: z.boolean().optional(),
   token: z.string().nullable(),
+  redirect: z.string().nullable(),
 });
 
 export type AuthParams = z.infer<typeof authenticationSchema>;

@@ -20,7 +20,7 @@ export default function NotFound() {
         }}
       >
         <Stack>
-          <Image src={"/kawaii/404.png"} alt="not found" w={500} />
+          <Image ms={"auto"} me={"auto"} src={"/kawaii/404.png"} alt="not found" w={500} />
           <Title className={classes.title}>Page Not Found </Title>
           <Text fz="md" ta="center" className={classes.description}>
             It seems that the page you are looking for does not exist.

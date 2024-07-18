@@ -38,7 +38,7 @@ export function useCSRFToken() {
   return csrfToken;
 }
 
-export function useRedirectMsg(sendMantineNotification = false, notificationTitle = "Informasi") {
+export function useRedirectMsg(sendMantineNotification = false, notificationTitle = "Information") {
   const csrfToken = useCSRFToken();
   const [redirectMsg, setRedirecMsg] = useState<string | null>(null);
 
@@ -85,18 +85,20 @@ export const useBaseFormMutation = <T extends ApiReturn>({
   cleanUp: (data?: T) => void;
   forceCleanUpFn?: () => void;
 }) => {
+  const csrf_token = useCSRFToken();
   const mutation = useMutation({
     mutationFn: async (form?: UseFormReturnType<any> | undefined | null) => {
       if (form) {
         const { hasErrors, errors } = form.validate();
         if (hasErrors) {
-          NotifyError("Form Tidak Valid", `${mapFormErrorsToMessage(errors)}`);
+          NotifyError("Invalid Form", `${mapFormErrorsToMessage(errors)}`);
           if (setReturnState) setReturnState({ success: false, message: `${formErrorToString(errors)}` });
           return;
         }
 
         const data = new FormData();
         for (const key in form.values) data.append(key, form.values[key]);
+        data.append("csrf_token", csrf_token);
 
         return await fn(data);
       } else {
@@ -107,15 +109,15 @@ export const useBaseFormMutation = <T extends ApiReturn>({
       if (data) {
         if (setReturnState) setReturnState(data);
         if (data.success) {
-          NotifySuccess("Berhasil", data.message!);
+          NotifySuccess("Success", data.message!);
           cleanUp(data);
         } else {
-          NotifyError("Gagal", data.message!);
+          NotifyError("Error", data.message!);
         }
 
         if (forceCleanUpFn) forceCleanUpFn();
       }
-      if (error) NotifyError("Gagal", error.message);
+      if (error) NotifyError("Error", error.message);
     },
   });
 
@@ -127,6 +129,7 @@ export const useProfile = (userId: string) => {
   const csrf_token = useCSRFToken();
   useEffect(() => {
     async function fetchProfile() {
+      if (!csrf_token) return;
       const res = await getProfileDataById(csrf_token, userId);
       if (res.success) {
         setProfile(res.data);
@@ -137,7 +140,7 @@ export const useProfile = (userId: string) => {
 
     fetchProfile();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [csrf_token]);
 
   return { csrf_token, profile };
 };

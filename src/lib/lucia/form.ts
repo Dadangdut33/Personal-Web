@@ -14,7 +14,8 @@ export const validateAuthFormData = (
   const password = formData.get("password");
   const rememberMe = formData.get("rememberMe") === "true";
   const token = formData.get("token");
-  const result = authenticationSchema.safeParse({ username, password, rememberMe, token });
+  const redirect = formData.get("redirect");
+  const result = authenticationSchema.safeParse({ username, password, rememberMe, token, redirect });
 
   if (!result.success) {
     return {

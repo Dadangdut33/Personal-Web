@@ -32,7 +32,7 @@ function Error({ error, reset }: { error: Error & { digest?: string }; reset: ()
         }}
       >
         <Stack>
-          <Image src={"/kawaii/500.png"} alt="not found" w={500} />
+          <Image ms={"auto"} me={"auto"} src={"/kawaii/500.png"} alt="not found" w={500} />
           <Title className={classes.title}>Sorry, an unexpected error occurred</Title>
           <Text fz="md" ta="center" className={classes.description}>
             {error.toString()}

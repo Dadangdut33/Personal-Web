@@ -1,10 +1,10 @@
 import Blog from "@/components/app/Blog";
-import HomeLayout from "@/layouts/Home";
+import PublicLayout from "@/layouts/Public";
 
 export default function Page() {
   return (
-    <HomeLayout>
+    <PublicLayout>
       <Blog />
-    </HomeLayout>
+    </PublicLayout>
   );
 }

@@ -1,9 +1,10 @@
 "use client";
 
 import { cn } from "@/lib/utils";
-import { Box, createPolymorphicComponent } from "@mantine/core";
+import { Box, createPolymorphicComponent, LoadingOverlay, MantineStyleProps } from "@mantine/core";
 import { ClassValue } from "clsx";
 import { forwardRef } from "react";
+import { LOADING_OVERLAY_CFG } from "../Form/utils";
 
 type Props = {
   className?: ClassValue;
@@ -12,6 +13,8 @@ type Props = {
   size?: "default" | "lg" | "sm" | "icon";
   disabled?: boolean;
   ref?: React.ForwardedRef<HTMLButtonElement>;
+  loading?: boolean;
+  center?: boolean;
 };
 
 const sizeMap = {
@@ -28,6 +31,8 @@ export const BaseButton = ({
   size = "default",
   disabled = false,
   ref,
+  loading,
+  center,
   ...others
 }: Props) => {
   return (
@@ -35,7 +40,10 @@ export const BaseButton = ({
       ref={ref}
       component="button"
       aria-label="Click to perform an action"
-      onClick={(e) => onClick && onClick(e)}
+      onClick={(e) => {
+        if (loading) return;
+        if (onClick) onClick(e);
+      }}
       className={cn(
         `flex cursor-pointer items-center rounded-base border-2 border-black text-sm disabled:bg-disabled font-base shadow-base
         transition-all hover:btn-active disabled:btn-active`,
@@ -45,17 +53,27 @@ export const BaseButton = ({
       )}
       disabled={disabled}
       {...others}
+      pos={"relative"}
     >
-      {children}
+      <LoadingOverlay visible={loading} {...LOADING_OVERLAY_CFG} />
+      {center ? (
+        <Box ms={"auto"} me={"auto"}>
+          {children}
+        </Box>
+      ) : (
+        <>{children}</>
+      )}
     </Box>
   );
 };
 
 // Base: https://neobrutalism-components.vercel.app/react/components/Button
 export const BtnActiveClass: ClassValue = "btn-active shadow-none bg-main dark:bg-main-dark";
-const Button = createPolymorphicComponent<"button", Props>(
+const Button = createPolymorphicComponent<"button", Props & MantineStyleProps>(
   // eslint-disable-next-line react/display-name
-  forwardRef<HTMLButtonElement, Props>((parameters, ref) => <BaseButton {...parameters} ref={ref} />)
+  forwardRef<HTMLButtonElement, Props & MantineStyleProps>((parameters, ref) => (
+    <BaseButton {...parameters} ref={ref} />
+  ))
 );
 Button.displayName = "Button";
 

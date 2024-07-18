@@ -17,7 +17,7 @@ export function BtnSignOutIcon() {
   );
 
   return (
-    <Tooltip events={{ hover: true, focus: true, touch: true }} label="Sign Out">
+    <Tooltip events={{ hover: true, focus: true, touch: true }} label="Logout">
       <ActionIcon
         variant="filled"
         color="red"

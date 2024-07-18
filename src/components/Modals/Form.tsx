@@ -5,7 +5,7 @@ import { useForm } from "@mantine/form";
 import { generateId } from "lucia";
 import { useEffect, useState } from "react";
 
-import { LoadingOverlayConfig } from "../Form/utils";
+import { LOADING_OVERLAY_CFG } from "../Form/utils";
 import { ConfirmModal } from "./Confirm";
 
 export function BaseFormModal({
@@ -117,7 +117,7 @@ export default function DeleteModal({
   return (
     <BaseFormModal opened={opened} onClose={closeModal} title={`Hapus ${title}`}>
       <Box pos={"relative"}>
-        <LoadingOverlay visible={mutation.isPending} {...LoadingOverlayConfig} />
+        <LoadingOverlay visible={mutation.isPending} {...LOADING_OVERLAY_CFG} />
         <Text ta={"justify"} size="sm" mb={"md"}>
           This action is permanent, deleted data cannot be restored. {description}
         </Text>

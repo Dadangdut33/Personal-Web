@@ -18,7 +18,7 @@ import "./globals.css";
 import { AppProvider } from "./provider";
 import { ViewTransitions } from "next-view-transitions";
 export const metadata = {
-  title: { default: WEB_NAME, template: `%s | ${WEB_NAME}` },
+  title: { default: WEB_NAME, template: `%s - ${WEB_NAME}` },
   description:
     "My personal website / portofolio. I write about programming, web development, and other things that I find interesting.",
   keywords: ["Personal", "Blog", "Portofolio", "Projects", "Programming", "Web Development", "Technology"],

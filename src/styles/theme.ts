@@ -1,12 +1,15 @@
 "use client";
 
-import RingLoader from "@/components/PageLoad/RingLoader";
+import RingLoader from "@/components/Loader/RingLoader";
 import { createTheme, Loader } from "@mantine/core";
+import { generateColors } from "@mantine/colors-generator";
 
+const gray = generateColors("#696969");
 export const theme = createTheme({
   fontFamily: "DM Sans, Public Sans, sans-serif",
   headings: { fontFamily: "DM Sans, Public Sans, sans-serif" },
   white: "#fef2e8",
+  primaryColor: "lime",
   colors: {
     dark: [
       "#f0f5fa",
@@ -15,11 +18,12 @@ export const theme = createTheme({
       "#97b5cd",
       "#789fc0",
       "#588ab5",
-      "#6491b8",
-      "#204059",
       "#3d6a8f",
+      "#204059",
+      "#6491b8",
       "#2e5c80",
     ],
+    gray,
   },
   focusRing: "always",
   radius: { md: "5px" },

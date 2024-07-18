@@ -1,6 +1,7 @@
 import { ApiReturn } from "@/lib/types";
 import { Alert, MantineSpacing, MantineStyleProps, StyleProp } from "@mantine/core";
 import { IconAlertOctagon, IconMessageCircle } from "@tabler/icons-react";
+import { CARD_SHADOW } from "@/components/ui/utils";
 
 export function FormAlert({
   state,
@@ -19,12 +20,13 @@ export function FormAlert({
     return (
       <Alert
         mt={mt}
-        variant={"outline"}
+        variant={"light"}
         color="blue"
-        title={customTitleSuccess || "Informasi"}
+        title={customTitleSuccess || "Information"}
         icon={<IconMessageCircle />}
         w={w}
         style={{ whiteSpace: "pre-wrap" }}
+        className={CARD_SHADOW}
       >
         {state.message}
       </Alert>
@@ -34,12 +36,13 @@ export function FormAlert({
     return (
       <Alert
         mt={mt}
-        variant="outline"
+        variant="light"
         color="red"
-        title={customTitleFailure || "Terjadi Kesalahan!"}
+        title={customTitleFailure || "Error!"}
         icon={<IconAlertOctagon />}
         w={w}
         style={{ whiteSpace: "pre-wrap" }}
+        className={CARD_SHADOW}
       >
         {state.message}
       </Alert>
@@ -51,11 +54,12 @@ export function InformationAlert({ msg, withMt = true }: { msg?: string | null; 
     return (
       <Alert
         mt={withMt ? "md" : 0}
-        variant="outline"
+        variant="light"
         color="blue"
-        title="Informasi"
+        title="Information"
         icon={<IconMessageCircle />}
         w={"90%"}
+        className={CARD_SHADOW}
       >
         {msg}
       </Alert>

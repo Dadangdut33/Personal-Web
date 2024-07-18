@@ -1,10 +1,14 @@
 import Home from "@/components/app/Home";
-import HomeLayout from "@/layouts/Home";
+import PublicLayout from "@/layouts/Public";
+
+export const metadata = {
+  title: "Hello :D - Dadangdut33",
+};
 
 export default function Page() {
   return (
-    <HomeLayout>
+    <PublicLayout>
       <Home />
-    </HomeLayout>
+    </PublicLayout>
   );
 }

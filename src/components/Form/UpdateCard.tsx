@@ -10,7 +10,7 @@ import { useState } from "react";
 
 import { CardInput, CardInputBody, CardInputFooter } from "./CardInput";
 import { PasswordStrengthWithConfirmation } from "./PasswordWithStrength";
-import { LoadingOverlayConfig } from "./utils";
+import { LOADING_OVERLAY_CFG } from "./utils";
 
 export default function UpdateCard({
   header,
@@ -127,7 +127,7 @@ export function UpdateCardWithAction({
       subDesc={subDesc}
       InputElement={
         <Stack gap={"md"} pos={"relative"}>
-          <LoadingOverlay visible={mutation.isPending || deleteMutation.isPending} {...LoadingOverlayConfig} />
+          <LoadingOverlay visible={mutation.isPending || deleteMutation.isPending} {...LOADING_OVERLAY_CFG} />
           {useTextarea ? (
             <Textarea {...form.getInputProps(formField)} radius={"md"} disabled={!edit} minRows={4} autosize />
           ) : usePasswordFields ? (

@@ -1,6 +1,6 @@
 import { Box, Loader } from "@mantine/core";
 
-import classes from "./PageLoad.module.css";
+import classes from "./Loader.module.css";
 
 export default function PageLoad({ both = true }: { both?: boolean }) {
   return (

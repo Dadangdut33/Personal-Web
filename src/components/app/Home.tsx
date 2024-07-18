@@ -1,6 +1,6 @@
 import { Image, Text } from "@mantine/core";
 import DotPattern from "@/components/ui/DotPattern";
-import { Link } from "../Router";
+import { Link } from "@/components/Router";
 
 export default function Home() {
   return (
@@ -10,19 +10,21 @@ export default function Home() {
           <Image src={"/assets/logo-transparent.png"} alt="Logo" className="w-[300px]" />
         </DotPattern>
 
-        <h1 className="text-2xl font-heading sm:text-4xl ">Fauzan Farhan Antoro</h1>
-        <p className="mt-2 text-lg sm:text-xl">Fullstack Developer</p>
+        <h1 className="text-2xl font-heading sm:text-4xl ">Hello :D</h1>
       </div>
 
       <div className="text-base sm:text-lg max-w-prose mt-6">
         <p className="text-justify">
-          Hello, i&apos;m Fauzan, a fresh graduate with a degree in Informatics Engineering from UIN Jakarta.
+          Welcome to my Home Page! I&apos;m Fauzan, otherwise known by the nickname Dadangdut33 on the internet.
+          I&apos;m a fresh graduate Computer Science student based in Indonesia.
         </p>
 
         <br />
+
         <Text className="text-justify">
-          I enjoy watching anime, reading manga, playing games, and coding. Creating desktop software and web
-          applications is a particular passion of mine. You can check out some of my projects on my{" "}
+          I&apos;m currently searching for a job as a software developer. I&apos;m open to any opportunities, so feel
+          free to reach out to me. Creating desktop software and web applications is also a particular passion of mine.
+          You can check out some of my projects on my{" "}
           <a target="_blank" className="font-heading underline" href="https://github.com/dadangdut33">
             Github
           </a>
@@ -40,7 +42,7 @@ export default function Home() {
           </Link>
           .
         </Text>
-        <Text className="text-justify">I hope you enjoy your visit here :D Thanks for stopping by!</Text>
+        <Text className="text-justify">I hope you enjoy your visit here :) Thanks for stopping by!</Text>
       </div>
     </main>
   );

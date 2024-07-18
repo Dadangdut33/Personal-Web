@@ -1,0 +1,13 @@
+.main {
+  /* @mixin light {
+    background-color: var(--mantine-color-gray-1);
+  } */
+
+  @mixin dark {
+    background-color: var(--bg-dark);
+  }
+}
+
+.menu {
+  @apply bg-white dark:bg-gray-700;
+}

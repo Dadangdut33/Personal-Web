@@ -20,6 +20,7 @@ export const ERR_INVALID_AUTH = {
   message: "Username or password is incorrect!",
 };
 export const WEB_NAME = "Dadangdut33";
+export const DASHBOARD_PATH = "/dashboard";
 export const PASS_REGEX = /^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[$&+,:;=?@#|'<>.^*()%!-])/;
 export const PASS_REQ = [
   { re: /[0-9]/, label: "Must contain at least one number" },

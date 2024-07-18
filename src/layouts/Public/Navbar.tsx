@@ -3,6 +3,7 @@
 import { Link } from "@/components/Router";
 import Button, { BtnActiveClass } from "@/components/ui/Button";
 import { usePathname } from "next/navigation";
+import { Image } from "@mantine/core";
 
 import MobileDrawer from "./MobileDrawer";
 import { BtnToggleColor } from "@/components/Button/BtnToggleColor";
@@ -19,7 +20,7 @@ function Navbar() {
 
         <div className="flex items-center gap-10 m400:flex-1 m400:pl-5">
           <Link className="text-4xl font-heading m500:text-xl" href={"/"}>
-            Dadangdut33
+            <Image src={"/assets/logo-transparent.png"} alt="Logo" className="w-[80px]" />
           </Link>
         </div>
 

@@ -47,9 +47,13 @@ export function mapFormErrorsToMessage(errors: FormErrors): string {
 export function formErrorToString(error: FormErrors) {
   const keys = Object.keys(error);
   let errorStr = "";
+  if (keys.length === 0) return "Unexpected error";
+  if (keys.length === 1) return `${error[keys[0]]}`;
+  // multiple errors
   keys.forEach((key, i) => {
     errorStr += `- ${error[key]}${i === keys.length - 1 ? "" : "\n"}`;
   });
+
   return errorStr;
 }
 
