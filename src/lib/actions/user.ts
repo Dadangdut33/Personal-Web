@@ -19,7 +19,8 @@ import {
 import { passValidation, stringTrimmed } from "@/lib/db/zod/utils";
 import { logger } from "@/lib/logger";
 import { lucia } from "@/lib/lucia/auth";
-import { isAdmin, isLoggedIn, roleIsAdmin, roleIsSuperAdmin } from "@/lib/lucia/utils";
+import { isAdmin, isLoggedIn } from "@/lib/lucia/utils";
+import { roleIsAdmin, roleIsSuperAdmin } from "@/lib/lucia/rolechecker";
 import rateLimit from "@/lib/rateLimit";
 import { ApiReturn, NeedsReAuth, TypedFormData } from "@/lib/types";
 import { getTimeMs } from "@/lib/utils";

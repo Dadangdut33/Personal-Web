@@ -1,15 +1,13 @@
 import { AuthSession } from "@/lib/types";
 import { Cookie } from "lucia";
-import { cookies, headers } from "next/headers";
+import { cookies } from "next/headers";
+import { headers } from "next/headers";
 import { notFound, redirect } from "next/navigation";
 
 import { validateSignedIn } from "./auth";
+import { roleIsAdmin, roleIsEditor, roleIsSuperAdmin } from "./rolechecker";
+import { RoleType } from "@/lib/db/schema/_enum";
 
-export const allowedAdminRoles = ["SUPER_ADMIN", "ADMIN"];
-export const roleIsSuperAdmin = (role: string[]) => role.includes("SUPER_ADMIN");
-export const roleIsAdmin = (role: string[]) => role.some((r) => allowedAdminRoles.includes(r));
-
-// mendapatkan informasi user yang sedang login
 export const getUserAuth = async (): Promise<AuthSession> => {
   const { session, user } = await validateSignedIn();
   if (!session) return { session: null };
@@ -25,34 +23,48 @@ export const getUserAuth = async (): Promise<AuthSession> => {
   };
 };
 
-export const checkAuth = async () => {
-  const source = headers().get("x-next-pathname");
-  const { session, user } = await validateSignedIn();
-  if (!session) redirect("/auth?redirect=" + encodeURIComponent(source || "/dashboard"));
-  return { session, user };
+export const setAuthCookie = (cookie: Cookie) => {
+  // cookies().set(cookie.name, cookie.value, cookie.attributes); // <- suggested approach from the docs, but does not work with `next build` locally
+  cookies().set(cookie);
 };
 
+// --------------------------
+// Logged in -> redirect to dashboard
 export const isLoggedIn = async (doRedirect = true) => {
   const { session, user } = await validateSignedIn();
   if (session && doRedirect) redirect("/dashboard");
   return { session, user };
 };
 
-export const isSuperAdmin = async (doRedirect = true) => {
+// --------------------------
+// Not Logged in -> redirect to auth
+const checkRole = async (roleCheckFn: (role: RoleType[]) => boolean = () => true, doRedirect = true) => {
+  const source = headers().get("x-next-pathname");
   const { session, user } = await validateSignedIn();
-  if (!session && doRedirect) redirect("/auth");
-  if (user && !roleIsSuperAdmin(user.role)) notFound();
+
+  if (!session && doRedirect) {
+    redirect("/auth?redirect=" + encodeURIComponent(source || "/dashboard"));
+  }
+
+  if (user && !roleCheckFn(user.role)) {
+    notFound();
+  }
+
   return { session, user };
+};
+
+export const checkAuth = async () => {
+  return await checkRole(); // no role check, only check if user is logged in
+};
+
+export const isSuperAdmin = async (doRedirect = true) => {
+  return await checkRole(roleIsSuperAdmin, doRedirect);
 };
 
 export const isAdmin = async (doRedirect = true) => {
-  const { session, user } = await validateSignedIn();
-  if (!session && doRedirect) redirect("/auth");
-  if (user && !roleIsAdmin(user.role)) notFound();
-  return { session, user };
+  return await checkRole(roleIsAdmin, doRedirect);
 };
 
-export const setAuthCookie = (cookie: Cookie) => {
-  // cookies().set(cookie.name, cookie.value, cookie.attributes); // <- suggested approach from the docs, but does not work with `next build` locally
-  cookies().set(cookie);
+export const isEditor = async (doRedirect = true) => {
+  return await checkRole(roleIsEditor, doRedirect);
 };

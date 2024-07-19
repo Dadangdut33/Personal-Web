@@ -12,6 +12,6 @@ export const FileCategoryOption = ["project_thumbnail", "blog_thumbnail", "blog_
 export type FileCategoryType = (typeof FileCategoryOption)[number];
 export const fileCategoryEnum = pgEnum("file_category", FileCategoryOption);
 
-export const RoleOption = ["user", "admin", "super_admin"] as const;
+export const RoleOption = ["user", "editor", "media_manager", "admin", "super_admin"] as const;
 export type RoleType = (typeof RoleOption)[number];
 export const roleEnum = pgEnum("role", RoleOption);

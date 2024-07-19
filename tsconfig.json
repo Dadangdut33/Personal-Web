@@ -30,7 +30,6 @@
     ".next/types/**/*.ts",
     "drizzle/seed.ts",
     "drizzle/migrate.ts",
-    "drizzle/test.ts",
     "build/.next/types/**/*.ts"
   ],
   "exclude": ["node_modules"]

@@ -37,7 +37,7 @@ export const getLogger = () => {
   return pinoLog;
 };
 
-class Logger {
+export class Logger {
   info: LogFn;
   debug: LogFn;
   trace: LogFn;

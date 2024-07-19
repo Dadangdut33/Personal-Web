@@ -34,7 +34,7 @@ export function LinksGroup({
   const pathname = usePathname();
   const hasLinks = Array.isArray(links);
   const [opened, setOpened] = useState(initiallyOpened || false);
-  const [currentPath, setCurrentPath] = useState<string | undefined>();
+  const [_currentPath, setCurrentPath] = useState<string | undefined>();
   const ChevronIcon = IconChevronRight;
 
   const items = (hasLinks ? links : []).map((link, i) => {
@@ -60,7 +60,7 @@ export function LinksGroup({
 
   useEffect(() => {
     const paths = pathname.split("/");
-    // check first if not initially opened and its not the link then closeq
+    // check first if not initially opened and its not the link then close
     if (!initiallyOpened && pathname !== link) setOpened(false);
     // if it turns out to be the link, open it
     if (pathname === link) setOpened(true);
