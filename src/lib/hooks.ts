@@ -1,8 +1,8 @@
-import { NotifyError, NotifySuccess } from "@/components/Notification/Notify";
-import { UseFormReturnType } from "@mantine/form";
-import { useLocalStorage } from "@mantine/hooks";
-import { notifications } from "@mantine/notifications";
-import { useMutation } from "@tanstack/react-query";
+import { NotifyError, NotifySuccess } from '@/components/Notification/Notify';
+import { UseFormReturnType } from '@mantine/form';
+import { useLocalStorage } from '@mantine/hooks';
+import { notifications } from '@mantine/notifications';
+import { useMutation } from '@tanstack/react-query';
 import {
   MRT_ColumnDef,
   MRT_ColumnSizingState,
@@ -14,21 +14,21 @@ import {
   MRT_Updater,
   MRT_VisibilityState,
   useMantineReactTable,
-} from "mantine-react-table";
-import { usePathname, useSearchParams } from "next/navigation";
-import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from "react";
+} from 'mantine-react-table';
+import { usePathname, useSearchParams } from 'next/navigation';
+import { Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 
-import { getProfileDataById } from "./actions/user";
-import { ProfileComplete } from "./db/types";
-import { ApiReturn } from "./types";
-import { formErrorToString, mapFormErrorsToMessage } from "./utils";
+import { getProfileDataById } from './actions/user';
+import { ProfileComplete } from './db/types';
+import { ApiReturn } from './types';
+import { formErrorToString, mapFormErrorsToMessage } from './utils';
 
 export function useCSRFToken() {
-  const [csrfToken, setCsrfToken] = useState("");
+  const [csrfToken, setCsrfToken] = useState('');
 
   useEffect(() => {
     async function fetchCsrfToken() {
-      const response = await fetch("/csrf-token");
+      const response = await fetch('/csrf-token');
       const data = await response.json();
       setCsrfToken(data.csrfToken);
     }
@@ -38,18 +38,18 @@ export function useCSRFToken() {
   return csrfToken;
 }
 
-export function useRedirectMsg(sendMantineNotification = false, notificationTitle = "Information") {
+export function useRedirectMsg(sendMantineNotification = false, notificationTitle = 'Information') {
   const csrfToken = useCSRFToken();
   const [redirectMsg, setRedirecMsg] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchRedirectMsg() {
-      if (typeof window === "undefined") return;
+      if (typeof window === 'undefined') return;
       if (!csrfToken) return;
-      const response = await fetch("/api/get-redirect-msg", {
-        method: "POST",
+      const response = await fetch('/api/get-redirect-msg', {
+        method: 'POST',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
         },
         body: JSON.stringify({ csrf_token: csrfToken }),
       });
@@ -61,7 +61,7 @@ export function useRedirectMsg(sendMantineNotification = false, notificationTitl
           notifications.show({
             title: notificationTitle,
             message: data,
-            color: "blue",
+            color: 'blue',
             autoClose: 6000,
           });
         }
@@ -91,14 +91,14 @@ export const useBaseFormMutation = <T extends ApiReturn>({
       if (form) {
         const { hasErrors, errors } = form.validate();
         if (hasErrors) {
-          NotifyError("Invalid Form", `${mapFormErrorsToMessage(errors)}`);
+          NotifyError('Invalid Form', `${mapFormErrorsToMessage(errors)}`);
           if (setReturnState) setReturnState({ success: false, message: `${formErrorToString(errors)}` });
           return;
         }
 
         const data = new FormData();
         for (const key in form.values) data.append(key, form.values[key]);
-        data.append("csrf_token", csrf_token);
+        data.append('csrf_token', csrf_token);
 
         return await fn(data);
       } else {
@@ -109,15 +109,15 @@ export const useBaseFormMutation = <T extends ApiReturn>({
       if (data) {
         if (setReturnState) setReturnState(data);
         if (data.success) {
-          NotifySuccess("Success", data.message!);
+          NotifySuccess('Success', data.message!);
           cleanUp(data);
         } else {
-          NotifyError("Error", data.message!);
+          NotifyError('Error', data.message!);
         }
 
         if (forceCleanUpFn) forceCleanUpFn();
       }
-      if (error) NotifyError("Error", error.message);
+      if (error) NotifyError('Error', error.message);
     },
   });
 
@@ -134,7 +134,7 @@ export const useProfile = (userId: string) => {
       if (res.success) {
         setProfile(res.data);
       } else {
-        NotifyError("Error Fetching Profile", res.message);
+        NotifyError('Error Fetching Profile', res.message);
       }
     }
 
@@ -194,7 +194,7 @@ export const useMantineTable = <T extends MRT_RowData>({
   });
   const [sorting, setSorting] = useLocalStorage<MRT_SortingState>({
     key: `mrt_sorting_table_${tblKey}`,
-    defaultValue: [{ id: "createdAt", desc: true }],
+    defaultValue: [{ id: 'createdAt', desc: true }],
   });
   const handlePaginationChange = (updater: MRT_Updater<MRT_PaginationState>) => {
     setPagination((prevPagination) => (updater instanceof Function ? updater(prevPagination) : updater));
@@ -206,21 +206,21 @@ export const useMantineTable = <T extends MRT_RowData>({
 
   // pagination in url
   useEffect(() => {
-    if (typeof window === "undefined") return;
+    if (typeof window === 'undefined') return;
 
     window.history.pushState(
       {},
-      "",
-      `${pathName}?page=${pagination.pageIndex + 1}&perpage=${pagination.pageSize}${globalFilter ? `&search=${globalFilter}` : ""}`
+      '',
+      `${pathName}?page=${pagination.pageIndex + 1}&perpage=${pagination.pageSize}${globalFilter ? `&search=${globalFilter}` : ''}`
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [pagination]);
 
   // run only once
   useEffect(() => {
-    const page = searchParams.get("page");
-    const perpage = searchParams.get("perpage");
-    const search = searchParams.get("search");
+    const page = searchParams.get('page');
+    const perpage = searchParams.get('perpage');
+    const search = searchParams.get('search');
     if (page) {
       let pNum = parseInt(page);
       setPagination((prev) => ({ ...prev, pageIndex: pNum - 1 }));
@@ -264,8 +264,8 @@ export const useMantineTable = <T extends MRT_RowData>({
       sorting,
       columnSizing,
     },
-    mantinePaperProps: { shadow: "0", withBorder: false },
-    initialState: { density: "xs", rowSelection: {} },
+    mantinePaperProps: { shadow: '0', withBorder: false },
+    initialState: { density: 'xs', rowSelection: {} },
     enableRowSelection: rowSelectionRules,
     renderBottomToolbarCustomActions: BottomToolbarAct,
     renderRowActionMenuItems,

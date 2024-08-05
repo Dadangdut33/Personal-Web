@@ -1,4 +1,4 @@
-import { addBasePath } from "next/dist/client/add-base-path";
+import { addBasePath } from 'next/dist/client/add-base-path';
 
 function getURL(href: string): URL {
   return new URL(addBasePath(href), location.href);
@@ -7,9 +7,9 @@ function getURL(href: string): URL {
 // https://github.com/vercel/next.js/blob/400ccf7b1c802c94127d8d8e0d5e9bdf9aab270c/packages/next/src/client/link.tsx#L169
 function isModifiedEvent(event: React.MouseEvent): boolean {
   const eventTarget = event.currentTarget as HTMLAnchorElement | SVGAElement;
-  const target = eventTarget.getAttribute("target");
+  const target = eventTarget.getAttribute('target');
   return (
-    (target && target !== "_self") ||
+    (target && target !== '_self') ||
     event.metaKey ||
     event.ctrlKey ||
     event.shiftKey ||

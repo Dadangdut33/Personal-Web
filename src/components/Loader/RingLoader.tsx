@@ -1,5 +1,5 @@
-import { forwardRef } from "react";
-import { MantineLoaderComponent } from "@mantine/core";
+import { MantineLoaderComponent } from '@mantine/core';
+import { forwardRef } from 'react';
 
 // eslint-disable-next-line react/display-name
 const RingLoader: MantineLoaderComponent = forwardRef(({ style, ...others }, ref) => (
@@ -7,9 +7,9 @@ const RingLoader: MantineLoaderComponent = forwardRef(({ style, ...others }, ref
     {...others}
     ref={ref}
     style={{
-      width: "var(--loader-size)",
-      height: "var(--loader-size)",
-      stroke: "var(--loader-color)",
+      width: 'var(--loader-size)',
+      height: 'var(--loader-size)',
+      stroke: 'var(--loader-color)',
       ...style,
     }}
     viewBox="0 0 45 45"

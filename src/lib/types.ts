@@ -1,4 +1,4 @@
-import { FileCategoryType, RoleType } from "./db/schema/_enum";
+import { FileCategoryType, RoleType } from './db/schema/_enum';
 
 // * Utils
 // https://stackoverflow.com/a/55032655/13997872
@@ -12,7 +12,7 @@ export interface DatabaseUserAttributes {
   twoFactorSecret: string | null;
   role: RoleType[];
 }
-export interface AuthSessionUser extends Omit<DatabaseUserAttributes, "twoFactorSecret"> {
+export interface AuthSessionUser extends Omit<DatabaseUserAttributes, 'twoFactorSecret'> {
   setupTwoFactor: boolean;
 }
 export type AuthSession = {

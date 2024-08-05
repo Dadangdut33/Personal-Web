@@ -1,13 +1,13 @@
-import { RoleOption } from "@/lib/db/schema/_enum";
-import { Modify, csrf } from "@/lib/types";
-import { z } from "zod";
+import { RoleOption } from '@/lib/db/schema/_enum';
+import { csrf, Modify } from '@/lib/types';
+import { z } from 'zod';
 
-import { passValidation, stringTrimmed } from "./utils";
+import { passValidation, stringTrimmed } from './utils';
 
 const baseUserZod = {
-  username: stringTrimmed.toLowerCase().min(3, { message: "Must be at least 3 characters" }),
-  role: z.enum(RoleOption, { message: "Not a valid role enum" }).array(),
-  name: stringTrimmed.min(1, { message: "Name is required" }),
+  username: stringTrimmed.toLowerCase().min(3, { message: 'Must be at least 3 characters' }),
+  role: z.enum(RoleOption, { message: 'Not a valid role enum' }).array(),
+  name: stringTrimmed.min(1, { message: 'Name is required' }),
   description: stringTrimmed.optional().nullable(),
   title: stringTrimmed.optional().nullable(),
 };

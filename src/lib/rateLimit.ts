@@ -1,4 +1,4 @@
-import { LRUCache } from "lru-cache";
+import { LRUCache } from 'lru-cache';
 
 type Options = {
   uniqueTokenPerInterval?: number; // requests per interval (old request will be removed when new request comes in if the limit is reached)
@@ -25,8 +25,8 @@ export default function rateLimit(options?: Options) {
         const currentUsage = tokenCount[0];
         const isRateLimited = currentUsage >= limit;
 
-        header.set("X-RateLimit-Limit", `${limit}`);
-        header.set("X-RateLimit-Remaining", isRateLimited ? `0` : `${limit - currentUsage}`);
+        header.set('X-RateLimit-Limit', `${limit}`);
+        header.set('X-RateLimit-Remaining', isRateLimited ? `0` : `${limit - currentUsage}`);
 
         return isRateLimited ? reject() : resolve();
       }),

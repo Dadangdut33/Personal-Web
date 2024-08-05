@@ -1,4 +1,4 @@
-import { Image } from "@mantine/core";
+import { Image } from '@mantine/core';
 
 type Props = {
   imageUrl: string;
@@ -8,9 +8,9 @@ type Props = {
 // Base: https://neobrutalism-components.vercel.app/react/components/ImageCard
 export default function ImageCard({ imageUrl, children }: Props) {
   return (
-    <figure className="w-[250px] overflow-hidden rounded-base border-2 border-black bg-main font-base shadow-base">
+    <figure className="w-[250px] overflow-hidden rounded-base border-2 border-border dark:border-darkBorder bg-main font-base shadow-light dark:shadow-dark">
       <Image className="w-full" src={imageUrl} alt="image" />
-      <figcaption className="border-t-2 border-black p-4">{children}</figcaption>
+      <figcaption className="border-t-2 text-text border-border dark:border-darkBorder p-4">{children}</figcaption>
     </figure>
   );
 }

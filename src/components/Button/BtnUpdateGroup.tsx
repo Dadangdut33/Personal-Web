@@ -1,6 +1,6 @@
-import { Button, ButtonProps, Group } from "@mantine/core";
-import { IconAlertTriangle, IconEditOff, IconPencil } from "@tabler/icons-react";
-import { Save } from "lucide-react";
+import { Button, ButtonProps, Group } from '@mantine/core';
+import { IconAlertTriangle, IconEditOff, IconPencil } from '@tabler/icons-react';
+import { Save } from 'lucide-react';
 
 export type BtnUpdateGroupProps = {
   edit: boolean;
@@ -29,17 +29,17 @@ export default function BtnUpdateGroup({
   propsReset,
   propsRemove,
 }: BtnUpdateGroupProps) {
-  if (!propsReset) propsReset = { variant: "outline" };
-  if (!propsRemove) propsRemove = { variant: "outline" };
+  if (!propsReset) propsReset = { variant: 'outline' };
+  if (!propsRemove) propsRemove = { variant: 'outline' };
 
   return (
-    <Group gap={"sm"}>
+    <Group gap={'sm'}>
       {edit ? (
         <>
           {onRemove && (
             <Button
               loading={loadingRemove}
-              color={"red"}
+              color={'red'}
               leftSection={<IconAlertTriangle />}
               {...propsRemove}
               onClick={onRemove}
@@ -49,7 +49,7 @@ export default function BtnUpdateGroup({
           )}
           <Button
             loading={loadingReset}
-            color={"yellow"}
+            color={'yellow'}
             leftSection={<IconEditOff />}
             {...propsReset}
             onClick={onReset}
@@ -61,7 +61,7 @@ export default function BtnUpdateGroup({
           </Button>
         </>
       ) : (
-        <Button leftSection={<IconPencil />} onClick={enableEdit} color={"yellow"}>
+        <Button leftSection={<IconPencil />} onClick={enableEdit} color={'yellow'}>
           Edit
         </Button>
       )}

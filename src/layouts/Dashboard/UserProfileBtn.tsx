@@ -1,11 +1,11 @@
-import { MATCH_MOBILE_MQ } from "@/lib/constants";
-import { limitString } from "@/lib/utils";
-import { Avatar, Group, Loader, Text, UnstyledButton, UnstyledButtonProps } from "@mantine/core";
-import { useMediaQuery } from "@mantine/hooks";
-import { IconChevronRight } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
+import { useRouter } from '@/components/Router';
+import { MATCH_MOBILE_MQ } from '@/lib/constants';
+import { limitString } from '@/lib/utils';
+import { Avatar, Group, Loader, Text, UnstyledButton, UnstyledButtonProps } from '@mantine/core';
+import { useMediaQuery } from '@mantine/hooks';
+import { IconChevronRight } from '@tabler/icons-react';
 
-import classes from "./UserProfileBtn.module.css";
+import classes from './UserProfileBtn.module.css';
 
 type UserProfileButtonProps = {
   name?: string;
@@ -22,9 +22,9 @@ const UserProfileButton = ({ name, username, ...others }: UserProfileButtonProps
       {...others}
       variant="subtle"
       onClick={() => {
-        router.push("/dashboard/akun");
+        router.push('/dashboard/akun');
       }}
-      style={{ width: "100%" }}
+      style={{ width: '100%' }}
     >
       <Group>
         <Avatar radius="xl" />

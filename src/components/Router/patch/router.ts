@@ -1,7 +1,7 @@
-import { useRouter as useRouterOriginal } from "next/navigation";
+import { useRouter as useRouterOriginal } from 'next/navigation';
 
-import { onStart } from "../events";
-import { shouldTriggerStartEvent } from "./should-trigger-start-event";
+import { onStart } from '../events';
+import { shouldTriggerStartEvent } from './should-trigger-start-event';
 
 export function useRouter(): ReturnType<typeof useRouterOriginal> {
   const router = useRouterOriginal();

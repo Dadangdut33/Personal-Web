@@ -1,31 +1,31 @@
-import { ApiReturn } from "@/lib/types";
-import { Alert, MantineSpacing, MantineStyleProps, StyleProp } from "@mantine/core";
-import { IconAlertOctagon, IconMessageCircle } from "@tabler/icons-react";
-import { CARD_SHADOW } from "@/components/ui/utils";
+import { CARD_SHADOW } from '@/components/ui/utils';
+import { ApiReturn } from '@/lib/types';
+import { Alert, MantineSpacing, MantineStyleProps, StyleProp } from '@mantine/core';
+import { IconAlertOctagon, IconMessageCircle } from '@tabler/icons-react';
 
 export function FormAlert({
   state,
   customTitleSuccess,
   customTitleFailure,
-  mt = "md",
-  w = "90%",
+  mt = 'md',
+  w = '90%',
 }: {
   state: ApiReturn;
   customTitleSuccess?: string;
   customTitleFailure?: string;
   mt?: StyleProp<MantineSpacing>;
-  w?: MantineStyleProps["w"];
+  w?: MantineStyleProps['w'];
 }) {
   if (state.success && state.message)
     return (
       <Alert
         mt={mt}
-        variant={"light"}
+        variant={'light'}
         color="blue"
-        title={customTitleSuccess || "Information"}
+        title={customTitleSuccess || 'Information'}
         icon={<IconMessageCircle />}
         w={w}
-        style={{ whiteSpace: "pre-wrap" }}
+        style={{ whiteSpace: 'pre-wrap' }}
         className={CARD_SHADOW}
       >
         {state.message}
@@ -38,10 +38,10 @@ export function FormAlert({
         mt={mt}
         variant="light"
         color="red"
-        title={customTitleFailure || "Error!"}
+        title={customTitleFailure || 'Error!'}
         icon={<IconAlertOctagon />}
         w={w}
-        style={{ whiteSpace: "pre-wrap" }}
+        style={{ whiteSpace: 'pre-wrap' }}
         className={CARD_SHADOW}
       >
         {state.message}
@@ -53,12 +53,12 @@ export function InformationAlert({ msg, withMt = true }: { msg?: string | null; 
   if (msg)
     return (
       <Alert
-        mt={withMt ? "md" : 0}
+        mt={withMt ? 'md' : 0}
         variant="light"
         color="blue"
         title="Information"
         icon={<IconMessageCircle />}
-        w={"90%"}
+        w={'90%'}
         className={CARD_SHADOW}
       >
         {msg}

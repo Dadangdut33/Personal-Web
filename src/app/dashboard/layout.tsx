@@ -1,5 +1,5 @@
-import LayoutDashboard from "@/layouts/Dashboard";
-import { checkAuth } from "@/lib/lucia/utils";
+import LayoutDashboard from '@/layouts/Dashboard';
+import { checkAuth } from '@/lib/lucia/utils';
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const { user } = await checkAuth();

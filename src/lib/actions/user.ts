@@ -1,34 +1,34 @@
-"use server";
+'use server';
 
-import { ERR_AUTH_EXPIRED, ERR_TOO_MANY_REQUESTS, ERR_UNAUTHORIZED } from "@/lib/constants";
-import { db } from "@/lib/db/index";
-import { M_File } from "@/lib/db/schema/file";
-import { M_Profile, M_User } from "@/lib/db/schema/user";
-import { ProfileComplete, UserComplete } from "@/lib/db/types";
+import { ERR_AUTH_EXPIRED, ERR_TOO_MANY_REQUESTS, ERR_UNAUTHORIZED } from '@/lib/constants';
+import { db } from '@/lib/db/index';
+import { M_File } from '@/lib/db/schema/file';
+import { M_Profile, M_User } from '@/lib/db/schema/user';
+import { ProfileComplete, UserComplete } from '@/lib/db/types';
 import {
   CreateUser,
+  createUserSchema,
   CreateUserZod,
   UpdatePassword,
+  updatePasswordSchema,
   UpdatePasswordZod,
   UpdateUser,
-  UpdateUserZod,
-  createUserSchema,
-  updatePasswordSchema,
   updateUserSchema,
-} from "@/lib/db/zod/user";
-import { passValidation, stringTrimmed } from "@/lib/db/zod/utils";
-import { logger } from "@/lib/logger";
-import { lucia } from "@/lib/lucia/auth";
-import { isAdmin, isLoggedIn } from "@/lib/lucia/utils";
-import { roleIsAdmin, roleIsSuperAdmin } from "@/lib/lucia/rolechecker";
-import rateLimit from "@/lib/rateLimit";
-import { ApiReturn, NeedsReAuth, TypedFormData } from "@/lib/types";
-import { getTimeMs } from "@/lib/utils";
-import { eq, getTableColumns, inArray } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
-import { headers } from "next/headers";
-import { Argon2id } from "oslo/password";
-import { cache } from "react";
+  UpdateUserZod,
+} from '@/lib/db/zod/user';
+import { passValidation, stringTrimmed } from '@/lib/db/zod/utils';
+import { logger } from '@/lib/logger';
+import { lucia } from '@/lib/lucia/auth';
+import { roleIsAdmin, roleIsSuperAdmin } from '@/lib/lucia/rolechecker';
+import { isAdmin, isLoggedIn } from '@/lib/lucia/utils';
+import rateLimit from '@/lib/rateLimit';
+import { ApiReturn, NeedsReAuth, TypedFormData } from '@/lib/types';
+import { getTimeMs } from '@/lib/utils';
+import { eq, getTableColumns, inArray } from 'drizzle-orm';
+import { revalidatePath } from 'next/cache';
+import { headers } from 'next/headers';
+import { Argon2id } from 'oslo/password';
+import { cache } from 'react';
 
 const { hashedPassword, ...rest } = getTableColumns(M_User);
 const profile = getTableColumns(M_Profile);
@@ -36,7 +36,7 @@ const avatar = getTableColumns(M_File);
 
 const limiter = rateLimit({
   uniqueTokenPerInterval: 250,
-  interval: getTimeMs(15, "minute"),
+  interval: getTimeMs(15, 'minute'),
 });
 
 export const getProfileDataById = cache(async (_csrf: string, userId: string): Promise<ApiReturn<ProfileComplete>> => {
@@ -50,10 +50,10 @@ export const getProfileDataById = cache(async (_csrf: string, userId: string): P
     return {
       success: true,
       data: result,
-      message: "Successfully fetched profile data",
+      message: 'Successfully fetched profile data',
     };
   } catch (error) {
-    logger.error(error, "Error fetching profile data");
+    logger.error(error, 'Error fetching profile data');
     return {
       success: false,
       message: `An error occured while fetching profile data ${error}`,
@@ -73,10 +73,10 @@ export const getAllUsers = cache(async (): Promise<ApiReturn<UserComplete[]>> =>
     return {
       success: true,
       data: result,
-      message: "Successfully fecthed all users",
+      message: 'Successfully fecthed all users',
     };
   } catch (error) {
-    logger.error(error, "Error fetching all users");
+    logger.error(error, 'Error fetching all users');
     return {
       success: false,
       message: `An error occured while fetching users ${error}`,
@@ -90,17 +90,17 @@ export const addUser = async (form: TypedFormData<CreateUser>): Promise<ApiRetur
 
   try {
     const data = createUserSchema.parse({
-      username: form.get("username")!,
-      password: form.get("password")!,
-      role: JSON.parse(form.get("role") as string),
-      name: form.get("name")!,
-      description: form.get("description")!,
-      title: form.get("title")!,
+      username: form.get('username')!,
+      password: form.get('password')!,
+      role: JSON.parse(form.get('role') as string),
+      name: form.get('name')!,
+      description: form.get('description')!,
+      title: form.get('title')!,
     } satisfies CreateUserZod);
     const hashedPassword = await new Argon2id().hash(data.password);
 
     // make sure that only super_admin can create super_admin
-    if (!roleIsSuperAdmin(user!.role) && data.role.includes("super_admin")) return ERR_UNAUTHORIZED;
+    if (!roleIsSuperAdmin(user!.role) && data.role.includes('super_admin')) return ERR_UNAUTHORIZED;
 
     // create user
     const [createdUser] = await db
@@ -119,11 +119,11 @@ export const addUser = async (form: TypedFormData<CreateUser>): Promise<ApiRetur
       title: data.title,
     });
 
-    revalidatePath("/dashboard/user");
-    return { success: 1, message: "Successfully created user" };
+    revalidatePath('/dashboard/user');
+    return { success: 1, message: 'Successfully created user' };
   } catch (error) {
-    logger.error(error, "Error creating user");
-    return { success: 0, message: "Error! " + error };
+    logger.error(error, 'Error creating user');
+    return { success: 0, message: 'Error! ' + error };
   }
 };
 
@@ -132,13 +132,13 @@ export const updateUser = async (form: TypedFormData<UpdateUser & { id: string }
   if (!session) return ERR_AUTH_EXPIRED;
 
   try {
-    const id = stringTrimmed.parse(form.get("id"));
+    const id = stringTrimmed.parse(form.get('id'));
     const data = updateUserSchema.parse({
-      username: form.get("username")!,
-      role: JSON.parse(form.get("role")!),
-      name: form.get("name")!,
-      description: form.get("description"),
-      title: form.get("title"),
+      username: form.get('username')!,
+      role: JSON.parse(form.get('role')!),
+      name: form.get('name')!,
+      description: form.get('description'),
+      title: form.get('title'),
     } satisfies UpdateUserZod);
 
     await db
@@ -158,11 +158,11 @@ export const updateUser = async (form: TypedFormData<UpdateUser & { id: string }
       })
       .where(eq(M_Profile.userId, id));
 
-    revalidatePath("/dashboard/user");
-    return { success: 1, message: "Successfully updated user" };
+    revalidatePath('/dashboard/user');
+    return { success: 1, message: 'Successfully updated user' };
   } catch (error) {
-    logger.error(error, "Error updating user");
-    return { success: 0, message: "Error! " + error };
+    logger.error(error, 'Error updating user');
+    return { success: 0, message: 'Error! ' + error };
   }
 };
 
@@ -173,24 +173,24 @@ export const admin_UpdateUserPassword = async (
   if (!session) return ERR_AUTH_EXPIRED;
 
   try {
-    const id = stringTrimmed.parse(form.get("id"));
+    const id = stringTrimmed.parse(form.get('id'));
     if (!roleIsAdmin(user!.role) && user!.id !== id) return ERR_UNAUTHORIZED;
 
     const { passwordOld: pass, passwordNew: passConfirm } = updatePasswordSchema.parse({
-      passwordOld: form.get("passwordOld")!,
-      passwordNew: form.get("passwordNew")!,
+      passwordOld: form.get('passwordOld')!,
+      passwordNew: form.get('passwordNew')!,
     } satisfies UpdatePasswordZod);
-    if (pass !== passConfirm) return { success: 0, message: "Password confirmation does not match!" };
+    if (pass !== passConfirm) return { success: 0, message: 'Password confirmation does not match!' };
 
     const hashedPassword = await new Argon2id().hash(passConfirm);
     await db.update(M_User).set({ hashedPassword }).where(eq(M_User.id, id));
     await lucia.invalidateUserSessions(id); // Logout all sessions for this user
 
-    revalidatePath("/dashboard/user");
-    return { success: 1, message: "Successfully updated user password" };
+    revalidatePath('/dashboard/user');
+    return { success: 1, message: 'Successfully updated user password' };
   } catch (error) {
-    logger.error(error, "Error updating user password");
-    return { success: 0, message: "Error! " + error };
+    logger.error(error, 'Error updating user password');
+    return { success: 0, message: 'Error! ' + error };
   }
 };
 
@@ -205,7 +205,7 @@ export const user_ChangePassword = async (
   try {
     const readOnlyHeader = headers();
     const header = new Headers(readOnlyHeader);
-    await limiter.check(header, 15, "CHANGE_PASSWORD");
+    await limiter.check(header, 15, 'CHANGE_PASSWORD');
   } catch (error) {
     return ERR_TOO_MANY_REQUESTS;
   }
@@ -213,23 +213,23 @@ export const user_ChangePassword = async (
   try {
     // Verify old password
     const [qUser] = await db.select().from(M_User).where(eq(M_User.id, user?.id!));
-    const isMatch = await new Argon2id().verify(qUser.hashedPassword, form.get("passwordOld")!);
-    if (!isMatch) return { success: 0, message: "Incorrect old password!" };
+    const isMatch = await new Argon2id().verify(qUser.hashedPassword, form.get('passwordOld')!);
+    if (!isMatch) return { success: 0, message: 'Incorrect old password!' };
 
-    const newPassword = passValidation.parse(form.get("passwordNew"));
-    const newPasswordConfirmation = passValidation.parse(form.get("passwordConfirmation"));
+    const newPassword = passValidation.parse(form.get('passwordNew'));
+    const newPasswordConfirmation = passValidation.parse(form.get('passwordConfirmation'));
     if (newPassword !== newPasswordConfirmation)
-      return { success: 0, message: "Password confirmation does not match!" };
+      return { success: 0, message: 'Password confirmation does not match!' };
 
     const hashedPassword = await new Argon2id().hash(newPassword);
     await db.update(M_User).set({ hashedPassword }).where(eq(M_User.id, user?.id!));
     await lucia.invalidateUserSessions(session.userId); // Logout all sessions
 
-    revalidatePath("/dashboard/user");
-    return { success: 1, message: "Successfully changed password, please re-authenticate (login)" };
+    revalidatePath('/dashboard/user');
+    return { success: 1, message: 'Successfully changed password, please re-authenticate (login)' };
   } catch (error) {
-    logger.error(error, "Error changing password");
-    return { success: 0, message: "Error! " + error };
+    logger.error(error, 'Error changing password');
+    return { success: 0, message: 'Error! ' + error };
   }
 };
 
@@ -241,11 +241,11 @@ export const deleteUser = async (id: string): Promise<ApiReturn> => {
   try {
     await db.delete(M_User).where(eq(M_User.id, id));
 
-    revalidatePath("/dashboard/user");
-    return { success: 1, message: "Successfully deleted user" };
+    revalidatePath('/dashboard/user');
+    return { success: 1, message: 'Successfully deleted user' };
   } catch (error) {
-    logger.error(error, "Error deleting user");
-    return { success: 0, message: "Error! " + error };
+    logger.error(error, 'Error deleting user');
+    return { success: 0, message: 'Error! ' + error };
   }
 };
 
@@ -256,10 +256,10 @@ export const batchDeleteUser = async (ids: string[]): Promise<ApiReturn> => {
   try {
     await db.delete(M_User).where(inArray(M_User.id, ids));
 
-    revalidatePath("/dashboard/user");
-    return { success: 1, message: "Successfully deleted users" };
+    revalidatePath('/dashboard/user');
+    return { success: 1, message: 'Successfully deleted users' };
   } catch (error) {
-    logger.error(error, "Error deleting users");
-    return { success: 0, message: "Error! " + error };
+    logger.error(error, 'Error deleting users');
+    return { success: 0, message: 'Error! ' + error };
   }
 };

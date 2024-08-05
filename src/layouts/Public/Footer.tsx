@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { Container, Group, Text, Tooltip } from "@mantine/core";
-import { IconBrandGithub, IconBrandLinkedin, IconCoffee, IconDeviceAnalytics, IconMail } from "@tabler/icons-react";
-import Link from "next/link";
+import Button from '@/components/ui/Button';
+import { Container, Group, Text, Tooltip } from '@mantine/core';
+import { IconBrandGithub, IconBrandLinkedin, IconCoffee, IconDeviceAnalytics, IconMail } from '@tabler/icons-react';
+import Link from 'next/link';
 
-import classes from "./Footer.module.css";
-import Button from "@/components/ui/Button";
+import classes from './Footer.module.css';
 
 export function Footer() {
   return (
@@ -15,12 +15,12 @@ export function Footer() {
           <Tooltip
             label="See my profile at Linkedin"
             position="top"
-            transitionProps={{ transition: "skew-down" }}
+            transitionProps={{ transition: 'skew-down' }}
             withArrow
           >
             <span>
               <Button
-                href={"https://www.linkedin.com/in/fauzan-farhan-antoro/"}
+                href={'https://www.linkedin.com/in/fauzan-farhan-antoro/'}
                 size="icon"
                 component={Link}
                 target="_blank"
@@ -30,11 +30,11 @@ export function Footer() {
               </Button>
             </span>
           </Tooltip>
-          <Tooltip label="Follow me on Github" position="top" transitionProps={{ transition: "skew-down" }} withArrow>
+          <Tooltip label="Follow me on Github" position="top" transitionProps={{ transition: 'skew-down' }} withArrow>
             <span>
               <Button
                 size="icon"
-                href={"https://github.com/Dadangdut33/"}
+                href={'https://github.com/Dadangdut33/'}
                 component={Link}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -43,19 +43,19 @@ export function Footer() {
               </Button>
             </span>
           </Tooltip>
-          <Tooltip label="Contact me via email" position="top" transitionProps={{ transition: "skew-down" }} withArrow>
+          <Tooltip label="Contact me via email" position="top" transitionProps={{ transition: 'skew-down' }} withArrow>
             <span>
               <Button size="icon" href={`mailto:dadang.contact@gmail.com`} component={Link}>
                 <IconMail stroke={1.5} />
               </Button>
             </span>
           </Tooltip>
-          <Tooltip label="Buy me a coffee" position="top" transitionProps={{ transition: "skew-down" }} withArrow>
+          <Tooltip label="Buy me a coffee" position="top" transitionProps={{ transition: 'skew-down' }} withArrow>
             <span>
               <Button
                 size="icon"
                 component={Link}
-                href={"https://ko-fi.com/dadangdut33"}
+                href={'https://ko-fi.com/dadangdut33'}
                 target="_blank"
                 rel="noopener noreferrer"
               >
@@ -63,7 +63,7 @@ export function Footer() {
               </Button>
             </span>
           </Tooltip>
-          <Tooltip label="View web analytics" position="top" transitionProps={{ transition: "skew-down" }} withArrow>
+          <Tooltip label="View web analytics" position="top" transitionProps={{ transition: 'skew-down' }} withArrow>
             <span>
               <Button
                 size="icon"
@@ -77,14 +77,14 @@ export function Footer() {
             </span>
           </Tooltip>
         </Group>
-        <Tooltip label="Made with ❤️ by Dadangdut33" transitionProps={{ transition: "pop" }} withArrow>
-          <span style={{ marginTop: "1rem" }}>
+        <Tooltip label="Made with ❤️ by Dadangdut33" transitionProps={{ transition: 'pop' }} withArrow>
+          <span style={{ marginTop: '1rem' }}>
             <Text
-              href={"https://github.com/Dadangdut33/Personal-Web"}
+              href={'https://github.com/Dadangdut33/Personal-Web'}
               component={Link}
               target="_blank"
               rel="noopener noreferrer"
-              style={{ textDecoration: "none" }}
+              style={{ textDecoration: 'none' }}
               size="16 px"
             >
               © 2024 Dadangdut33

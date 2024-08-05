@@ -1,29 +1,29 @@
-import { FormErrors } from "@mantine/form";
-import { type ClassValue, clsx } from "clsx";
-import moment from "moment";
-import { twMerge } from "tailwind-merge";
+import { FormErrors } from '@mantine/form';
+import { clsx, type ClassValue } from 'clsx';
+import moment from 'moment';
+import { twMerge } from 'tailwind-merge';
 
-import { TypedFormData, TypedFormDataValue } from "./types";
+import { TypedFormData, TypedFormDataValue } from './types';
 
-export function getTimeMs(amount: number, type: "second" | "minute" | "hour" | "day" | "week") {
+export function getTimeMs(amount: number, type: 'second' | 'minute' | 'hour' | 'day' | 'week') {
   // Utilitas untuk mengubah waktu dalam satuan tertentu menjadi milidetik
-  if (type == "second") return amount * 1000;
-  if (type == "minute") return amount * 60 * 1000;
-  if (type == "hour") return amount * 60 * 60 * 1000;
-  if (type == "day") return amount * 24 * 60 * 60 * 1000;
-  if (type == "week") return amount * 7 * 24 * 60 * 60 * 1000;
+  if (type == 'second') return amount * 1000;
+  if (type == 'minute') return amount * 60 * 1000;
+  if (type == 'hour') return amount * 60 * 60 * 1000;
+  if (type == 'day') return amount * 24 * 60 * 60 * 1000;
+  if (type == 'week') return amount * 7 * 24 * 60 * 60 * 1000;
 }
 
 export function limitString(str: string, limit: number): string {
-  return str.length > limit ? str.substring(0, limit - 3) + "..." : str;
+  return str.length > limit ? str.substring(0, limit - 3) + '...' : str;
 }
 
 export function formatDate(date: Date | string): string {
-  return moment(date).format("DD/MM/YYYY");
+  return moment(date).format('DD/MM/YYYY');
 }
 
 export function formatDateDetailed(date: Date | string): string {
-  return moment(date).format("DD/MM/YYYY HH:mm:ss");
+  return moment(date).format('DD/MM/YYYY HH:mm:ss');
 }
 
 export function getLocalDate() {
@@ -33,25 +33,25 @@ export function getLocalDate() {
 }
 
 export function calculateDaysBetweenDates(start: Date, end: Date): number {
-  return moment(end).diff(moment(start), "days") + 1;
+  return moment(end).diff(moment(start), 'days') + 1;
 }
 
 export function isSameDay(date1: Date, date2: Date): boolean {
-  return moment(date1).isSame(date2, "day");
+  return moment(date1).isSame(date2, 'day');
 }
 
 export function mapFormErrorsToMessage(errors: FormErrors): string {
-  return Object.values(errors).join(", ");
+  return Object.values(errors).join(', ');
 }
 
 export function formErrorToString(error: FormErrors) {
   const keys = Object.keys(error);
-  let errorStr = "";
-  if (keys.length === 0) return "Unexpected error";
+  let errorStr = '';
+  if (keys.length === 0) return 'Unexpected error';
   if (keys.length === 1) return `${error[keys[0]]}`;
   // multiple errors
   keys.forEach((key, i) => {
-    errorStr += `- ${error[key]}${i === keys.length - 1 ? "" : "\n"}`;
+    errorStr += `- ${error[key]}${i === keys.length - 1 ? '' : '\n'}`;
   });
 
   return errorStr;
@@ -75,7 +75,7 @@ export function readableFileSize(attachmentSize: number) {
 }
 
 export function getFileName(fName: string) {
-  return fName.replace(/^(.*[/\\])?/, "").replace(/(\.[^.]*)$/, "");
+  return fName.replace(/^(.*[/\\])?/, '').replace(/(\.[^.]*)$/, '');
 }
 
 export function getExtension(fName: string) {
@@ -83,7 +83,7 @@ export function getExtension(fName: string) {
   if (!basename) return null;
 
   // (supports `\\` and `/` separators)
-  let pos = basename.lastIndexOf("."); // get last position of `.`
+  let pos = basename.lastIndexOf('.'); // get last position of `.`
   if (pos < 1)
     // if file name is empty or ...
     return null; //  `.` not found (-1) or comes first (0)

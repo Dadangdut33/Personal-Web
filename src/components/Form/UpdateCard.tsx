@@ -1,16 +1,16 @@
-import BtnUpdateGroup from "@/components/Button/BtnUpdateGroup";
-import { ConfirmAddModal, ConfirmDeleteModal, ConfirmResetModal } from "@/components/Modals/Confirm";
-import { useBaseFormMutation } from "@/lib/hooks";
-import { ApiReturn, UpdateCardFn } from "@/lib/types";
-import { LoadingOverlay, PasswordInput, Stack, TextInput, Textarea } from "@mantine/core";
-import { UseFormReturnType } from "@mantine/form";
-import { useTimeout } from "@mantine/hooks";
-import { IconLock } from "@tabler/icons-react";
-import { useState } from "react";
+import BtnUpdateGroup from '@/components/Button/BtnUpdateGroup';
+import { ConfirmAddModal, ConfirmDeleteModal, ConfirmResetModal } from '@/components/Modals/Confirm';
+import { useBaseFormMutation } from '@/lib/hooks';
+import { ApiReturn, UpdateCardFn } from '@/lib/types';
+import { LoadingOverlay, PasswordInput, Stack, Textarea, TextInput } from '@mantine/core';
+import { UseFormReturnType } from '@mantine/form';
+import { useTimeout } from '@mantine/hooks';
+import { IconLock } from '@tabler/icons-react';
+import { useState } from 'react';
 
-import { CardInput, CardInputBody, CardInputFooter } from "./CardInput";
-import { PasswordStrengthWithConfirmation } from "./PasswordWithStrength";
-import { LOADING_OVERLAY_CFG } from "./utils";
+import { CardInput, CardInputBody, CardInputFooter } from './CardInput';
+import { PasswordStrengthWithConfirmation } from './PasswordWithStrength';
+import { LOADING_OVERLAY_CFG } from './utils';
 
 export default function UpdateCard({
   header,
@@ -38,7 +38,7 @@ export default function UpdateCard({
       }}
     >
       <CardInputBody>{InputElement}</CardInputBody>
-      {withFooter && <CardInputFooter description={footerDesc || ""}>{SubmitElement}</CardInputFooter>}
+      {withFooter && <CardInputFooter description={footerDesc || ''}>{SubmitElement}</CardInputFooter>}
     </CardInput>
   );
 }
@@ -72,10 +72,10 @@ export function UpdateCardWithAction({
   usePasswordFields?: boolean;
   withOldPassword?: boolean;
 }) {
-  const [state, setState] = useState<ApiReturn>({ success: 0, message: "" });
+  const [state, setState] = useState<ApiReturn>({ success: 0, message: '' });
   const [edit, setEdit] = useState(false);
   const { start: startResetState, clear } = useTimeout(() => {
-    setState({ success: 0, message: "" });
+    setState({ success: 0, message: '' });
   }, 7000);
 
   const mutation = useBaseFormMutation({
@@ -91,7 +91,7 @@ export function UpdateCardWithAction({
   const saveModal = ConfirmAddModal(
     () => {},
     async () => mutation.mutate(form),
-    "data " + formField
+    'data ' + formField
   );
 
   const resetModal = ConfirmResetModal(
@@ -100,7 +100,7 @@ export function UpdateCardWithAction({
       setEdit(false);
       form.reset();
     },
-    "/ cancel perubahan untuk data " + formField
+    '/ cancel perubahan untuk data ' + formField
   );
 
   const deleteMutation = useBaseFormMutation({
@@ -108,7 +108,7 @@ export function UpdateCardWithAction({
     cleanUp: (data) => {
       clear();
       if (!data) return;
-      form.setValues({ [formField]: "" });
+      form.setValues({ [formField]: '' });
       setState(data);
       startResetState();
     },
@@ -117,7 +117,7 @@ export function UpdateCardWithAction({
   const deleteDataModal = ConfirmDeleteModal(
     () => {},
     async () => deleteMutation.mutate(null),
-    "data " + formField
+    'data ' + formField
   );
 
   return (
@@ -126,10 +126,10 @@ export function UpdateCardWithAction({
       desc={desc}
       subDesc={subDesc}
       InputElement={
-        <Stack gap={"md"} pos={"relative"}>
+        <Stack gap={'md'} pos={'relative'}>
           <LoadingOverlay visible={mutation.isPending || deleteMutation.isPending} {...LOADING_OVERLAY_CFG} />
           {useTextarea ? (
-            <Textarea {...form.getInputProps(formField)} radius={"md"} disabled={!edit} minRows={4} autosize />
+            <Textarea {...form.getInputProps(formField)} radius={'md'} disabled={!edit} minRows={4} autosize />
           ) : usePasswordFields ? (
             <>
               {withOldPassword && (
@@ -137,7 +137,7 @@ export function UpdateCardWithAction({
                   {...form.getInputProps(`${formField}Old`)}
                   placeholder="Old Password"
                   label="Old Password"
-                  radius={"md"}
+                  radius={'md'}
                   disabled={!edit}
                 />
               )}
@@ -149,7 +149,7 @@ export function UpdateCardWithAction({
               />
             </>
           ) : (
-            <TextInput {...form.getInputProps(formField)} radius={"md"} disabled={!edit} />
+            <TextInput {...form.getInputProps(formField)} radius={'md'} disabled={!edit} />
           )}
         </Stack>
       }

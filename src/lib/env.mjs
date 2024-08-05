@@ -1,12 +1,12 @@
-import { createEnv } from "@t3-oss/env-nextjs";
-import dotenv from "dotenv";
-import { z } from "zod";
+import { createEnv } from '@t3-oss/env-nextjs';
+import dotenv from 'dotenv';
+import { z } from 'zod';
 
 dotenv.config();
 
 export const env = createEnv({
   server: {
-    NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
+    NODE_ENV: z.enum(['development', 'test', 'production']).default('development'),
     CLOUDINARY_NAME: z.string().min(1),
     CLOUDINARY_API_KEY: z.string().min(1),
     CLOUDINARY_API_SECRET: z.string().min(1),
@@ -35,4 +35,4 @@ export const env = createEnv({
   },
 });
 
-export const isProd = env.NODE_ENV === "production";
+export const isProd = env.NODE_ENV === 'production';

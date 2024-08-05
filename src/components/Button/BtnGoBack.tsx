@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
-import { Button as MantineButton } from "@mantine/core";
-import { IconArrowLeft, IconHome2 } from "@tabler/icons-react";
-import { useRouter } from "next/navigation";
-import { BaseButton } from "@/components/ui/Button";
+import { useRouter } from '@/components/Router';
+import { BaseButton } from '@/components/ui/Button';
+import { Button as MantineButton } from '@mantine/core';
+import { IconArrowLeft, IconHome2 } from '@tabler/icons-react';
 
 export default function BtnGoBack() {
   const router = useRouter();
@@ -27,7 +27,7 @@ export function BtnGoHome() {
       leftSection={<IconHome2 size={18} />}
       component={BaseButton}
       variant="default"
-      onClick={() => router.push("/")}
+      onClick={() => router.push('/')}
     >
       Back to Home
     </MantineButton>

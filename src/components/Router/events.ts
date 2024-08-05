@@ -1,4 +1,4 @@
-import { nprogress } from "@mantine/nprogress";
+import { nprogress } from '@mantine/nprogress';
 
 export function onStart() {
   nprogress.start();

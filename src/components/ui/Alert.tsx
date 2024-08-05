@@ -1,6 +1,6 @@
-import { cn } from "@/lib/utils";
-import { ClassValue } from "clsx";
-import { CircleAlert } from "lucide-react";
+import { cn } from '@/lib/utils';
+import { ClassValue } from 'clsx';
+import { CircleAlert } from 'lucide-react';
 
 // Base: https://neobrutalism-components.vercel.app/react/components/Alert
 export default function Alert({ className, message }: { className?: ClassValue; message: string }) {
@@ -8,7 +8,7 @@ export default function Alert({ className, message }: { className?: ClassValue; 
     <div
       role="alert"
       className={cn(
-        "flex items-center justify-center rounded-base border-2 border-black bg-main py-4 sm:px-8 sm:py-5 px-4 font-heading text-sm md:text-base shadow-base",
+        'flex items-center justify-center text-text rounded-base border-2 border-border dark:border-darkBorder bg-main py-4 sm:px-8 sm:py-5 px-4 font-heading text-sm md:text-base shadow-light dark:shadow-dark',
         className
       )}
     >

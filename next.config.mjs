@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   webpack: (config) => {
-    config.externals.push("@node-rs/argon2", "@node-rs/bcrypt");
+    config.externals.push('@node-rs/argon2', '@node-rs/bcrypt');
     return config;
   },
   reactStrictMode: false,
@@ -9,8 +9,8 @@ const nextConfig = {
   experimental: {
     optimizePackageImports: ['@mantine/core', '@mantine/hooks'],
     serverActions: {
-      bodySizeLimit: "25mb"
-    }
+      bodySizeLimit: '25mb',
+    },
   },
   async rewrites() {
     return [
@@ -18,7 +18,7 @@ const nextConfig = {
         source: '/api/umami',
         destination: 'https://umami-dadangdut33.vercel.app/script.js',
       },
-    ]
+    ];
   },
 };
 

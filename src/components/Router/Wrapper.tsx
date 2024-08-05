@@ -1,7 +1,7 @@
-import { usePathname, useSearchParams } from "next/navigation";
-import { Suspense, useEffect } from "react";
+import { usePathname, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect } from 'react';
 
-import { onComplete } from "./events";
+import { onComplete } from './events';
 
 function HandleOnCompleteChild() {
   const pathname = usePathname();

@@ -1,6 +1,6 @@
-import { env } from "@/lib/env.mjs";
-import { AnyColumn, sql } from "drizzle-orm";
-import { PoolConfig } from "pg";
+import { env } from '@/lib/env.mjs';
+import { AnyColumn, sql } from 'drizzle-orm';
+import { PoolConfig } from 'pg';
 
 export const dbConfig: PoolConfig = {
   host: env.DB_HOST,

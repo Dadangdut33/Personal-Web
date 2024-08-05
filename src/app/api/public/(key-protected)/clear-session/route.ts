@@ -1,31 +1,31 @@
-import { db } from "@/lib/db";
-import { Session, SessionTemp } from "@/lib/db/schema";
-import { env } from "@/lib/env.mjs";
-import { logger } from "@/lib/logger";
-import { lucia } from "@/lib/lucia/auth";
-import rateLimit from "@/lib/rateLimit";
-import { getTimeMs } from "@/lib/utils";
-import { inArray } from "drizzle-orm";
-import { NextRequest, NextResponse } from "next/server";
+import { db } from '@/lib/db';
+import { Session, SessionTemp } from '@/lib/db/schema';
+import { env } from '@/lib/env.mjs';
+import { logger } from '@/lib/logger';
+import { lucia } from '@/lib/lucia/auth';
+import rateLimit from '@/lib/rateLimit';
+import { getTimeMs } from '@/lib/utils';
+import { inArray } from 'drizzle-orm';
+import { NextRequest, NextResponse } from 'next/server';
 
 const limiter = rateLimit({
   uniqueTokenPerInterval: 100, // requests per interval (old request will be removed when new request comes in)
-  interval: getTimeMs(1, "hour"), // 1 hour
+  interval: getTimeMs(1, 'hour'), // 1 hour
 });
 
 // clean db session protected with a simple API_KEY set in the environment
 export async function GET(req: NextRequest) {
   try {
-    await limiter.check(req.headers, 10, "CLEAN_SESSION"); // 10 requests per minute
+    await limiter.check(req.headers, 10, 'CLEAN_SESSION'); // 10 requests per minute
   } catch (error) {
-    return NextResponse.json({ success: 0, message: "Too many requests" }, { status: 429 });
+    return NextResponse.json({ success: 0, message: 'Too many requests' }, { status: 429 });
   }
 
   const reqData = await req.json();
   // if the request does not contain the API_KEY, return an error
 
-  if (req.headers.get("Authorization") !== `Bearer ${env.CRON_SECRET}`) {
-    return NextResponse.json({ success: 0, message: "Invalid API_KEY" }, { status: 403 });
+  if (req.headers.get('Authorization') !== `Bearer ${env.CRON_SECRET}`) {
+    return NextResponse.json({ success: 0, message: 'Invalid API_KEY' }, { status: 403 });
   }
 
   // use lucia to delete expired sessions
@@ -52,6 +52,6 @@ export async function GET(req: NextRequest) {
     );
   }
 
-  logger.info(reqData, "Session cleaned");
-  return NextResponse.json({ success: 1, message: "Session cleaned" }, { status: 200 });
+  logger.info(reqData, 'Session cleaned');
+  return NextResponse.json({ success: 1, message: 'Session cleaned' }, { status: 200 });
 }

@@ -1,7 +1,7 @@
-import pino, { type LogFn, Logger as PinoLogger } from "pino";
-import { createPinoBrowserSend, createWriteStream } from "pino-logflare";
+import pino, { Logger as PinoLogger, type LogFn } from 'pino';
+import { createPinoBrowserSend, createWriteStream } from 'pino-logflare';
 
-import { env, isProd } from "./env.mjs";
+import { env, isProd } from './env.mjs';
 
 let pinoLog: PinoLogger;
 export const getLogger = () => {
@@ -24,7 +24,7 @@ export const getLogger = () => {
           env: process.env.VERCEL_ENV,
           revision: process.env.VERCEL_GITHUB_COMMIT_SHA,
         },
-        level: isProd ? "info" : "debug",
+        level: isProd ? 'info' : 'debug',
         browser: {
           transmit: {
             send: send,
@@ -46,103 +46,103 @@ export class Logger {
   fatal: LogFn;
 
   constructor() {
-    this.info = this.log.bind(this, "info") as LogFn;
-    this.debug = this.log.bind(this, "debug") as LogFn;
-    this.trace = this.log.bind(this, "trace") as LogFn;
-    this.warn = this.log.bind(this, "warn") as LogFn;
-    this.error = this.log.bind(this, "error") as LogFn;
-    this.fatal = this.log.bind(this, "fatal") as LogFn;
+    this.info = this.log.bind(this, 'info') as LogFn;
+    this.debug = this.log.bind(this, 'debug') as LogFn;
+    this.trace = this.log.bind(this, 'trace') as LogFn;
+    this.warn = this.log.bind(this, 'warn') as LogFn;
+    this.error = this.log.bind(this, 'error') as LogFn;
+    this.fatal = this.log.bind(this, 'fatal') as LogFn;
   }
 
   private log(
-    level: "info" | "debug" | "trace" | "warn" | "error" | "fatal",
+    level: 'info' | 'debug' | 'trace' | 'warn' | 'error' | 'fatal',
     objOrMsg: any,
     msg?: string,
     ...args: any[]
   ) {
     try {
       switch (level) {
-        case "info":
+        case 'info':
           this.logInfo(objOrMsg, msg, ...args);
           break;
-        case "debug":
+        case 'debug':
           this.logDebug(objOrMsg, msg, ...args);
           break;
-        case "trace":
+        case 'trace':
           this.logTrace(objOrMsg, msg, ...args);
           break;
-        case "warn":
+        case 'warn':
           this.logWarn(objOrMsg, msg, ...args);
           break;
-        case "error":
+        case 'error':
           this.logError(objOrMsg, msg, ...args);
           break;
-        case "fatal":
+        case 'fatal':
           this.logFatal(objOrMsg, msg, ...args);
           break;
       }
     } catch (error) {
-      console.log("Error sending log: ", error);
+      console.log('Error sending log: ', error);
     }
   }
 
   private logInfo(objOrMsg: any, msg?: string, ...args: any[]) {
-    if (typeof objOrMsg === "string") {
+    if (typeof objOrMsg === 'string') {
       getLogger().info(objOrMsg, ...args);
-      console.log("INFO", objOrMsg, ...args);
+      console.log('INFO', objOrMsg, ...args);
     } else {
       getLogger().info(objOrMsg, msg, ...args);
-      console.log("INFO", objOrMsg, msg, ...args);
+      console.log('INFO', objOrMsg, msg, ...args);
     }
   }
 
   private logDebug(objOrMsg: any, msg?: string, ...args: any[]) {
-    if (typeof objOrMsg === "string") {
+    if (typeof objOrMsg === 'string') {
       getLogger().debug(objOrMsg, ...args);
-      console.log("DEBUG", objOrMsg, ...args);
+      console.log('DEBUG', objOrMsg, ...args);
     } else {
       getLogger().debug(objOrMsg, msg, ...args);
-      console.log("DEBUG", objOrMsg, msg, ...args);
+      console.log('DEBUG', objOrMsg, msg, ...args);
     }
   }
 
   private logTrace(objOrMsg: any, msg?: string, ...args: any[]) {
-    if (typeof objOrMsg === "string") {
+    if (typeof objOrMsg === 'string') {
       getLogger().trace(objOrMsg, ...args);
-      console.log("TRACE", objOrMsg, ...args);
+      console.log('TRACE', objOrMsg, ...args);
     } else {
       getLogger().trace(objOrMsg, msg, ...args);
-      console.log("TRACE", objOrMsg, msg, ...args);
+      console.log('TRACE', objOrMsg, msg, ...args);
     }
   }
 
   private logWarn(objOrMsg: any, msg?: string, ...args: any[]) {
-    if (typeof objOrMsg === "string") {
+    if (typeof objOrMsg === 'string') {
       getLogger().warn(objOrMsg, ...args);
-      console.log("WARN", objOrMsg, ...args);
+      console.log('WARN', objOrMsg, ...args);
     } else {
       getLogger().warn(objOrMsg, msg, ...args);
-      console.log("WARN", objOrMsg, msg, ...args);
+      console.log('WARN', objOrMsg, msg, ...args);
     }
   }
 
   private logError(objOrMsg: any, msg?: string, ...args: any[]) {
-    if (typeof objOrMsg === "string") {
+    if (typeof objOrMsg === 'string') {
       getLogger().error(objOrMsg, ...args);
-      console.log("ERROR", objOrMsg, ...args);
+      console.log('ERROR', objOrMsg, ...args);
     } else {
       getLogger().error(objOrMsg, msg, ...args);
-      console.log("ERROR", objOrMsg, msg, ...args);
+      console.log('ERROR', objOrMsg, msg, ...args);
     }
   }
 
   private logFatal(objOrMsg: any, msg?: string, ...args: any[]) {
-    if (typeof objOrMsg === "string") {
+    if (typeof objOrMsg === 'string') {
       getLogger().fatal(objOrMsg, ...args);
-      console.log("FATAL", objOrMsg, ...args);
+      console.log('FATAL', objOrMsg, ...args);
     } else {
       getLogger().fatal(objOrMsg, msg, ...args);
-      console.log("FATAL", objOrMsg, msg, ...args);
+      console.log('FATAL', objOrMsg, msg, ...args);
     }
   }
 }

@@ -16,8 +16,14 @@ const styling = `
     cursor: pointer;
     background: #fff;
   }
+
+  .dark input.rangeSlider::-webkit-slider-thumb {
+    border: 3px solid white;
+    background: black;
+  }
 `;
 
+// Base: https://www.neobrutalism.dev/react/components/range-slider
 export default function RangeSlider({ rangeValue, setRangeValue, min, max }: Props) {
   return (
     <>
@@ -33,7 +39,7 @@ export default function RangeSlider({ rangeValue, setRangeValue, min, max }: Pro
           max={max}
           value={rangeValue}
           onChange={(e) => setRangeValue(+e.target.value)}
-          className="rangeSlider h-2 w-full cursor-pointer appearance-none rounded-lg border-2 border-black bg-white"
+          className="rangeSlider h-2 w-full cursor-pointer appearance-none rounded-lg border-2 border-border dark:border-darkBorder bg-white dark:bg-darkBg"
         />
       </div>
     </>

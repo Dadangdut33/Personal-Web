@@ -1,11 +1,12 @@
-import { Box, Collapse, Group, Text, UnstyledButton } from "@mantine/core";
-import { IconChevronRight } from "@tabler/icons-react";
-import { last as getLastItem } from "lodash";
-import Link from "next/link";
-import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useRouter } from '@/components/Router';
+import { Box, Collapse, Group, Text, UnstyledButton } from '@mantine/core';
+import { IconChevronRight } from '@tabler/icons-react';
+import { isArray } from 'lodash';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-import classes from "./LinksGroup.module.css";
+import classes from './LinksGroup.module.css';
 
 interface LinksGroupProps {
   icon?: any;
@@ -32,9 +33,8 @@ export function LinksGroup({
 }: LinksGroupProps) {
   const router = useRouter();
   const pathname = usePathname();
-  const hasLinks = Array.isArray(links);
+  const hasLinks = isArray(links);
   const [opened, setOpened] = useState(initiallyOpened || false);
-  const [_currentPath, setCurrentPath] = useState<string | undefined>();
   const ChevronIcon = IconChevronRight;
 
   const items = (hasLinks ? links : []).map((link, i) => {
@@ -59,14 +59,14 @@ export function LinksGroup({
   });
 
   useEffect(() => {
-    const paths = pathname.split("/");
     // check first if not initially opened and its not the link then close
     if (!initiallyOpened && pathname !== link) setOpened(false);
+
     // if it turns out to be the link, open it
     if (pathname === link) setOpened(true);
 
-    setCurrentPath(getLastItem(paths)?.toLowerCase() || undefined);
-  }, [pathname, link, initiallyOpened]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [pathname]);
 
   const btnProps = hasLinks
     ? {
@@ -74,15 +74,14 @@ export function LinksGroup({
           if (hasLinks) setOpened((o) => !o);
           // if a link is provided, navigate to it
           if (link) {
-            router.push(link || "#");
-
+            router.push(link || '#');
             if (matchMobile && closeNav) closeNav();
           }
         },
       }
     : {
         component: Link,
-        href: link || "#",
+        href: link || '#',
         onClick: () => {
           if (matchMobile && closeNav) closeNav();
         },
@@ -93,7 +92,7 @@ export function LinksGroup({
       {/* @ts-ignore */}
       <UnstyledButton {...btnProps} className={classes.control} data-active={opened || undefined}>
         <Group justify="space-between" gap={0}>
-          <Box style={{ display: "flex", alignItems: "center" }}>
+          <Box style={{ display: 'flex', alignItems: 'center' }}>
             <Icon size={18} />
             <Box ml="md">{label}</Box>
           </Box>
@@ -103,7 +102,7 @@ export function LinksGroup({
               size="1rem"
               stroke={1.5}
               style={{
-                transform: opened ? `rotate(90deg)` : "none",
+                transform: opened ? `rotate(90deg)` : 'none',
               }}
             />
           )}

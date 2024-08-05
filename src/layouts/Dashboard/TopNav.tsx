@@ -1,8 +1,11 @@
-"use client";
+'use client';
 
-import { BtnSignOutIcon } from "@/components/Button/BtnSignOut";
-import { ActionIcon, Burger, Group, Tooltip } from "@mantine/core";
-import { IconLayoutSidebarLeftCollapse, IconLayoutSidebarLeftExpand } from "@tabler/icons-react";
+import { BtnSignOutIcon } from '@/components/Button/BtnSignOut';
+import { BtnToggleColor } from '@/components/Button/BtnToggleColor';
+import { Link, useRouter } from '@/components/Router';
+import Button from '@/components/ui/Button';
+import { Box, Burger, Group } from '@mantine/core';
+import { IconHome, IconLayoutSidebarLeftCollapse, IconLayoutSidebarLeftExpand } from '@tabler/icons-react';
 
 type TopNavProps = {
   opened?: boolean;
@@ -14,17 +17,23 @@ type TopNavProps = {
 };
 
 const TopNav = ({ handleOpen, opened, desktopOpened, toggleDesktop, toggleMobile, mobileOpened }: TopNavProps) => {
+  const router = useRouter();
+
   return (
     <Group justify="space-between">
       <Group gap={0}>
-        <Tooltip events={{ hover: true, focus: true, touch: true }} label="Toggle navigation menu">
-          <ActionIcon visibleFrom="md" onClick={toggleDesktop} size={"lg"}>
+        <Box component="span" visibleFrom="md">
+          <Button onClick={toggleDesktop} size={'sm'}>
             {desktopOpened ? <IconLayoutSidebarLeftCollapse /> : <IconLayoutSidebarLeftExpand />}
-          </ActionIcon>
-        </Tooltip>
+          </Button>
+        </Box>
         <Burger opened={mobileOpened} onClick={toggleMobile} hiddenFrom="md" size="sm" />
       </Group>
-      <Group>
+      <Group gap={'xs'}>
+        <BtnToggleColor size="sm" />
+        <Button component={Link} href="/" size="sm">
+          <IconHome />
+        </Button>
         <BtnSignOutIcon />
       </Group>
     </Group>

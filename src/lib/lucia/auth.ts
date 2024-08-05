@@ -1,17 +1,17 @@
-import { db } from "@/lib/db/index";
-import { Session } from "@/lib/db/schema/auth";
-import { M_User } from "@/lib/db/schema/user";
-import { isProd } from "@/lib/env.mjs";
-import { DatabaseUserAttributes } from "@/lib/types";
-import { DrizzlePostgreSQLAdapter } from "@lucia-auth/adapter-drizzle";
-import { Lucia, type Session as LuciaSession, type User as LuciaUser, TimeSpan } from "lucia";
-import { cookies } from "next/headers";
-import { cache } from "react";
+import { db } from '@/lib/db/index';
+import { Session } from '@/lib/db/schema/auth';
+import { M_User } from '@/lib/db/schema/user';
+import { isProd } from '@/lib/env.mjs';
+import { DatabaseUserAttributes } from '@/lib/types';
+import { DrizzlePostgreSQLAdapter } from '@lucia-auth/adapter-drizzle';
+import { Lucia, TimeSpan, type Session as LuciaSession, type User as LuciaUser } from 'lucia';
+import { cookies } from 'next/headers';
+import { cache } from 'react';
 
 export const adapter = new DrizzlePostgreSQLAdapter(db, Session, M_User);
 
 export const lucia = new Lucia(adapter, {
-  sessionExpiresIn: new TimeSpan(1, "w"),
+  sessionExpiresIn: new TimeSpan(1, 'w'),
   sessionCookie: {
     expires: true,
     attributes: {
@@ -29,7 +29,7 @@ export const lucia = new Lucia(adapter, {
   },
 });
 
-declare module "lucia" {
+declare module 'lucia' {
   interface Register {
     Lucia: typeof lucia;
     DatabaseUserAttributes: DatabaseUserAttributes;

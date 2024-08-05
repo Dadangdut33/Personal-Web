@@ -1,8 +1,8 @@
-import Home from "@/components/app/Home";
-import PublicLayout from "@/layouts/Public";
+import Home from '@/components/app/Home';
+import PublicLayout from '@/layouts/Public';
 
 export const metadata = {
-  title: "Hello :D - Dadangdut33",
+  title: 'Hello :D - Dadangdut33',
 };
 
 export default function Page() {

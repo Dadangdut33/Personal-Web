@@ -1,6 +1,6 @@
-import { ActionIcon, Button, MantineColor, Popover, PopoverDropdown, PopoverTarget } from "@mantine/core";
-import { IconDotsVertical, IconTrash } from "@tabler/icons-react";
-import { ReactNode } from "react";
+import { ActionIcon, Button, MantineColor, Popover, PopoverDropdown, PopoverTarget } from '@mantine/core';
+import { IconDotsVertical, IconTrash } from '@tabler/icons-react';
+import { ReactNode } from 'react';
 
 export default function BatchAction({
   disabled,
@@ -32,5 +32,5 @@ export default function BatchAction({
 }
 
 export function BatchDelete({ disabled, doFn, doText }: { disabled: boolean; doFn: () => void; doText: string }) {
-  return <BatchAction disabled={disabled} doFn={doFn} doText={"Delete " + doText} icon={<IconTrash />} color="red" />;
+  return <BatchAction disabled={disabled} doFn={doFn} doText={'Delete ' + doText} icon={<IconTrash />} color="red" />;
 }

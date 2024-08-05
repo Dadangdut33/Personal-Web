@@ -1,29 +1,31 @@
-"use client";
+'use client';
 
-import { onStart } from "@/components/Router/events";
-import Button from "@/components/ui/Button";
-import Drawer from "@/components/ui/Drawer";
-import { isString } from "lodash";
-import { usePathname, useRouter } from "next/navigation";
-import { useState } from "react";
-import { FaBars } from "react-icons/fa";
+import { useRouter } from '@/components/Router';
+import { onStart } from '@/components/Router/events';
+import Button from '@/components/ui/Button';
+import Drawer from '@/components/ui/Drawer';
+import { isString } from 'lodash';
+import { usePathname } from 'next/navigation';
+import { useState } from 'react';
+import { FaBars } from 'react-icons/fa';
+import { FiCornerDownRight } from 'react-icons/fi';
 
 const SIDEBAR = [
-  "Navigation",
+  'Navigation',
   {
-    href: "/",
-    text: "About",
+    href: '/',
+    text: 'About',
   },
   {
-    href: "/project",
-    text: "Project",
+    href: '/project',
+    text: 'Project',
   },
   {
-    href: "/blog",
-    text: "Blog",
+    href: '/blog',
+    text: 'Blog',
   },
 ];
-import { FiCornerDownRight } from "react-icons/fi";
+
 export default function MobileDrawer() {
   const router = useRouter();
   const [isDrawerActive, setIsDrawerActive] = useState(false);
@@ -60,7 +62,7 @@ export default function MobileDrawer() {
                   handleLinkClick(item.href);
                 }}
                 className={`block w-full border-b-4 border-r-4 border-black p-4 pl-7 text-left text-lg font-base hover:bg-main
-                  hover:dark:text-black/90 m800:p-4 m800:pl-6 m800:text-base ${pathName === item.href ? "bg-main dark:text-black/90" : ""}`}
+                  hover:dark:text-black/90 m800:p-4 m800:pl-6 m800:text-base ${pathName === item.href ? 'bg-main dark:text-black/90' : ''}`}
               >
                 <FiCornerDownRight className="inline-block" /> {item.text}
               </button>

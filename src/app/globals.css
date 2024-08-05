@@ -3,6 +3,37 @@
 @tailwind components;
 @tailwind utilities;
 
+/* neobrutalism tailwind @ https://www.neobrutalism.dev */
+:root {
+  --main: #ffdc58;
+  --main-accent: #ffc800;
+  --overlay: rgba(0, 0, 0, 0.8);
+
+  /* light mode */
+  --bg: #fef2e8;
+  --text: #000;
+  --border: #000;
+
+  /* dark mode */
+  --darkBg: '#374151';
+  --darkText: '#eeefe9';
+  --darkBorder: '#000';
+
+  --secondary-black: #374151;
+
+  /* border radius */
+  --border-radius: 5px;
+
+  /* font weight */
+  --base-font-weight: 500;
+  --heading-font-weight: 700;
+
+  /* scrolllbar */
+  --sb-track-color: #ffffff;
+  --sb-thumb-color: #000000;
+  --sb-size: 16px;
+}
+
 @layer base {
   p {
     @apply text-base;
@@ -11,39 +42,32 @@
     @apply shadow-none translate-x-boxShadowX translate-y-boxShadowY;
   }
   .bg-disabled {
-    background-color:  rgba(19, 1, 1, 0.3);
+    background-color: rgba(19, 1, 1, 0.3);
     color: rgba(16, 16, 16, 0.3);
   }
+  .btn-size-xs {
+    @apply p-0.5;
+  }
   .btn-size-sm {
-    @apply px-2 py-1
+    @apply p-1;
   }
   .btn-size-default {
-    @apply px-4 py-2
+    @apply px-4 py-2;
   }
   .btn-size-lg {
-    @apply h-11 px-8 text-base
+    @apply h-11 px-8 text-base;
   }
   .btn-size-icon {
-    @apply p-2.5 m900:p-2
+    @apply p-2.5 m900:p-2;
   }
-}
-
-/* neobrutalism tailwind */
-:root {
-  --bg: #fef2e8;
-  --bg-dark: #204059;
-  --main: #FFDC58;
-  --main-dark: #807935;
-  --main-accent: #ffc800;
-  --main-accent-dark: #cca007;
-  --border-radius: 5px;
-  --horizontal-box-shadow: 4px;
-  --vertical-box-shadow: 4px;
-  --heading-font-weight: 700;
-  --base-font-weight: 500;
-  --sb-track-color: #ffffff;
-  --sb-thumb-color: #000000;
-  --sb-size: 16px;
+  .darkText {
+    /* using var does not work? */
+    /* color: var(--darkText); */
+    color: #eeefe9;
+  }
+  .no-shadow {
+    box-shadow: none !important;
+  }
 }
 
 body::-webkit-scrollbar,
@@ -136,7 +160,6 @@ figure[data-rehype-pretty-code-figure] pre::-webkit-scrollbar-corner,
   word-wrap: break-word;
   white-space: pre-line;
 }
-
 
 /* expressive code */
 .expressive-code figure.frame,

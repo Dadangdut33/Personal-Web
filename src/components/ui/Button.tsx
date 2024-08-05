@@ -1,16 +1,17 @@
-"use client";
+'use client';
 
-import { cn } from "@/lib/utils";
-import { Box, createPolymorphicComponent, LoadingOverlay, MantineStyleProps } from "@mantine/core";
-import { ClassValue } from "clsx";
-import { forwardRef } from "react";
-import { LOADING_OVERLAY_CFG } from "../Form/utils";
+import { cn } from '@/lib/utils';
+import { Box, createPolymorphicComponent, LoadingOverlay, MantineStyleProps } from '@mantine/core';
+import { ClassValue } from 'clsx';
+import { forwardRef } from 'react';
 
-type Props = {
+import { LOADING_OVERLAY_CFG } from '../Form/utils';
+
+export type ButtonProps = {
   className?: ClassValue;
   children: React.ReactNode;
   onClick?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  size?: "default" | "lg" | "sm" | "icon";
+  size?: 'default' | 'lg' | 'sm' | 'xs' | 'icon';
   disabled?: boolean;
   ref?: React.ForwardedRef<HTMLButtonElement>;
   loading?: boolean;
@@ -18,23 +19,24 @@ type Props = {
 };
 
 const sizeMap = {
-  default: "btn-size-default",
-  lg: "btn-size-lg",
-  sm: "btn-size-sm",
-  icon: "btn-size-icon",
+  xs: 'btn-size-xs',
+  sm: 'btn-size-sm',
+  default: 'btn-size-default',
+  lg: 'btn-size-lg',
+  icon: 'btn-size-icon',
 };
 
 export const BaseButton = ({
   className,
   children,
   onClick,
-  size = "default",
+  size = 'default',
   disabled = false,
-  ref,
+  ref = null,
   loading,
   center,
   ...others
-}: Props) => {
+}: ButtonProps) => {
   return (
     <Box
       ref={ref}
@@ -45,19 +47,22 @@ export const BaseButton = ({
         if (onClick) onClick(e);
       }}
       className={cn(
-        `flex cursor-pointer items-center rounded-base border-2 border-black text-sm disabled:bg-disabled font-base shadow-base
-        transition-all hover:btn-active disabled:btn-active`,
+        `flex text-text cursor-pointer items-center rounded-base border-2 border-border
+        dark:border-darkBorder bg-main text-sm font-base shadow-light dark:shadow-dark
+        transition-all hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none
+        dark:hover:shadow-none disabled:btn-active disabled:bg-disabled`,
         sizeMap[size],
-        !disabled ? "hover:bg-main dark:hover:bg-main-dark" : "",
+        disabled ? 'no-shadow cursor-not-allowed' : 'hover:bg-main',
+        loading && 'cursor-not-allowed no-shadow',
         className
       )}
-      disabled={disabled}
+      disabled={disabled || loading}
       {...others}
-      pos={"relative"}
+      pos={'relative'}
     >
       <LoadingOverlay visible={loading} {...LOADING_OVERLAY_CFG} />
       {center ? (
-        <Box ms={"auto"} me={"auto"}>
+        <Box ms={'auto'} me={'auto'}>
           {children}
         </Box>
       ) : (
@@ -68,13 +73,13 @@ export const BaseButton = ({
 };
 
 // Base: https://neobrutalism-components.vercel.app/react/components/Button
-export const BtnActiveClass: ClassValue = "btn-active shadow-none bg-main dark:bg-main-dark";
-const Button = createPolymorphicComponent<"button", Props & MantineStyleProps>(
+export const BtnActiveClass: ClassValue = 'btn-active no-shadow bg-main ';
+const Button = createPolymorphicComponent<'button', ButtonProps & MantineStyleProps>(
   // eslint-disable-next-line react/display-name
-  forwardRef<HTMLButtonElement, Props & MantineStyleProps>((parameters, ref) => (
+  forwardRef<HTMLButtonElement, ButtonProps & MantineStyleProps>((parameters, ref) => (
     <BaseButton {...parameters} ref={ref} />
   ))
 );
-Button.displayName = "Button";
+Button.displayName = 'Button';
 
 export default Button;

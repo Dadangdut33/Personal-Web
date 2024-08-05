@@ -1,6 +1,7 @@
-import { Box, Center, Input, LoadingOverlay, PinInput, type PinInputProps, Text } from "@mantine/core";
-import { UseFormReturnType } from "@mantine/form";
-import { LOADING_OVERLAY_CFG } from "./utils";
+import { Box, Center, Input, LoadingOverlay, PinInput, Text, type PinInputProps } from '@mantine/core';
+import { UseFormReturnType } from '@mantine/form';
+
+import { LOADING_OVERLAY_CFG } from './utils';
 
 export const PinVerification = ({
   description,
@@ -24,16 +25,16 @@ export const PinVerification = ({
   return (
     <>
       {description && (
-        <Text c="dimmed" size="xs" mt={"lg"} mb={5} ta={"center"}>
+        <Text c="dimmed" size="xs" mt={'lg'} mb={5} ta={'center'}>
           {description}
         </Text>
       )}
-      <Box pos={"relative"}>
+      <Box pos={'relative'}>
         <LoadingOverlay visible={loading} {...LOADING_OVERLAY_CFG} />
         {centerPin ? (
           <Center>
             <PinInput
-              ta={"center"}
+              ta={'center'}
               placeholder=""
               type="number"
               {...formInput.getInputProps(formField)}
@@ -45,7 +46,7 @@ export const PinVerification = ({
           </Center>
         ) : (
           <PinInput
-            ta={"center"}
+            ta={'center'}
             placeholder=""
             type="number"
             {...formInput.getInputProps(formField)}
@@ -56,7 +57,7 @@ export const PinVerification = ({
           />
         )}
       </Box>
-      <Input.Error mt={"sm"}>{formInput.errors[formField]}</Input.Error>
+      <Input.Error mt={'sm'}>{formInput.errors[formField]}</Input.Error>
     </>
   );
 };

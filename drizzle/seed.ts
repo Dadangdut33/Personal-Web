@@ -1,9 +1,9 @@
-import { seedUser } from "./scripts/seedUser";
+import { seedUser } from './scripts/seedUser';
 
-seedUser("admin")
+seedUser('admin')
   .then(() => process.exit(0))
   .catch((err) => {
-    console.error("❌ Seeding failed");
+    console.error('❌ Seeding failed');
     console.error(err);
     process.exit(1);
   });

@@ -9,5 +9,5 @@
 }
 
 .menu {
-  @apply bg-white dark:bg-gray-700;
+  @apply bg-white dark:bg-secondaryBlack;
 }

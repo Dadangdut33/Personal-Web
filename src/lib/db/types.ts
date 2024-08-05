@@ -8,9 +8,9 @@ import {
   M_Project,
   M_Shortlink,
   M_User,
-} from "@/lib/db/schema";
-import { ProjectLinkIcon } from "@/lib/db/schema/project";
-import { Modify } from "@/lib/types";
+} from '@/lib/db/schema';
+import { ProjectLinkIcon } from '@/lib/db/schema/project';
+import { Modify } from '@/lib/types';
 
 // ----- Category -----
 export type QCategory = typeof M_Category.$inferSelect;
@@ -50,7 +50,7 @@ export interface ProfileComplete extends QProfile {
   avatar: QFile | null;
 }
 
-export interface UserComplete extends Omit<QUser, "hashedPassword"> {
+export interface UserComplete extends Omit<QUser, 'hashedPassword'> {
   profile: QProfile | null;
   avatar: QFile | null;
 }

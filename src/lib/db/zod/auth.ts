@@ -1,6 +1,6 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-import { passValidation } from "./utils";
+import { passValidation } from './utils';
 
 export const authenticationSchema = z.object({
   username: z.string(),

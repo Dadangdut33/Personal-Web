@@ -1,15 +1,16 @@
-"use client";
+'use client';
 
-import { signOutAction } from "@/lib/actions/auth/logout";
-import { ActionIcon, Tooltip } from "@mantine/core";
-import { IconPower } from "@tabler/icons-react";
-import { useMutation } from "@tanstack/react-query";
-
-import { ConfirmLogoutModal } from "../Modals/Confirm";
+import { ConfirmLogoutModal } from '@/components/Modals/Confirm';
+import Button from '@/components/ui/Button';
+import { signOutAction } from '@/lib/actions/auth/logout';
+import { useCSRFToken } from '@/lib/hooks';
+import { IconPower } from '@tabler/icons-react';
+import { useMutation } from '@tanstack/react-query';
 
 export function BtnSignOutIcon() {
+  const csrf = useCSRFToken();
   const mutation = useMutation({
-    mutationFn: () => signOutAction(),
+    mutationFn: () => signOutAction(csrf),
   });
   const confirmModal = ConfirmLogoutModal(
     () => mutation.reset(),
@@ -17,17 +18,8 @@ export function BtnSignOutIcon() {
   );
 
   return (
-    <Tooltip events={{ hover: true, focus: true, touch: true }} label="Logout">
-      <ActionIcon
-        variant="filled"
-        color="red"
-        type="submit"
-        loading={mutation.isPending}
-        onClick={confirmModal}
-        size={"lg"}
-      >
-        <IconPower />
-      </ActionIcon>
-    </Tooltip>
+    <Button size="sm" loading={mutation.isPending} onClick={confirmModal}>
+      <IconPower color="red" />
+    </Button>
   );
 }

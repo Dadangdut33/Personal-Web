@@ -1,9 +1,9 @@
-import { describe, test, expect, vi } from "vitest";
-import { logger, Logger } from "@/lib/logger";
+import { logger, Logger } from '@/lib/logger';
+import { describe, expect, test, vi } from 'vitest';
 
-describe("Logger Tests", () => {
-  test("Logger should log messages at different levels", () => {
-    const logLevels = ["info", "debug", "trace", "warn", "error", "fatal"];
+describe('Logger Tests', () => {
+  test('Logger should log messages at different levels', () => {
+    const logLevels = ['info', 'debug', 'trace', 'warn', 'error', 'fatal'];
 
     logLevels.forEach((level) => {
       const spy = vi.spyOn(logger, level as keyof Logger);
