@@ -11,8 +11,8 @@ const inertiaConfig = defineConfig({
    * Data that should be shared with all rendered pages
    */
   sharedData: {
-    user: (ctx) => ctx.inertia.always(() => ctx.auth.user),
-    flashMessages: (ctx) => ctx.session.flashMessages,
+    user: (ctx) => ctx.inertia.always(() => (ctx.auth ? ctx.auth.user : null)),
+    flashMessages: (ctx) => (ctx.session ? ctx.session.flashMessages : null),
     currentPath: (ctx) => ctx.request.url(false),
     previousPath: (ctx) => {
       const referer = ctx.request.header('referer')
