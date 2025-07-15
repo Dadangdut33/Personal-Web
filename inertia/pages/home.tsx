@@ -1,16 +1,19 @@
-import { Box } from '@mantine/core'
+import { Stack } from '@mantine/core'
 
-import { Button } from '@/components/ui/button'
+import Logo from '@/components/homepage/logo'
 import PublicLayout from '@/layouts/public'
 
 export default function Home(props: any) {
   return (
     <PublicLayout>
-      <div className="max-w-3xl">
-        <div>test</div>
-        <Button>test btn</Button>
-        aaa
-        <Box>test</Box>
+      <div className="max-w-3xl mx-auto pt-5">
+        <Logo />
+        <Stack>
+          <h1 className="text-4xl font-extrabold text-center">Dadangdut33</h1>
+          <p className="text-xl text-neutral-500 dark:text-white/80 text-center">
+            Code, Create, Contribute—One Commit at a Time.
+          </p>
+        </Stack>
       </div>
     </PublicLayout>
   )

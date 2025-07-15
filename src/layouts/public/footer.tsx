@@ -105,6 +105,7 @@ export default function Footer() {
               rel="noopener noreferrer"
               style={{ textDecoration: 'none' }}
               size="16 px"
+              fw={600}
             >
               © {new Date().getFullYear()} Dadangdut33
             </Text>

@@ -16,6 +16,9 @@ const buttonVariants = cva(
           'bg-secondary-background text-foreground border-2 border-border shadow-shadow hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none',
         reverse:
           'text-main-foreground bg-main border-2 border-border hover:translate-x-reverseBoxShadowX hover:translate-y-reverseBoxShadowY hover:shadow-shadow',
+        active: 'text-main-foreground bg-main border-2 border-border',
+        disabled:
+          'bg-muted text-muted-foreground border-2 border-border opacity-60 !cursor-not-allowed shadow-none',
       },
       size: {
         default: 'h-10 px-4 py-2',
@@ -35,18 +38,23 @@ function Button({
   className,
   variant,
   size,
+  cursorPointer = true,
   asChild = false,
   ...props
 }: React.ComponentProps<'button'> &
   VariantProps<typeof buttonVariants> & {
     asChild?: boolean
+    cursorPointer?: boolean
   }) {
   const Comp = asChild ? Slot : 'button'
 
   return (
     <Comp
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
+      className={cn(
+        buttonVariants({ variant, size, className }),
+        cursorPointer ? 'cursor-pointer' : ''
+      )}
       {...props}
     />
   )

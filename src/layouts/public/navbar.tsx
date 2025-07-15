@@ -29,11 +29,23 @@ export default function Navbar() {
             href={route('home').path}
             initial={isHome ? true : false}
             animate={{ width: isHome ? '9.2rem' : '2rem' }}
-            transition={{ duration: 0.3 }}
+            whileHover={
+              !isHome
+                ? {
+                    x: '4px',
+                    y: '4px',
+                    boxShadow: 'none',
+                  }
+                : {}
+            }
+            transition={{ duration: 0.2 }}
             onClick={(e) => {
               if (isHome) e.preventDefault() // don’t remount if already home
             }}
-            className="flex items-center justify-center overflow-hidden rounded-base border-2 border-black bg-main text-main-foreground"
+            className={cn(
+              'flex items-center justify-center overflow-hidden rounded-base border-2 border-black bg-main text-main-foreground',
+              !isHome ? 'shadow-nav dark:shadow-navDark' : ''
+            )}
           >
             <Code2Icon className="h-8 w-8" />
 
