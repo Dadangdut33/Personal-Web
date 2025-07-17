@@ -1,20 +1,33 @@
 import AuthService from '#services/auth.service'
-import { emailValidatorCompiled } from '#validators/_shared'
-import { loginValidator, registerValidator, resetPasswordValidator } from '#validators/auth/auth'
+import env from '#start/env'
+import {
+  askEmailVerifyValidator,
+  askResetPasswordValidator,
+  loginValidator,
+  registerValidator,
+  resetPasswordValidator,
+} from '#validators/auth/auth'
 
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
 export default class AuthController {
+  protected bypassCaptcha = env.get('BYPASS_CF_TURNSTILE')
+  protected siteKey = env.get('TURNSTILE_SITE')
+  protected baseProp = {
+    site_key: this.siteKey,
+    bypass_captcha: this.bypassCaptcha,
+  }
+
   constructor(protected service: AuthService) {}
 
   async viewLogin({ inertia }: HttpContext) {
-    return inertia.render('auth/login')
+    return inertia.render('auth/login', { ...this.baseProp })
   }
 
   async viewRegister({ inertia }: HttpContext) {
-    return inertia.render('auth/register')
+    return inertia.render('auth/register', { ...this.baseProp })
   }
 
   // Basically for the reset password and verify email page.
@@ -23,17 +36,18 @@ export default class AuthController {
   // If token exist, we give the form to reset the password
   async viewResetPassword({ inertia, params }: HttpContext) {
     const token = params.token || ''
-    return inertia.render('auth/resetPassword', { token })
+    return inertia.render('auth/resetPassword', { token, ...this.baseProp })
   }
 
   async viewVerifyMail({ inertia, params }: HttpContext) {
     const token = params.token || ''
-    return inertia.render('auth/verifyMail', { token })
+    return inertia.render('auth/verifyMail', { token, ...this.baseProp })
   }
 
   async login({ request, response }: HttpContext) {
     try {
       const payload = await request.validateUsing(loginValidator)
+      await this.service.verifyCFToken(payload.cf_token)
       const { accessToken, user } = await this.service.login(payload)
 
       // if user is not verified, redirect to verify email page
@@ -55,6 +69,7 @@ export default class AuthController {
   async register({ request, response }: HttpContext) {
     try {
       const payload = await request.validateUsing(registerValidator)
+      await this.service.verifyCFToken(payload.cf_token)
       const { accessToken, user } = await this.service.register(payload)
 
       return response.status(201).json({
@@ -74,12 +89,14 @@ export default class AuthController {
    * Request a new email verification for the authenticated user.
    * This is used for when the user have logged in but their email is not verified.
    *
-   * @param {HttpContext} { response, auth }
+   * @param {HttpContext} { request,response, auth }
    * @return {*}
    * @memberof AuthController
    */
-  async requestVerifyEmail({ response, auth }: HttpContext) {
+  async requestVerifyEmail({ request, response, auth }: HttpContext) {
     try {
+      const payload = await request.validateUsing(askEmailVerifyValidator)
+      await this.service.verifyCFToken(payload.cf_token)
       const user = auth.getUserOrFail()
       await this.service.requestEmail(user)
 
@@ -132,8 +149,9 @@ export default class AuthController {
    */
   async requestResetPassword({ request, response }: HttpContext) {
     try {
-      const email = await request.validateUsing(emailValidatorCompiled)
-      await this.service.requestResetPassword(email)
+      const payload = await request.validateUsing(askResetPasswordValidator)
+      await this.service.verifyCFToken(payload.cf_token)
+      await this.service.requestResetPassword(payload.email)
 
       return response.status(200).json({
         status: 'success',
@@ -149,7 +167,10 @@ export default class AuthController {
 
   async resetPassword({ request, response }: HttpContext) {
     try {
-      const { email, password, token } = await request.validateUsing(resetPasswordValidator)
+      // eslint-disable-next-line @typescript-eslint/naming-convention
+      const { email, password, token, cf_token } =
+        await request.validateUsing(resetPasswordValidator)
+      await this.service.verifyCFToken(cf_token)
       await this.service.resetPassword(token, password, email)
     } catch (error) {
       return response.status(error.status || 500).json({

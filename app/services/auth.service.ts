@@ -3,6 +3,8 @@ import VerifyEmailNotification from '#mails/verify_e_notification'
 import User from '#models/user'
 import AuthRepository from '#repositories/auth.repository'
 import TokenRepository from '#repositories/token.repository'
+import env from '#start/env'
+import { TurnstileResponse } from '#types/api'
 import { LoginPayload, RegisterPayload } from '#types/inferred'
 
 import { AccessToken } from '@adonisjs/auth/access_tokens'
@@ -148,5 +150,26 @@ export default class AuthService {
     user.password = password
     await user.save()
     await this.tokenRepo.expireTokens(user, 'passwordResetTokens')
+  }
+
+  async fetchVerifyCFToken(token: string) {
+    const url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify'
+
+    const res = await fetch(url, {
+      method: 'POST',
+      body: `secret=${env.get('TURNSTILE_SECRET')}&response=${token}`,
+      headers: {
+        'content-type': 'application/x-www-form-urlencoded',
+      },
+    })
+
+    const data = (await res.json()) as TurnstileResponse
+    return data.success
+  }
+
+  async verifyCFToken(token: string) {
+    const res = await this.fetchVerifyCFToken(token)
+
+    if (!res) throw new Exception('Invalid captcha.', { status: 401 })
   }
 }

@@ -6,5 +6,5 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 export function isProd() {
-  return process.env.NODE_ENV === 'production'
+  return import.meta.env.PROD
 }

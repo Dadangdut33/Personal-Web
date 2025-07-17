@@ -1,27 +1,14 @@
 {
-  "extends": "@adonisjs/tsconfig/tsconfig.app.json",
+  "extends": "@adonisjs/tsconfig/tsconfig.client.json",
   "compilerOptions": {
-    "useDefineForClassFields": true,
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "skipLibCheck": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "allowJs": true,
+    "baseUrl": ".",
     "module": "ESNext",
-    "types": ["node"],
-    "moduleResolution": "bundler",
     "jsx": "react-jsx",
-    "strict": true,
-    "isolatedModules": true,
-    "target": "ESNext",
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
     "paths": {
       "@/*": ["./*"],
       "~/*": ["../inertia/*"],
       "#types/*": ["../shared/types/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx"]
+  "include": ["./**/*.ts", "./**/*.tsx", "../config/inertia.ts"]
 }

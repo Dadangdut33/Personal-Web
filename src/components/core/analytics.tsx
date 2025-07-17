@@ -1,19 +1,8 @@
-import env from '#start/env'
-
 import { isProd } from '@/lib/utils'
 
-export default function Analytics() {
-  if (!env.get('UMAMI_ID')) return null
-
+export default function Analytics({ id, url }: { id: string; url: string }) {
+  if (!isProd()) return null
+  if (!url || !id) return null
   // only load the analytics script in production
-  if (isProd())
-    return (
-      <script
-        defer
-        src="https://analytics.dadangdut33.my.id/x.js"
-        data-website-id={env.get('UMAMI_ID')}
-      ></script>
-    )
-
-  return null
+  return <script defer src={url} data-website-id={id}></script>
 }

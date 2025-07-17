@@ -1,6 +1,8 @@
+import { SharedProps } from '@adonisjs/inertia/types'
+
 import PublicLayout from '@/layouts/public'
 
-export default function Home(props: any) {
+export default function Home(props: SharedProps) {
   return (
     <PublicLayout>
       <main className="inset-0 flex w-full flex-col items-center justify-center pt-[50px] px-4 m500:pt-[10px]">

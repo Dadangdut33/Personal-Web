@@ -17,8 +17,23 @@ export default await Env.create(new URL('../', import.meta.url), {
   HOST: Env.schema.string({ format: 'host' }),
   APP_URL: Env.schema.string(),
   LOG_LEVEL: Env.schema.string(),
+
+  /*
+  |----------------------------------------------------------
+  | Analytics
+  |----------------------------------------------------------
+  */
   UMAMI_ID: Env.schema.string.optional(),
   UMAMI_PUBLIC_URL: Env.schema.string.optional(),
+
+  /*
+  |----------------------------------------------------------
+  | Cloudflare
+  |----------------------------------------------------------
+  */
+  TURNSTILE_SECRET: Env.schema.string.optional(),
+  TURNSTILE_SITE: Env.schema.string.optional(),
+  BYPASS_CF_TURNSTILE: Env.schema.boolean.optional(),
 
   /*
   |----------------------------------------------------------
