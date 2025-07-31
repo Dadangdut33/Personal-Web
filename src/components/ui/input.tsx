@@ -3,7 +3,7 @@ import * as React from 'react'
 import { cn } from '@/lib/utils'
 
 interface InputProps extends React.ComponentProps<'input'> {
-  error?: string
+  error?: React.ReactNode
   label?: string
   labelId?: string
   labelClassName?: string

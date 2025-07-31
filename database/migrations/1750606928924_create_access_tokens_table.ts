@@ -11,7 +11,6 @@ export default class extends BaseSchema {
       table
         .uuid('tokenable_id')
         .notNullable()
-        .unsigned()
         .references('id')
         .inTable(Tables.USERS)
         .onDelete('CASCADE')

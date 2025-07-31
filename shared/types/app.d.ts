@@ -12,3 +12,19 @@ export interface QueryBuilderParams<T extends LucidModel> {
     columns: string[]
   }[]
 }
+
+export type ValidationError = {
+  message: string
+  rule: string
+  field: string
+}
+
+export type RequestError = {
+  status: number
+  code: string
+  messages: ValidationError[]
+}
+
+export type FormError = {
+  [key: string]: string
+}

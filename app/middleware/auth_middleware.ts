@@ -11,7 +11,7 @@ export default class AuthMiddleware {
   /**
    * The URL to redirect to, when authentication fails
    */
-  redirectTo = '/login'
+  redirect_to = '/login'
 
   async handle(
     ctx: HttpContext,
@@ -21,7 +21,7 @@ export default class AuthMiddleware {
     } = {}
   ) {
     try {
-      await ctx.auth.authenticateUsing(options.guards, { loginRoute: this.redirectTo })
+      await ctx.auth.authenticateUsing(options.guards, { loginRoute: this.redirect_to })
     } catch (error) {
       if (error instanceof authErrors.E_UNAUTHORIZED_ACCESS) {
         ctx.response.status(401).json({

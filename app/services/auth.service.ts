@@ -1,3 +1,4 @@
+import Roles from '#enums/roles'
 import PasswordResetNotification from '#mails/password_reset_notification'
 import VerifyEmailNotification from '#mails/verify_e_notification'
 import User from '#models/user'
@@ -10,6 +11,7 @@ import { LoginPayload, RegisterPayload } from '#types/inferred'
 import { AccessToken } from '@adonisjs/auth/access_tokens'
 import { inject } from '@adonisjs/core'
 import { Exception } from '@adonisjs/core/exceptions'
+import db from '@adonisjs/lucid/services/db'
 import mail from '@adonisjs/mail/services/main'
 
 @inject()
@@ -27,16 +29,40 @@ export default class AuthService {
    * @memberof AuthService
    */
   async register(payload: RegisterPayload) {
-    const exist = await this.authRepo.findBy('email', payload.email)
-    if (exist)
+    const existEmail = await this.authRepo.findBy('email', payload.email)
+    if (existEmail)
       throw new Exception('User with this email already exists.', {
         status: 400,
       })
 
-    const user = await User.create(payload)
+    const existUsername = await this.authRepo.findBy('username', payload.username)
+    if (existUsername)
+      throw new Exception('User with this username already exists.', {
+        status: 400,
+      })
+
+    // create user roles and profile in transaction
+    const trx = await db.transaction()
+    let user
+    try {
+      user = new User()
+      user.useTransaction(trx)
+      user.fill(payload)
+      await user.save()
+
+      await user.related('roles').attach([Roles.USER])
+      await user.related('profile').create({})
+      console.log(user)
+
+      await trx.commit()
+    } catch (error) {
+      trx.rollback()
+      throw error
+    }
+
     const accessToken = await User.accessTokens.create(user)
     const emailVerifyToken = await this.tokenRepo.generateToken(user, 'VERIFY_EMAIL')
-    await mail.sendLater(new VerifyEmailNotification(user, emailVerifyToken))
+    await mail.send(new VerifyEmailNotification(user, emailVerifyToken))
 
     return { accessToken, user }
   }

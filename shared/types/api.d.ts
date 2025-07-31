@@ -1,3 +1,5 @@
+import { FormError } from './app.js'
+
 export interface TurnstileResponse {
   'success': boolean
   'challenge_ts': string
@@ -8,4 +10,12 @@ export interface TurnstileResponse {
   'metadata': {
     ephemeral_id: string
   }
+}
+
+export interface BaseAPIResponse<T = any> {
+  status: 'success' | 'error'
+  message: string
+  data?: T
+  redirect_to?: string
+  form_errors?: FormError[]
 }

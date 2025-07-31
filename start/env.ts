@@ -18,6 +18,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   APP_URL: Env.schema.string(),
   LOG_LEVEL: Env.schema.string(),
 
+  ENABLE_REGISTRATION: Env.schema.boolean.optional(),
+  HIDE_REGISTRATION: Env.schema.boolean.optional(),
+
   /*
   |----------------------------------------------------------
   | Analytics

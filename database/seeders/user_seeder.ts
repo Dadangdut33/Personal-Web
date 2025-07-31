@@ -7,8 +7,9 @@ export default class extends BaseSeeder {
   async run() {
     const user = await User.create({
       fullName: 'Super Admin',
+      username: 'SuperAdmin',
       email: 'admin@admin.com',
-      password: 'wadaw1234',
+      password: 'Password@123',
       isEmailVerified: true,
     })
 

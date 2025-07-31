@@ -11,6 +11,7 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { useGenericMutation } from '@/hooks/use_generic_mutation'
 import AuthLayout from '@/layouts/auth'
 import { cn } from '@/lib/utils'
 
@@ -18,16 +19,12 @@ import { AuthProps } from './props'
 
 export default function Page(props: SharedProps & AuthProps) {
   const form = useForm({
+    fullname: '',
     email: '',
     password: '',
     cf_token: '',
   })
-
-  const onSubmit = async () => {
-    form.post(route('auth.login.post').path, {
-      onError: () => NotifyError('Error', 'Failed to login'),
-    })
-  }
+  const mutation = useGenericMutation('POST', route('auth.login.post').path)
 
   return (
     <AuthLayout>
@@ -36,12 +33,12 @@ export default function Page(props: SharedProps & AuthProps) {
       </Head>
       <Box pos={'absolute'} top={10} left={10}>
         <Button
-          disabled={form.processing}
+          disabled={mutation.isPending}
           onClick={() => {
             router.visit('/')
           }}
         >
-          {form.processing ? <Loader size={16} color="black" /> : <IconArrowLeft stroke={2} />}
+          {mutation.isPending ? <Loader size={16} color="black" /> : <IconArrowLeft stroke={2} />}
           Home
         </Button>
       </Box>
@@ -103,17 +100,23 @@ export default function Page(props: SharedProps & AuthProps) {
                     onError={() => NotifyError('Error', 'Failed to load captcha')}
                   />
                 )}
-                <Button className="w-full" disabled={form.processing}>
-                  {form.processing && <Loader size={16} color="black" />}
+                <Button
+                  className="w-full"
+                  disabled={mutation.isPending}
+                  onClick={() => mutation.mutate(form.data)}
+                >
+                  {mutation.isPending && <Loader size={16} color="black" />}
                   Login
                 </Button>
               </div>
-              <div className="text-center text-sm">
-                Don&apos;t have an account?{' '}
-                <Link href={route('auth.register').path} className="underline underline-offset-4">
-                  Sign up
-                </Link>
-              </div>
+              {!props.hide_registration && (
+                <div className="text-center text-sm">
+                  Don&apos;t have an account?{' '}
+                  <Link href={route('auth.register').path} className="underline underline-offset-4">
+                    Sign up
+                  </Link>
+                </div>
+              )}
             </div>
           </CardContent>
         </Card>

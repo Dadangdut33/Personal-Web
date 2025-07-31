@@ -9,7 +9,9 @@ export function NotifyError(title: string, message: string = '', others?: Notifi
     title,
     message: (
       <Stack gap={4}>
-        <Text size="sm">{message}</Text>
+        <Text size="sm" className="whitespace-pre-wrap">
+          {message}
+        </Text>
         <Flex justify={'left'}>
           <Divider className="hr-error" />
         </Flex>
@@ -27,7 +29,9 @@ export function NotifySuccess(title: string, message: string = '', others?: Noti
     title,
     message: (
       <Stack gap={4}>
-        <Text size="sm">{message}</Text>
+        <Text size="sm" className="whitespace-pre-wrap">
+          {message}
+        </Text>
         <Flex justify={'left'}>
           <Divider className="hr-success" />
         </Flex>
@@ -45,7 +49,9 @@ export function NotifyInfo(title: string, message: string = '', others?: Notific
     title,
     message: (
       <Stack gap={4}>
-        <Text size="sm">{message}</Text>
+        <Text size="sm" className="whitespace-pre-wrap">
+          {message}
+        </Text>
         <Flex justify={'left'}>
           <Divider className="hr-info" />
         </Flex>
@@ -63,7 +69,9 @@ export function NotifyWarning(title: string, message: string = '', others?: Noti
     title,
     message: (
       <Stack gap={4}>
-        <Text size="sm">{message}</Text>
+        <Text size="sm" className="whitespace-pre-wrap">
+          {message}
+        </Text>
         <Flex justify={'left'}>
           <Divider className="hr-warning" />
         </Flex>

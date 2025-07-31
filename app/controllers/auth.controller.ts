@@ -1,8 +1,10 @@
+import { formErrorsToString, mapFormErrors } from '#lib/utils_server'
 import AuthService from '#services/auth.service'
 import env from '#start/env'
 import {
   askEmailVerifyValidator,
   askResetPasswordValidator,
+  authValidatorMessage,
   loginValidator,
   registerValidator,
   resetPasswordValidator,
@@ -10,14 +12,18 @@ import {
 
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
+import logger from '@adonisjs/core/services/logger'
 
 @inject()
 export default class AuthController {
   protected bypassCaptcha = env.get('BYPASS_CF_TURNSTILE')
   protected siteKey = env.get('TURNSTILE_SITE')
+  protected enableRegistration = env.get('ENABLE_REGISTRATION')
+  protected hideRegistration = env.get('HIDE_REGISTRATION')
   protected baseProp = {
     site_key: this.siteKey,
     bypass_captcha: this.bypassCaptcha,
+    hide_registration: this.hideRegistration,
   }
 
   constructor(protected service: AuthService) {}
@@ -26,7 +32,8 @@ export default class AuthController {
     return inertia.render('auth/login', { ...this.baseProp })
   }
 
-  async viewRegister({ inertia }: HttpContext) {
+  async viewRegister({ inertia, response }: HttpContext) {
+    if (!this.enableRegistration) return response.redirect().toRoute('auth.login')
     return inertia.render('auth/register', { ...this.baseProp })
   }
 
@@ -46,8 +53,10 @@ export default class AuthController {
 
   async login({ request, response }: HttpContext) {
     try {
-      const payload = await request.validateUsing(loginValidator)
-      await this.service.verifyCFToken(payload.cf_token)
+      const payload = await request.validateUsing(loginValidator, {
+        messagesProvider: authValidatorMessage,
+      })
+      if (!this.bypassCaptcha) await this.service.verifyCFToken(payload.cf_token!)
       const { accessToken, user } = await this.service.login(payload)
 
       // if user is not verified, redirect to verify email page
@@ -56,31 +65,39 @@ export default class AuthController {
       return response.status(200).json({
         status: 'success',
         message: 'Login successful',
-        data: { accessToken, user },
+        data: { accessToken, user: user.toJSON() },
+        redirect_to: 'dashboard',
       })
     } catch (error) {
+      logger.error(error, 'AUTH_LOGIN_USER')
       return response.status(error.status || 500).json({
         status: 'error',
-        message: error.messages?.[0]?.message || error.message || 'Something went wrong',
+        message: formErrorsToString(error) || error.message || 'Something went wrong',
+        form_errorss: mapFormErrors(error),
       })
     }
   }
 
   async register({ request, response }: HttpContext) {
     try {
-      const payload = await request.validateUsing(registerValidator)
-      await this.service.verifyCFToken(payload.cf_token)
+      const payload = await request.validateUsing(registerValidator, {
+        messagesProvider: authValidatorMessage,
+      })
+      if (!this.bypassCaptcha) await this.service.verifyCFToken(payload.cf_token!)
       const { accessToken, user } = await this.service.register(payload)
 
       return response.status(201).json({
         status: 'success',
         message: 'User registered successfully, please verify your email to continue',
-        data: { accessToken, user },
+        data: { accessToken, user: user.toJSON() },
+        redirect_to: 'dashboard',
       })
     } catch (error) {
+      logger.error(error, 'AUTH_REGISTER_USER')
       return response.status(error.status || 500).json({
         status: 'error',
-        message: error.messages?.[0]?.message || error.message || 'Something went wrong',
+        message: formErrorsToString(error) || error.message || 'Something went wrong',
+        form_errors: mapFormErrors(error),
       })
     }
   }
@@ -95,8 +112,10 @@ export default class AuthController {
    */
   async requestVerifyEmail({ request, response, auth }: HttpContext) {
     try {
-      const payload = await request.validateUsing(askEmailVerifyValidator)
-      await this.service.verifyCFToken(payload.cf_token)
+      const payload = await request.validateUsing(askEmailVerifyValidator, {
+        messagesProvider: authValidatorMessage,
+      })
+      if (!this.bypassCaptcha) await this.service.verifyCFToken(payload.cf_token!)
       const user = auth.getUserOrFail()
       await this.service.requestEmail(user)
 
@@ -105,9 +124,11 @@ export default class AuthController {
         message: 'Request for new email verification sent successfully',
       })
     } catch (error) {
+      logger.error(error, 'AUTH_REQUEST_VERIFY_EMAIL')
       return response.status(error.status || 500).json({
         status: 'error',
-        message: error.messages?.[0]?.message || error.message || 'Something went wrong',
+        message: formErrorsToString(error) || error.message || 'Something went wrong',
+        form_errors: mapFormErrors(error),
       })
     }
   }
@@ -133,9 +154,11 @@ export default class AuthController {
         data: isAdmin,
       })
     } catch (error) {
+      logger.error(error, 'AUTH_VERIFY_EMAIL')
       return response.status(error.status || 500).json({
         status: 'error',
-        message: error.messages?.[0]?.message || error.message || 'Something went wrong',
+        message: formErrorsToString(error) || error.message || 'Something went wrong',
+        form_errors: mapFormErrors(error),
       })
     }
   }
@@ -149,8 +172,10 @@ export default class AuthController {
    */
   async requestResetPassword({ request, response }: HttpContext) {
     try {
-      const payload = await request.validateUsing(askResetPasswordValidator)
-      await this.service.verifyCFToken(payload.cf_token)
+      const payload = await request.validateUsing(askResetPasswordValidator, {
+        messagesProvider: authValidatorMessage,
+      })
+      if (!this.bypassCaptcha) await this.service.verifyCFToken(payload.cf_token!)
       await this.service.requestResetPassword(payload.email)
 
       return response.status(200).json({
@@ -158,9 +183,11 @@ export default class AuthController {
         message: 'Password reset email sent successfully',
       })
     } catch (error) {
+      logger.error(error, 'AUTH_REQUEST_RESET_PASSWORD')
       return response.status(error.status || 500).json({
         status: 'error',
-        message: error.messages?.[0]?.message || error.message || 'Something went wrong',
+        message: formErrorsToString(error) || error.message || 'Something went wrong',
+        form_errors: mapFormErrors(error),
       })
     }
   }
@@ -170,12 +197,14 @@ export default class AuthController {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       const { email, password, token, cf_token } =
         await request.validateUsing(resetPasswordValidator)
-      await this.service.verifyCFToken(cf_token)
+      if (!this.bypassCaptcha) await this.service.verifyCFToken(cf_token!)
       await this.service.resetPassword(token, password, email)
     } catch (error) {
+      logger.error(error, 'AUTH_RESET_PASSWORD')
       return response.status(error.status || 500).json({
         status: 'error',
-        message: error.messages?.[0]?.message || error.message || 'Something went wrong',
+        message: formErrorsToString(error) || error.message || 'Something went wrong',
+        form_errors: mapFormErrors(error),
       })
     }
   }
@@ -202,9 +231,11 @@ export default class AuthController {
         message: 'Logged out successfully',
       })
     } catch (error) {
+      logger.error(error, 'AUTH_LOGOUT')
       return response.status(error.status || 500).json({
         status: 'error',
-        message: error.messages?.[0]?.message || error.message || 'Something went wrong',
+        message: formErrorsToString(error) || error.message || 'Something went wrong',
+        form_errors: mapFormErrors(error),
       })
     }
   }
@@ -221,7 +252,8 @@ export default class AuthController {
     } catch (error) {
       return response.status(error.status || 500).json({
         status: 'error',
-        message: error.messages?.[0]?.message || error.message || 'Something went wrong',
+        message: formErrorsToString(error) || error.message || 'Something went wrong',
+        form_errors: mapFormErrors(error),
       })
     }
   }

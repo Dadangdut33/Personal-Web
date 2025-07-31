@@ -5,6 +5,7 @@ import { Notifications } from '@mantine/notifications'
 import { NavigationProgress } from '@mantine/nprogress'
 import ReactDOMServer from 'react-dom/server'
 
+import AppProvider from '@/components/provider'
 import { theme } from '@/theme'
 
 export default function render(page: any) {
@@ -26,7 +27,9 @@ export default function render(page: any) {
               zIndex: 1000,
             }}
           >
-            <App {...props} />
+            <AppProvider>
+              <App {...props} />
+            </AppProvider>
           </ModalsProvider>
         </MantineProvider>
       )
