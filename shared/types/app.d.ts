@@ -25,6 +25,9 @@ export type RequestError = {
   messages: ValidationError[]
 }
 
-export type FormError = {
-  [key: string]: string
+export type FlashAlertType = {
+  success?: string
+  error?: string
+  info?: string
+  warning?: string
 }

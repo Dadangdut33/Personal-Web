@@ -7,17 +7,25 @@ import { inject } from '@adonisjs/core'
 
 @inject()
 export default class PermissionService {
-  constructor(protected permissionRepo: PermissionRepository) {}
+  constructor(protected repo: PermissionRepository) {}
 
   async index(queryParams: QueryBuilderParams<typeof Permission>) {
-    return await this.permissionRepo.query(queryParams)
+    return await this.repo.query(queryParams)
   }
 
-  async createEdit(data: PermissionPayload) {
-    return this.permissionRepo.updateOrCreateGeneric(data)
+  async create(data: PermissionPayload) {
+    return this.repo.createGeneric(data)
+  }
+
+  async update(permission: Permission, data: PermissionPayload) {
+    return this.repo.updateGeneric(permission, data)
+  }
+
+  async findOrFail(value: any) {
+    return this.repo.findOrFail(value)
   }
 
   async deletePermission(id: string) {
-    return this.permissionRepo.deleteGeneric(id)
+    return this.repo.deleteGeneric(id)
   }
 }

@@ -7,17 +7,17 @@ import { inject } from '@adonisjs/core'
 
 @inject()
 export default class UserService {
-  constructor(protected userRepo: UserRepository) {}
+  constructor(protected repo: UserRepository) {}
 
   async index(queryParams: QueryBuilderParams<typeof User>) {
-    return await this.userRepo.query(queryParams)
+    return await this.repo.query(queryParams)
   }
 
-  async createEdit(data: UserPayload) {
-    return this.userRepo.updateOrCreateUser(data)
+  async createUpdate(data: UserPayload) {
+    return this.repo.updateOrCreateUser(data)
   }
 
   async deleteUser(id: string) {
-    return this.userRepo.deleteGeneric(id)
+    return this.repo.deleteGeneric(id)
   }
 }

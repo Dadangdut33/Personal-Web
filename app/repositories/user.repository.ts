@@ -16,7 +16,7 @@ export default class UserRepository extends BaseRepository<typeof User> {
     )
 
     // sync the roles
-    if (data.roles) await user.related('roles').sync(data.roles)
+    if (data.roleIds) await user.related('roles').sync(data.roleIds)
 
     return user
   }

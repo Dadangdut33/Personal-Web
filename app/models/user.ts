@@ -1,4 +1,3 @@
-import Roles from '#enums/roles'
 import Tables from '#enums/tables'
 
 import { AccessToken, DbAccessTokensProvider } from '@adonisjs/auth/access_tokens'
@@ -37,34 +36,45 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column({ isPrimary: true })
   declare id: string
 
-  @column()
+  @column({
+    prepare: (value: string) => value.trim().toLowerCase(),
+  })
   declare username: string
 
-  @column()
-  declare fullName: string
+  @column({
+    prepare: (value: string) => value.trim(),
+  })
+  declare full_name: string
 
-  @column()
+  @column({
+    prepare: (value: string) => value.trim().toLowerCase(),
+  })
   declare email: string
 
   @column({ serializeAs: null })
   declare password: string
 
   @column()
-  declare isEmailVerified: boolean
+  declare is_email_verified: boolean
 
   @column.dateTime({ autoCreate: true, serializeAs: null })
-  declare createdAt: DateTime
+  declare created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true, serializeAs: null })
-  declare updatedAt: DateTime | null
+  declare update_at: DateTime | null
 
   @computed()
   public get isAdmin() {
-    return this.roles.some((role) => role.id === Roles.ADMIN)
+    return this.roles?.some((role) => role.name === 'ADMIN') ?? false
+  }
+
+  @computed()
+  public get isSuperAdmin() {
+    return this.roles?.some((role) => role.name === 'SUPER_ADMIN') ?? false
   }
 
   @manyToMany(() => Role, {
-    pivotTable: 'user_roles',
+    pivotTable: Tables.USER_ROLES,
   })
   declare roles: ManyToMany<typeof Role>
 

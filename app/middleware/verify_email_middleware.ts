@@ -15,14 +15,12 @@ import type { NextFn } from '@adonisjs/core/types/http'
  * @returns {Promise<any>} Returns the result of the next middleware or a 403 response if the email is not verified.
  */
 export default class VerifyEmailMiddleware {
-  async handle({ response, auth }: HttpContext, next: NextFn) {
-    const isEmailVerified = auth.user?.isEmailVerified
+  async handle({ response, auth, session }: HttpContext, next: NextFn) {
+    const isEmailVerified = auth.user?.is_email_verified
 
     if (!isEmailVerified) {
-      return response.status(403).json({
-        status: 'error',
-        message: 'Please verify your email address to proceed.',
-      })
+      session.flash('error', 'Please verify your email address to proceed.')
+      return response.redirect().toRoute('auth.verifyMail')
     }
 
     const output = await next()

@@ -11,7 +11,7 @@ export default class PermissionMiddleware {
   async handle({ auth, response }: HttpContext, next: NextFn, options: { permission: string }) {
     const user = auth.user!
 
-    const hasPermission = await this.permChecker.hasPerm(user, options.permission)
+    const hasPermission = await this.permChecker.check(user, options.permission)
 
     if (!hasPermission) {
       return response.unauthorized({ message: 'You are not authorized to perform this action' })

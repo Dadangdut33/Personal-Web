@@ -75,7 +75,7 @@ export default class PasswordResetNotification extends BaseMail {
               <h1>Password Reset Request</h1>
             </div>
             <div class="content">
-              <p>Hi ${this.user.fullName},</p>
+              <p>Hi ${this.user.full_name},</p>
               <p>We received a request to reset your password. If you made this request, you can reset your password by clicking the button below:</p>
               <a href="${resetLink}" class="button">Reset Your Password</a>
               <p>If you didn't request a password reset, please ignore this email.</p>

@@ -1,4 +1,4 @@
-import Roles from '#enums/roles'
+import PreDefinedRolesId from '#enums/roles'
 import PasswordResetNotification from '#mails/password_reset_notification'
 import VerifyEmailNotification from '#mails/verify_e_notification'
 import User from '#models/user'
@@ -50,7 +50,7 @@ export default class AuthService {
       user.fill(payload)
       await user.save()
 
-      await user.related('roles').attach([Roles.USER])
+      await user.related('roles').attach([PreDefinedRolesId.USER])
       await user.related('profile').create({})
       console.log(user)
 
@@ -101,7 +101,7 @@ export default class AuthService {
    * @memberof AuthService
    */
   async requestEmail(user: User) {
-    if (user.isEmailVerified)
+    if (user.is_email_verified)
       throw new Exception('Your email is already verified.', {
         status: 400,
       })
@@ -132,7 +132,7 @@ export default class AuthService {
         status: 401,
       })
 
-    user.isEmailVerified = true
+    user.is_email_verified = true
     await user.save()
     await this.tokenRepo.expireTokens(user, 'verifyEmailTokens')
   }

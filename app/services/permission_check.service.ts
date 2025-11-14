@@ -14,7 +14,7 @@ export default class PermissionCheckService {
    * @param permissionName - The name of the permission to check.
    * @returns A promise that resolves to `true` if the user has the permission, otherwise `false`.
    */
-  async hasPerm(user: User, permissionName: string): Promise<boolean> {
+  async check(user: User, permissionName: string): Promise<boolean> {
     await user.load('roles', (query) => {
       query.preload('permissions')
     })
@@ -31,8 +31,8 @@ export default class PermissionCheckService {
    * @param permissionName - The name of the permission to check.
    * @throws Exception if the user does not have the required permission.
    */
-  async checkPerm(user: User, permissionName: string) {
-    const hasPermission = await this.hasPerm(user, permissionName)
+  async checkThrowErr(user: User, permissionName: string) {
+    const hasPermission = await this.check(user, permissionName)
 
     if (!hasPermission) {
       throw new Exception('You are not authorized to perform this action', {
@@ -51,13 +51,33 @@ export default class PermissionCheckService {
    * @param matchMethod - The HTTP method to match (e.g., 'POST', 'GET').
    * @throws Exception if the user does not have the required permission and the method matches.
    */
-  async checkPermInMethod(
+  async checkInMethodThrowErr(
     user: User,
     permissionName: string,
     request: HttpContext['request'],
     matchMethod: string
   ) {
     if (request.method() !== matchMethod) return
-    await this.checkPerm(user, permissionName)
+    await this.checkThrowErr(user, permissionName)
+  }
+
+  /**
+   * Checks if the user has the specified permission for a specific HTTP method.
+   * If the request method does not match, no check is performed.
+   *
+   * @param user - The user entity to check permissions for.
+   * @param permissionName - The name of the permission to check.
+   * @param request - The HTTP request context.
+   * @param matchMethod - The HTTP method to match (e.g., 'POST', 'GET').
+   * @returns A promise that resolves to `true` if the user has the permission, otherwise `false`.
+   */
+  async checkInMethod(
+    user: User,
+    permissionName: string,
+    request: HttpContext['request'],
+    matchMethod: string
+  ) {
+    if (request.method() !== matchMethod) return false
+    return await this.check(user, permissionName)
   }
 }

@@ -1,22 +1,15 @@
-export enum Roles {
+export enum PreDefinedRolesId {
   USER = 1,
-  EDITOR = 2,
-  MODERATOR = 3,
-  ADMIN = 19,
-  SUPER_ADMIN = 20,
+  ADMIN = 2,
+  SUPER_ADMIN = 3,
 }
 
-export const roleMap: Record<string, number> = {
-  user: Roles.USER,
-  editor: Roles.EDITOR,
-  moderator: Roles.MODERATOR,
-  admin: Roles.ADMIN,
-  superAdmin: Roles.SUPER_ADMIN,
+export const PreDefinedRoleMap: Record<string, number> = {
+  USER: PreDefinedRolesId.USER,
+  ADMIN: PreDefinedRolesId.ADMIN,
+  SUPER_ADMIN: PreDefinedRolesId.SUPER_ADMIN,
 }
 
-export const roleValue = Object.values(Roles).filter((v) => typeof v === 'number') as number[]
-export const roleName = Object.keys(Roles).filter((v) =>
-  Number.isNaN(Number(v))
-) as (keyof typeof Roles)[]
+export type PreDefinedRoleNameType = keyof typeof PreDefinedRolesId
 
-export default Roles
+export default PreDefinedRolesId

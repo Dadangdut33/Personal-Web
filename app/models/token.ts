@@ -14,7 +14,7 @@ export default class Token extends BaseModel {
   declare id: string
 
   @column()
-  declare userId: string | null
+  declare user_id: string | null
 
   @column()
   declare type: string
@@ -26,10 +26,10 @@ export default class Token extends BaseModel {
   declare expiresAt: DateTime | null
 
   @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+  declare created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  declare update_at: DateTime
 
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>
@@ -55,9 +55,9 @@ export default class Token extends BaseModel {
     if (!user) return null
 
     const lastResetRequest = await Token.query()
-      .where('userId', user.id)
+      .where('user_id', user.id)
       .where('type', 'PASSWORD_RESET')
-      .where('createdAt', '>', DateTime.now().minus({ minutes: 15 }).toSQL())
+      .where('created_at', '>', DateTime.now().minus({ minutes: 15 }).toSQL())
       .first()
     if (lastResetRequest) {
       throw new Error('You can only request a password reset every 15 minutes.')
@@ -84,8 +84,8 @@ export default class Token extends BaseModel {
       .preload('user')
       .where('token', token)
       .where('type', type)
-      .where('expiresAt', '>', DateTime.now().toSQL())
-      .orderBy('createdAt', 'desc')
+      .where('expires_at', '>', DateTime.now().toSQL())
+      .orderBy('created_at', 'desc')
       .first()
 
     return record?.user
@@ -93,7 +93,7 @@ export default class Token extends BaseModel {
 
   public static async verify(token: string, type: TokenType) {
     const record = await Token.query()
-      .where('expiresAt', '>', DateTime.now().toSQL())
+      .where('expires_at', '>', DateTime.now().toSQL())
       .where('token', token)
       .where('type', type)
       .first()

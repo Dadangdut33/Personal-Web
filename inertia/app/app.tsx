@@ -12,17 +12,15 @@ import '@mantine/notifications/styles.css'
 import { NavigationProgress } from '@mantine/nprogress'
 import '@mantine/nprogress/styles.css'
 import { createRoot, hydrateRoot } from 'react-dom/client'
-
-import AppProvider from '@/components/provider'
-import { theme } from '@/theme'
-
-import '../css/app.css'
+import AppProvider from '~/components/provider'
+import '~/css/app.css'
+import { theme } from '~/theme'
 
 const appName = import.meta.env.VITE_APP_NAME || 'AdonisJS'
 
 createInertiaApp({
   progress: { color: '#5468FF' },
-  title: (title) => `${title} - ${appName}`,
+  title: (title) => (title ? `${title} - ${appName}` : appName),
   resolve: (name) => {
     return resolvePageComponent(`../pages/${name}.tsx`, import.meta.glob('../pages/**/*.tsx'))
   },
@@ -30,7 +28,7 @@ createInertiaApp({
   setup({ el, App, props }) {
     const comp = (
       <MantineProvider theme={theme}>
-        <ColorSchemeScript />
+        <ColorSchemeScript defaultColorScheme="dark" />
         <NavigationProgress />
         <Notifications position="top-right" zIndex={1000} />
         <ModalsProvider

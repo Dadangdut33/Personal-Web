@@ -12,4 +12,9 @@
 |
 */
 
-export const policies = {}
+export const policies = {
+  RolePolicy: () => import('#policies/role_policy'),
+  UserPolicy: () => import('#policies/user_policy'),
+  PermissionPolicy: () => import('#policies/permission_policy'),
+  ProfilePolicy: () => import('#policies/profile_policy'),
+}

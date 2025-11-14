@@ -7,17 +7,29 @@ import { inject } from '@adonisjs/core'
 
 @inject()
 export default class RoleService {
-  constructor(protected roleRepo: RoleRepository) {}
+  constructor(protected repo: RoleRepository) {}
 
   async index(queryParams: QueryBuilderParams<typeof Role>) {
-    return await this.roleRepo.query(queryParams)
+    return await this.repo.query(queryParams)
   }
 
-  async createEdit(data: RolePayload) {
-    return this.roleRepo.updateOrCreateGeneric(data)
+  async create(data: RolePayload) {
+    return this.repo.createRole(data)
+  }
+
+  async updateWithModel(role: Role, data: RolePayload) {
+    if (role.is_protected) {
+      data.name = role.name // if protected, we must not update the name
+    }
+
+    return this.repo.updateRoleWithModel(role, data)
+  }
+
+  async findOrFail(value: any) {
+    return this.repo.findOrFail(value)
   }
 
   async deleteRole(id: string) {
-    return this.roleRepo.deleteGeneric(id)
+    return this.repo.deleteGeneric(id)
   }
 }

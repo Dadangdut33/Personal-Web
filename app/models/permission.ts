@@ -1,4 +1,6 @@
-import { BaseModel, column, manyToMany } from '@adonisjs/lucid/orm'
+import Tables from '#enums/tables'
+
+import { BaseModel, beforeDelete, beforeSave, column, manyToMany } from '@adonisjs/lucid/orm'
 import type { ManyToMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 
@@ -11,14 +13,33 @@ export default class Permission extends BaseModel {
   @column()
   declare name: string
 
+  // * A special role that should always be there. it is protected from deletion and modification
+  // ! must only be inserted from seeder.
+  @column()
+  declare is_protected: boolean
+
   @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
+  declare created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime
+  declare update_at: DateTime
 
   @manyToMany(() => Role, {
-    pivotTable: 'role_permissions',
+    pivotTable: Tables.ROLE_PERMISSIONS,
   })
   declare roles: ManyToMany<typeof Role>
+
+  @beforeSave()
+  public static preventProtectedEdit(permission: Permission) {
+    if (permission.$dirty && permission.is_protected) {
+      throw new Error('Cannot modify a protected permission')
+    }
+  }
+
+  @beforeDelete()
+  public static preventProtectedDelete(permission: Permission) {
+    if (permission.is_protected) {
+      throw new Error('Cannot delete a protected permission')
+    }
+  }
 }

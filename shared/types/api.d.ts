@@ -1,4 +1,4 @@
-import { FormError } from './app.js'
+import type { FormErrors } from '@mantine/form'
 
 export interface TurnstileResponse {
   'success': boolean
@@ -17,5 +17,5 @@ export interface BaseAPIResponse<T = any> {
   message: string
   data?: T
   redirect_to?: string
-  form_errors?: FormError[]
+  form_errors?: FormErrors
 }

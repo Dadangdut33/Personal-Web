@@ -1,4 +1,4 @@
-import { getMethodActName, mapRequestToQueryParams } from '#lib/utils_server'
+import { getMethodActName, mapRequestToQueryParams, throwForbidden } from '#lib/utils'
 import PermissionService from '#services/permission.service'
 import PermissionCheckService from '#services/permission_check.service'
 import { createEditPermissionValidator } from '#validators/auth/permission'
@@ -13,18 +13,14 @@ export default class PermissionController {
     protected permChecker: PermissionCheckService
   ) {}
 
-  async viewList({ request, response, auth }: HttpContext) {
-    try {
-      await this.permChecker.checkPerm(auth.user!, 'permission.view')
+  async viewList({ request, response, bouncer, inertia }: HttpContext) {
+    if (await bouncer.with('PermissionPolicy').denies('view')) return throwForbidden()
 
+    try {
       const q = mapRequestToQueryParams(request)
       const data = await this.service.index(q)
 
-      return response.status(200).json({
-        status: 'success',
-        message: 'Successfully fetched permissions.',
-        data: data,
-      })
+      return inertia.render('dashboard/user', data)
     } catch (error) {
       return response.status(error.status || 500).json({
         status: 'error',
@@ -35,13 +31,23 @@ export default class PermissionController {
 
   // if POST request -> create
   // if PATCH request -> update
-  async storeOrUpdate({ request, response, auth }: HttpContext) {
+  async storeOrUpdate({ request, response, bouncer }: HttpContext) {
     try {
-      await this.permChecker.checkPermInMethod(auth.user!, 'permission.create', request, 'POST')
-      await this.permChecker.checkPermInMethod(auth.user!, 'permission.update', request, 'PATCH')
+      const payload = await request.validateUsing(createEditPermissionValidator)
 
-      const data = await request.validateUsing(createEditPermissionValidator)
-      await this.service.createEdit(data)
+      if (request.method() === 'POST') {
+        if (await bouncer.with('PermissionPolicy').denies('create', request)) throwForbidden()
+
+        await this.service.create(payload)
+      } else if (request.method() === 'PATCH') {
+        const permission = await this.service.findOrFail(payload.id!)
+        if (await bouncer.with('PermissionPolicy').denies('update', permission, request))
+          throwForbidden()
+
+        await this.service.create(payload)
+      } else {
+        throwForbidden()
+      }
 
       return response.status(200).json({
         status: 'success',
@@ -55,10 +61,11 @@ export default class PermissionController {
     }
   }
 
-  async destroy({ response, params, auth }: HttpContext) {
+  async destroy({ response, params, bouncer }: HttpContext) {
     try {
-      await this.permChecker.checkPerm(auth.user!, 'role.delete')
       const id = params.id
+      const permission = await this.service.findOrFail(id)
+      if (await bouncer.with('PermissionPolicy').denies('delete', permission)) throwForbidden()
 
       await this.service.deletePermission(id)
 

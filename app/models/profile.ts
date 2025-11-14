@@ -17,16 +17,16 @@ export default class Profile extends BaseModel {
   declare bio: string
 
   @column()
-  declare userId: string
+  declare user_id: string
 
   @hasOne(() => User)
   declare user: HasOne<typeof User>
 
   @column.dateTime({ autoCreate: true, serializeAs: null })
-  declare createdAt: DateTime
+  declare created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true, serializeAs: null })
-  declare updatedAt: DateTime | null
+  declare update_at: DateTime | null
 
   @beforeCreate()
   static assignUuid(profile: Profile) {

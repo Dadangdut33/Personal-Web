@@ -1,13 +1,10 @@
 'use client'
 
-import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
-import { Center, Group, Image, Stack, Text, Title } from '@mantine/core'
-import { IconHome2, IconRefresh } from '@tabler/icons-react'
+import { Center, Image, Stack, Text, Title } from '@mantine/core'
 import { useEffect } from 'react'
 
-import { Button } from '@/components/ui/button'
-
+import ButtonGroup from './button_group'
 import classes from './error.module.css'
 
 export default function ServerError(props: { error: any }) {
@@ -37,16 +34,7 @@ export default function ServerError(props: { error: any }) {
           <Text fz="md" ta="center" className={classes.description}>
             {props.error.message}
           </Text>
-          <Group justify="center" mt="md">
-            <Button onClick={() => window.location.reload()}>
-              <IconRefresh />
-              Refresh
-            </Button>
-            <Button variant="neutral" onClick={() => router.visit('/')}>
-              <IconHome2 />
-              Back to Home
-            </Button>
-          </Group>
+          <ButtonGroup />
         </Stack>
       </Center>
     </>

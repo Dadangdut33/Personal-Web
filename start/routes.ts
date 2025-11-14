@@ -1,3 +1,5 @@
+import router from '@adonisjs/core/services/router'
+
 /*
 |--------------------------------------------------------------------------
 | Routes file
@@ -6,13 +8,15 @@
 | The routes file is used for defining the HTTP routes.
 |
 */
-import router from '@adonisjs/core/services/router'
-
 import './routes/auth.js'
 import './routes/dashboard.js'
 
+const BlogController = () => import('#controllers/blog.controller')
+const ProjectsController = () => import('#controllers/projects.controller')
+const HomeController = () => import('#controllers/home.controller')
+
 router.group(() => {
-  router.on('/').renderInertia('home').as('home')
-  router.on('/projects').renderInertia('projects/index').as('projects')
-  router.on('/blog').renderInertia('blogs/index').as('blog')
+  router.get('/', [HomeController, 'view']).as('home')
+  router.get('/projects', [ProjectsController, 'view']).as('projects')
+  router.get('/blog', [BlogController, 'view']).as('blog')
 })

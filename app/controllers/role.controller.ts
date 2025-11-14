@@ -1,5 +1,4 @@
-import { getMethodActName, mapRequestToQueryParams } from '#lib/utils_server'
-import PermissionCheckService from '#services/permission_check.service'
+import { getMethodActName, mapRequestToQueryParams, throwForbidden } from '#lib/utils'
 import RoleService from '#services/role.service'
 import { createEditRoleValidator } from '#validators/auth/role'
 
@@ -8,23 +7,15 @@ import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
 export default class RoleController {
-  constructor(
-    protected service: RoleService,
-    protected permChecker: PermissionCheckService
-  ) {}
+  constructor(protected service: RoleService) {}
 
-  async viewList({ request, response, auth }: HttpContext) {
+  async viewList({ bouncer, request, response, inertia }: HttpContext) {
+    if (await bouncer.with('RolePolicy').denies('view')) throwForbidden()
     try {
-      await this.permChecker.checkPerm(auth.user!, 'role.view')
-
       const q = mapRequestToQueryParams(request)
       const data = await this.service.index(q)
 
-      return response.status(200).json({
-        status: 'success',
-        message: 'Successfully fetched roles.',
-        data: data,
-      })
+      return inertia.render('dashboard/role', data)
     } catch (error) {
       return response.status(error.status || 500).json({
         status: 'error',
@@ -35,13 +26,22 @@ export default class RoleController {
 
   // if POST request -> create
   // if PATCH request -> update
-  async storeOrUpdate({ request, response, auth }: HttpContext) {
+  async storeOrUpdate({ request, response, bouncer }: HttpContext) {
     try {
-      await this.permChecker.checkPermInMethod(auth.user!, 'role.create', request, 'POST')
-      await this.permChecker.checkPermInMethod(auth.user!, 'role.update', request, 'PATCH')
+      const payload = await request.validateUsing(createEditRoleValidator)
 
-      const data = await request.validateUsing(createEditRoleValidator)
-      await this.service.createEdit(data)
+      if (request.method() === 'POST') {
+        if (await bouncer.with('RolePolicy').denies('create', request)) throwForbidden()
+
+        await this.service.create(payload)
+      } else if (request.method() === 'PATCH') {
+        const role = await this.service.findOrFail(payload.id!)
+        if (await bouncer.with('RolePolicy').denies('update', request)) throwForbidden()
+
+        await this.service.updateWithModel(role, payload)
+      } else {
+        throwForbidden()
+      }
 
       return response.status(200).json({
         status: 'success',
@@ -55,10 +55,11 @@ export default class RoleController {
     }
   }
 
-  async destroy({ response, params, auth }: HttpContext) {
+  async destroy({ bouncer, response, params }: HttpContext) {
     try {
-      await this.permChecker.checkPerm(auth.user!, 'role.delete')
       const id = params.id
+      const role = await this.service.findOrFail(id)
+      if (await bouncer.with('RolePolicy').denies('delete', role)) throwForbidden()
 
       await this.service.deleteRole(id)
 

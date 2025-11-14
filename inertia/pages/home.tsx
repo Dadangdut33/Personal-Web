@@ -1,12 +1,11 @@
 import { SharedProps } from '@adonisjs/inertia/types'
 import { Stack } from '@mantine/core'
-
-import Logo from '@/components/homepage/logo'
-import PublicLayout from '@/layouts/public'
+import Logo from '~/components/homepage/logo'
+import PublicLayout from '~/layouts/public'
 
 export default function Home(props: SharedProps) {
   return (
-    <PublicLayout {...props}>
+    <PublicLayout>
       <div className="max-w-3xl mx-auto pt-5">
         <Logo />
         <Stack>

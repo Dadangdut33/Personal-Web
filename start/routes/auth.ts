@@ -12,6 +12,8 @@ const AuthController = () => import('#controllers/auth.controller')
 
 router
   .group(() => {
+    router.post('/logout', [AuthController, 'logout']).as('auth.logout').use([middleware.auth()])
+
     router.get('/login', [AuthController, 'viewLogin']).as('auth.login').use([middleware.guest()])
     router
       .post('/login', [AuthController, 'login'])
@@ -28,16 +30,19 @@ router
       .use([middleware.guest(), registerThrottle])
 
     router
+      .get('/reset-password', [AuthController, 'viewRequestResetPassword'])
+      .as('auth.requestResetPassword')
+    router
+      .post('/reset-password/request', [AuthController, 'requestResetPassword'])
+      .as('auth.requestResetPassword.post')
+      .use(resetPasswordRequestThrottle)
+    router
       .get('/reset-password/:token', [AuthController, 'viewResetPassword'])
       .as('auth.resetPassword')
     router.post('/reset-password', [AuthController, 'resetPassword']).as('auth.resetPassword.post')
-    router
-      .post('/reset-password/request', [AuthController, 'requestResetPassword'])
-      .as('auth.resetPassword.request')
-      .use(resetPasswordRequestThrottle)
 
     router
-      .get('/verify-email/:token', [AuthController, 'viewVerifyMail'])
+      .get('/verify-email/:token?', [AuthController, 'viewVerifyMail'])
       .as('auth.verifyMail')
       .use(middleware.auth())
     router

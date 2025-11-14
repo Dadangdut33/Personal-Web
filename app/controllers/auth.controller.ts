@@ -1,4 +1,4 @@
-import { formErrorsToString, mapFormErrors } from '#lib/utils_server'
+import { mapReqErrors, reqErrorsToString } from '#lib/utils'
 import AuthService from '#services/auth.service'
 import env from '#start/env'
 import {
@@ -13,6 +13,7 @@ import {
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
 import logger from '@adonisjs/core/services/logger'
+import { route } from '@izzyjs/route/client'
 
 @inject()
 export default class AuthController {
@@ -37,17 +38,17 @@ export default class AuthController {
     return inertia.render('auth/register', { ...this.baseProp })
   }
 
-  // Basically for the reset password and verify email page.
-  // We will rely on the token in the URL.
-  // If no token, we give the form to make rqeuest
-  // If token exist, we give the form to reset the password
+  async viewRequestResetPassword({ inertia }: HttpContext) {
+    return inertia.render('auth/requestResetPassword', { ...this.baseProp })
+  }
+
   async viewResetPassword({ inertia, params }: HttpContext) {
-    const token = params.token || ''
+    const token: string = params.token || ''
     return inertia.render('auth/resetPassword', { token, ...this.baseProp })
   }
 
   async viewVerifyMail({ inertia, params }: HttpContext) {
-    const token = params.token || ''
+    const token: string = params.token || ''
     return inertia.render('auth/verifyMail', { token, ...this.baseProp })
   }
 
@@ -60,25 +61,25 @@ export default class AuthController {
       const { accessToken, user } = await this.service.login(payload)
 
       // if user is not verified, redirect to verify email page
-      if (!user.isEmailVerified) return response.redirect().toRoute('auth.verifyMail')
+      if (!user.is_email_verified) return response.redirect().toRoute('auth.verifyMail')
 
       return response.status(200).json({
         status: 'success',
         message: 'Login successful',
         data: { accessToken, user: user.toJSON() },
-        redirect_to: 'dashboard',
+        redirect_to: route('auth.login').path,
       })
     } catch (error) {
-      logger.error(error, 'AUTH_LOGIN_USER')
+      if (error.type !== 'ValidationError') logger.error(error, 'AUTH_LOGIN_USER')
       return response.status(error.status || 500).json({
         status: 'error',
-        message: formErrorsToString(error) || error.message || 'Something went wrong',
-        form_errorss: mapFormErrors(error),
+        message: reqErrorsToString(error) || error.message || 'Something went wrong',
+        form_errorss: mapReqErrors(error),
       })
     }
   }
 
-  async register({ request, response }: HttpContext) {
+  async register({ request, response, session }: HttpContext) {
     try {
       const payload = await request.validateUsing(registerValidator, {
         messagesProvider: authValidatorMessage,
@@ -86,18 +87,23 @@ export default class AuthController {
       if (!this.bypassCaptcha) await this.service.verifyCFToken(payload.cf_token!)
       const { accessToken, user } = await this.service.register(payload)
 
+      session.flash(
+        'success',
+        'User registered successfully, please login and verify your email to continue'
+      )
+
       return response.status(201).json({
         status: 'success',
-        message: 'User registered successfully, please verify your email to continue',
+        message: 'User registered successfully, please login and verify your email to continue',
         data: { accessToken, user: user.toJSON() },
-        redirect_to: 'dashboard',
+        redirect_to: route('auth.login').path,
       })
     } catch (error) {
-      logger.error(error, 'AUTH_REGISTER_USER')
+      if (error.type !== 'ValidationError') logger.error(error, 'AUTH_REGISTER_USER')
       return response.status(error.status || 500).json({
         status: 'error',
-        message: formErrorsToString(error) || error.message || 'Something went wrong',
-        form_errors: mapFormErrors(error),
+        message: reqErrorsToString(error) || error.message || 'Something went wrong',
+        form_errors: mapReqErrors(error),
       })
     }
   }
@@ -124,11 +130,11 @@ export default class AuthController {
         message: 'Request for new email verification sent successfully',
       })
     } catch (error) {
-      logger.error(error, 'AUTH_REQUEST_VERIFY_EMAIL')
+      if (error.type !== 'ValidationError') logger.error(error, 'AUTH_REQUEST_VERIFY_EMAIL')
       return response.status(error.status || 500).json({
         status: 'error',
-        message: formErrorsToString(error) || error.message || 'Something went wrong',
-        form_errors: mapFormErrors(error),
+        message: reqErrorsToString(error) || error.message || 'Something went wrong',
+        form_errors: mapReqErrors(error),
       })
     }
   }
@@ -157,8 +163,8 @@ export default class AuthController {
       logger.error(error, 'AUTH_VERIFY_EMAIL')
       return response.status(error.status || 500).json({
         status: 'error',
-        message: formErrorsToString(error) || error.message || 'Something went wrong',
-        form_errors: mapFormErrors(error),
+        message: reqErrorsToString(error) || error.message || 'Something went wrong',
+        form_errors: mapReqErrors(error),
       })
     }
   }
@@ -183,11 +189,11 @@ export default class AuthController {
         message: 'Password reset email sent successfully',
       })
     } catch (error) {
-      logger.error(error, 'AUTH_REQUEST_RESET_PASSWORD')
+      if (error.type !== 'ValidationError') logger.error(error, 'AUTH_REQUEST_RESET_PASSWORD')
       return response.status(error.status || 500).json({
         status: 'error',
-        message: formErrorsToString(error) || error.message || 'Something went wrong',
-        form_errors: mapFormErrors(error),
+        message: reqErrorsToString(error) || error.message || 'Something went wrong',
+        form_errors: mapReqErrors(error),
       })
     }
   }
@@ -200,11 +206,11 @@ export default class AuthController {
       if (!this.bypassCaptcha) await this.service.verifyCFToken(cf_token!)
       await this.service.resetPassword(token, password, email)
     } catch (error) {
-      logger.error(error, 'AUTH_RESET_PASSWORD')
+      if (error.type !== 'ValidationError') logger.error(error, 'AUTH_RESET_PASSWORD')
       return response.status(error.status || 500).json({
         status: 'error',
-        message: formErrorsToString(error) || error.message || 'Something went wrong',
-        form_errors: mapFormErrors(error),
+        message: reqErrorsToString(error) || error.message || 'Something went wrong',
+        form_errors: mapReqErrors(error),
       })
     }
   }
@@ -234,8 +240,8 @@ export default class AuthController {
       logger.error(error, 'AUTH_LOGOUT')
       return response.status(error.status || 500).json({
         status: 'error',
-        message: formErrorsToString(error) || error.message || 'Something went wrong',
-        form_errors: mapFormErrors(error),
+        message: reqErrorsToString(error) || error.message || 'Something went wrong',
+        form_errors: mapReqErrors(error),
       })
     }
   }
@@ -252,8 +258,8 @@ export default class AuthController {
     } catch (error) {
       return response.status(error.status || 500).json({
         status: 'error',
-        message: formErrorsToString(error) || error.message || 'Something went wrong',
-        form_errors: mapFormErrors(error),
+        message: reqErrorsToString(error) || error.message || 'Something went wrong',
+        form_errors: mapReqErrors(error),
       })
     }
   }

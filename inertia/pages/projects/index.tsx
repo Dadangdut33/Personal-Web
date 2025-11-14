@@ -1,6 +1,5 @@
 import { SharedProps } from '@adonisjs/inertia/types'
-
-import PublicLayout from '@/layouts/public'
+import PublicLayout from '~/layouts/public'
 
 export default function Home(props: SharedProps) {
   return (

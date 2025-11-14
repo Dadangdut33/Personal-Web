@@ -1,10 +1,15 @@
 import { QueryBuilderParams } from '#types/app'
 
-import { LucidModel, ModelAttributes, ModelQueryBuilderContract } from '@adonisjs/lucid/types/model'
+import {
+  LucidModel,
+  ModelAdapterOptions,
+  ModelAttributes,
+  ModelQueryBuilderContract,
+} from '@adonisjs/lucid/types/model'
 import { ExtractModelRelations } from '@adonisjs/lucid/types/relations'
 
 export default abstract class BaseRepository<T extends LucidModel> {
-  protected model: T
+  public model: T
 
   constructor(model: T) {
     this.model = model
@@ -84,11 +89,25 @@ export default abstract class BaseRepository<T extends LucidModel> {
     return this.model.find(id)
   }
 
+  public async findOrFail(value: any, options?: ModelAdapterOptions) {
+    return this.model.findOrFail(value, options)
+  }
+
+  public async findByOrFail(column: string, value: string | number, options?: ModelAdapterOptions) {
+    return this.model.findByOrFail(column, value, options)
+  }
+
   public async updateGeneric<P extends Partial<ModelAttributes<InstanceType<T>>>>(
     instance: InstanceType<T>,
     data: P
   ) {
     instance.merge(data)
+    return instance.save()
+  }
+
+  public async createGeneric<P extends Partial<ModelAttributes<InstanceType<T>>>>(data: P) {
+    const instance = new this.model()
+    instance.fill(data)
     return instance.save()
   }
 

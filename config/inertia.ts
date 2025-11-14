@@ -1,4 +1,5 @@
 import env from '#start/env'
+import { FlashAlertType } from '#types/app'
 
 import { defineConfig } from '@adonisjs/inertia'
 import type { InferSharedProps } from '@adonisjs/inertia/types'
@@ -14,7 +15,7 @@ const inertiaConfig = defineConfig({
    */
   sharedData: {
     user: (ctx) => ctx.inertia.always(() => (ctx.auth ? ctx.auth.user : null)),
-    flashMessages: (ctx) => (ctx.session ? ctx.session.flashMessages : null),
+    flashMessages: (ctx) => (ctx.session ? (ctx.session.flashMessages as FlashAlertType) : null),
     currentPath: (ctx) => ctx.request.url(false),
     previousPath: (ctx) => {
       const referer = ctx.request.header('referer')
@@ -30,6 +31,7 @@ const inertiaConfig = defineConfig({
     previousURL: (ctx) => ctx.request.header('referer'),
     umami_id: () => env.get('UMAMI_ID'),
     umami_public_url: () => env.get('UMAMI_PUBLIC_URL'),
+    umami_share_url: () => env.get('UMAMI_SHARE_URL'),
   },
 
   /**

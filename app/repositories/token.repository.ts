@@ -50,9 +50,9 @@ export default class TokenRepository extends BaseRepository<typeof Token> {
   async canRequestToken(user: User, type: TokenType) {
     return await this.model
       .query()
-      .where('userId', user.id)
+      .where('user_id', user.id)
       .where('type', type)
-      .where('createdAt', '>', DateTime.now().minus(this.getTokenTimeLimit(type)).toSQL())
+      .where('created_at', '>', DateTime.now().minus(this.getTokenTimeLimit(type)).toSQL())
       .first()
   }
 
@@ -86,7 +86,7 @@ export default class TokenRepository extends BaseRepository<typeof Token> {
       .where('token', token)
       .where('type', type)
       .where('expiresAt', '>', DateTime.now().toSQL())
-      .orderBy('createdAt', 'desc')
+      .orderBy('created_at', 'desc')
       .first()
 
     return record?.user

@@ -4,13 +4,16 @@ import { ModalsProvider } from '@mantine/modals'
 import { Notifications } from '@mantine/notifications'
 import { NavigationProgress } from '@mantine/nprogress'
 import ReactDOMServer from 'react-dom/server'
+import AppProvider from '~/components/provider'
+import '~/css/app.css'
+import { theme } from '~/theme'
 
-import AppProvider from '@/components/provider'
-import { theme } from '@/theme'
+const appName = import.meta.env.VITE_APP_NAME || 'AdonisJS'
 
 export default function render(page: any) {
   return createInertiaApp({
     page,
+    title: (title) => title ? `${title} - ${appName}` : appName,
     render: ReactDOMServer.renderToString,
     resolve: (name) => {
       const pages = import.meta.glob('../pages/**/*.tsx', { eager: true })

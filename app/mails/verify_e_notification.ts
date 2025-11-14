@@ -75,7 +75,7 @@ export default class VerifyEmailNotification extends BaseMail {
               <h1>Email Verification Request</h1>
             </div>
             <div class="content">
-              <p>Hi ${this.user.fullName},</p>
+              <p>Hi ${this.user.full_name},</p>
               <p>Thank you for registering with us! To complete your registration, please verify your email address by clicking the button below:</p>
               <a href="${verificationLink}" class="button">Verify Your Email</a>
               <p>If you didn't create an account with us, please ignore this email.</p>

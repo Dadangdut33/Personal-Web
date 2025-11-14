@@ -1,26 +1,38 @@
-import { SharedProps } from '@adonisjs/inertia/types'
+import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
+import type AuthController from '@app/controllers/auth.controller.ts'
 import { router } from '@inertiajs/core'
-import { Head, Link } from '@inertiajs/react'
+import { Head } from '@inertiajs/react'
 import { route } from '@izzyjs/route/client'
-import { Box, Image, Loader } from '@mantine/core'
+import { Box, Loader, Popover, Progress, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
+import { useLocalStorage } from '@mantine/hooks'
 import { Turnstile } from '@marsidev/react-turnstile'
 import { IconArrowLeft } from '@tabler/icons-react'
+import { useState } from 'react'
+import PasswordRequirement, {
+  PasswordPopover,
+  getPasswordStrength,
+} from '~/components/auth/password'
+import { ConfirmModal } from '~/components/core/modals'
+import { NotifyError } from '~/components/core/notify'
+import { Button } from '~/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
+import { Input } from '~/components/ui/input'
+import { useGenericMutation } from '~/hooks/use_generic_mutation'
+import AuthLayout from '~/layouts/auth'
+import { PASS_REGEX, PASS_REQ } from '~/lib/constants'
+import { checkForm, cn } from '~/lib/utils'
 
-import { NotifyError } from '@/components/core/notify'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { useGenericMutation } from '@/hooks/use_generic_mutation'
-import AuthLayout from '@/layouts/auth'
-import { cn } from '@/lib/utils'
-
-import { AuthProps } from './props'
-
-export default function Page(props: SharedProps & AuthProps) {
+export default function Page(props: SharedProps & InferPageProps<AuthController, 'viewRegister'>) {
+  const [openPW, setOpenPW] = useState(false)
+  const [openPWConfirm, setOpenPWConfirm] = useState(false)
+  const [_, setEmailTimeoutNewFlag] = useLocalStorage({
+    key: 'timeout_verify_email_new', // key for new email verification timeout
+    defaultValue: true,
+  })
   const form = useForm({
     initialValues: {
-      fullName: '',
+      full_name: '',
       username: '',
       email: '',
       password: '',
@@ -28,30 +40,55 @@ export default function Page(props: SharedProps & AuthProps) {
       cf_token: '',
     },
     validate: {
-      fullName: (value) => (value.length > 0 ? null : 'FullName is required'),
+      full_name: (value) => (value.length > 0 ? null : 'FullName is required'),
       username: (value) => (value.length > 0 ? null : 'Username is required'),
       email: (value) => (value.length > 0 ? null : 'Email is required'),
-      password: (value) => (value.length > 0 ? null : 'Password is required'),
+      password: (value) => (PASS_REGEX.test(value) ? null : 'Password does not meet requirements'),
       password_confirmation: (value) => {
+        if (!PASS_REGEX.test(value)) return 'Password does not meet requirements'
         if (value !== form.values.password) return 'Passwords do not match'
-        if (value.length < 8) return 'Password is required'
         return null
       },
+      cf_token: (value) => (value.length > 0 ? null : 'Captcha is required'),
     },
   })
   const mutation = useGenericMutation('POST', route('auth.register.post').path, {
     onError(error, _variables, _context) {
       if (error.response?.data.form_errors) {
-        form.setErrors(error.response?.data.form_errors as any)
+        form.setErrors(error.response?.data.form_errors)
       }
+    },
+    onSuccess() {
+      setEmailTimeoutNewFlag(true)
     },
   })
   const doMutate = () => {
-    const { hasErrors, errors } = form.validate()
-    console.log(hasErrors, errors)
-    if (hasErrors) return
+    if (!checkForm(form, { bypass_captcha: props.bypass_captcha })) return
     mutation.mutate(form.values)
   }
+
+  const checks = PASS_REQ.map((requirement, index) => (
+    <PasswordRequirement
+      key={index}
+      label={requirement.label}
+      meets={requirement.re.test(form.values.password)}
+    />
+  ))
+  const strength = getPasswordStrength(form.values.password)
+  const color = strength === 100 ? 'teal' : strength > 50 ? 'yellow' : 'red'
+  const passwordDropdown = (
+    <Popover.Dropdown className="bg-background!">
+      <Progress color={color} value={strength} size={5} mb="xs" />
+      {checks}
+    </Popover.Dropdown>
+  )
+
+  const confirm = ConfirmModal({
+    message: 'Are you sure you want to register with this data?',
+    onConfirm: () => {
+      doMutate()
+    },
+  })
 
   return (
     <AuthLayout>
@@ -70,77 +107,85 @@ export default function Page(props: SharedProps & AuthProps) {
         </Button>
       </Box>
 
-      <div className="flex w-full max-w-sm flex-col gap-6">
-        <Link href="/" className="flex items-center gap-2 self-center font-medium">
-          <Image src={'/assets/logo-transparent.png'} alt="Logo" w={150} />
-        </Link>
-      </div>
-
-      <div className={cn('flex flex-col gap-6')}>
+      <div className={cn('flex flex-col gap-4')}>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-xl">Register</CardTitle>
             <CardDescription>Fill the form to register an account</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-6">
-              <div className="grid gap-6">
-                <Input
-                  label="Full Name"
-                  id="fullName"
-                  type="text"
-                  placeholder="John Smith"
-                  required
-                  value={form.values.fullName}
-                  error={form.errors.fullName}
-                  onChange={(e) => form.setFieldValue('fullName', e.target.value)}
-                />
+            <div className="grid gap-4">
+              <Input
+                label="Full Name"
+                id="fullName"
+                type="text"
+                placeholder="John Smith"
+                required
+                value={form.values.full_name}
+                error={form.errors.fullName}
+                onChange={(e) => form.setFieldValue('fullName', e.target.value)}
+              />
 
-                <Input
-                  label="Username"
-                  id="username"
-                  type="text"
-                  placeholder="johnsmith67"
-                  required
-                  value={form.values.username}
-                  error={form.errors.username}
-                  onChange={(e) => form.setFieldValue('username', e.target.value)}
-                />
+              <Input
+                label="Username"
+                id="username"
+                type="text"
+                placeholder="johnsmith67"
+                required
+                value={form.values.username}
+                error={form.errors.username}
+                onChange={(e) => form.setFieldValue('username', e.target.value)}
+              />
 
-                <Input
-                  label="Email"
-                  id="email"
-                  type="email"
-                  placeholder="mail@example.com"
-                  required
-                  value={form.values.email}
-                  error={form.errors.email}
-                  onChange={(e) => form.setFieldValue('email', e.target.value)}
-                />
+              <Input
+                label="Email"
+                id="email"
+                type="email"
+                placeholder="mail@example.com"
+                required
+                value={form.values.email}
+                error={form.errors.email}
+                onChange={(e) => form.setFieldValue('email', e.target.value)}
+              />
 
-                <Input
-                  label="Password"
-                  id="password"
-                  type="password"
-                  placeholder="******"
-                  required
-                  value={form.values.password}
-                  error={form.errors.password}
-                  onChange={(e) => form.setFieldValue('password', e.target.value)}
-                />
+              <PasswordPopover
+                input={
+                  <Input
+                    label="Password"
+                    id="password"
+                    type="password"
+                    placeholder="******"
+                    required
+                    value={form.values.password}
+                    error={form.errors.password}
+                    onChange={(e) => form.setFieldValue('password', e.target.value)}
+                  />
+                }
+                popoverOpened={openPW}
+                setPopoverOpened={setOpenPW}
+                popoverDropdown={passwordDropdown}
+              />
 
-                <Input
-                  label="Password Confirmation"
-                  id="password_confirmation"
-                  type="password"
-                  placeholder="******"
-                  required
-                  value={form.values.password_confirmation}
-                  error={form.errors.password_confirmation}
-                  onChange={(e) => form.setFieldValue('password_confirmation', e.target.value)}
-                />
+              <PasswordPopover
+                input={
+                  <Input
+                    label="Password Confirmation"
+                    id="password_confirmation"
+                    type="password"
+                    placeholder="******"
+                    required
+                    value={form.values.password_confirmation}
+                    error={form.errors.password_confirmation}
+                    onChange={(e) => form.setFieldValue('password_confirmation', e.target.value)}
+                  />
+                }
+                popoverOpened={openPWConfirm}
+                setPopoverOpened={setOpenPWConfirm}
+                popoverDropdown={passwordDropdown}
+              />
 
-                {props.site_key && !props.bypass_captcha && (
+              {props.site_key && !props.bypass_captcha && (
+                <>
                   <Turnstile
                     className="mx-auto"
                     siteKey={props.site_key}
@@ -150,13 +195,16 @@ export default function Page(props: SharedProps & AuthProps) {
                     }}
                     onError={() => NotifyError('Error', 'Failed to load captcha')}
                   />
-                )}
+                  <Text size="xs" mt="xs" color="red" className="text-center">
+                    {form.errors.cf_token}
+                  </Text>
+                </>
+              )}
 
-                <Button className="w-full" disabled={mutation.isPending} onClick={() => doMutate()}>
-                  {mutation.isPending && <Loader size={16} color="black" />}
-                  Register
-                </Button>
-              </div>
+              <Button className="w-full" disabled={mutation.isPending} onClick={confirm}>
+                {mutation.isPending && <Loader size={16} color="black" />}
+                Register
+              </Button>
             </div>
           </CardContent>
         </Card>

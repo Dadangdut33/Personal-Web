@@ -4,7 +4,7 @@ export interface User {
   fullName: string | null
   email: string
   isEmailVerified: boolean
-  createdAt: Date
-  updatedAt: Date | null
+  created_at: Date
+  update_at: Date | null
   isAdmin: boolean
 }
