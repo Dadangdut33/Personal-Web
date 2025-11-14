@@ -12,11 +12,11 @@ import './routes/auth.js'
 import './routes/dashboard.js'
 
 const BlogController = () => import('#controllers/blog.controller')
-const ProjectsController = () => import('#controllers/projects.controller')
+const ProjectController = () => import('#controllers/project.controller')
 const HomeController = () => import('#controllers/home.controller')
 
 router.group(() => {
   router.get('/', [HomeController, 'view']).as('home')
-  router.get('/projects', [ProjectsController, 'view']).as('projects')
+  router.get('/projects', [ProjectController, 'view']).as('projects')
   router.get('/blog', [BlogController, 'view']).as('blog')
 })

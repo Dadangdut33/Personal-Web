@@ -3,7 +3,7 @@ import Tables from '#enums/tables'
 import { BaseSchema } from '@adonisjs/lucid/schema'
 
 export default class extends BaseSchema {
-  protected tableName = Tables.MEDIA
+  protected tableName = Tables.MEDIAS
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {

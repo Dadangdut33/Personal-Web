@@ -85,7 +85,7 @@ export default abstract class BaseRepository<T extends LucidModel> {
     return this.model.query().where(column, value).first()
   }
 
-  public async findById(id: string) {
+  public async findById(id: any) {
     return this.model.find(id)
   }
 
@@ -111,7 +111,7 @@ export default abstract class BaseRepository<T extends LucidModel> {
     return instance.save()
   }
 
-  public async deleteGeneric(id: string) {
+  public async deleteGeneric(id: any) {
     const instance = await this.findById(id)
     if (!instance) throw new Error(`${this.model.name} not found`)
     await instance.delete()

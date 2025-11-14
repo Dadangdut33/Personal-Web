@@ -13,7 +13,7 @@ enum Tables {
   RATE_LIMITS = 'rate_limits',
 
   // content
-  MEDIA = 'media',
+  MEDIAS = 'medias',
   PROJECTS = 'projects',
   BLOGS = 'blogs',
   BLOGS_PROJECTS = 'blogs_projects',

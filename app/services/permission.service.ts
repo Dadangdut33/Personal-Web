@@ -25,7 +25,7 @@ export default class PermissionService {
     return this.repo.findOrFail(value)
   }
 
-  async deletePermission(id: string) {
+  async deletePermission(id: any) {
     return this.repo.deleteGeneric(id)
   }
 }

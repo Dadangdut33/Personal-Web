@@ -12,7 +12,7 @@ export default class extends BaseSchema {
       table.boolean('is_pinned').defaultTo(false)
 
       table.string('title').notNullable()
-      table.foreign('thumbnail_id').references('id').inTable(Tables.MEDIA).onDelete('SET NULL')
+      table.foreign('thumbnail_id').references('id').inTable(Tables.MEDIAS).onDelete('SET NULL')
       table.text('description').nullable()
       table.json('tags').nullable()
 

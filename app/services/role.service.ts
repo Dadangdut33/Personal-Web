@@ -29,7 +29,7 @@ export default class RoleService {
     return this.repo.findOrFail(value)
   }
 
-  async deleteRole(id: string) {
+  async deleteRole(id: any) {
     return this.repo.deleteGeneric(id)
   }
 }

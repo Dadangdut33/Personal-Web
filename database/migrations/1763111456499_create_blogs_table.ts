@@ -11,7 +11,7 @@ export default class extends BaseSchema {
       table.string('slug_id').notNullable()
 
       table.string('title').notNullable()
-      table.foreign('thumbnail_id').references('id').inTable(Tables.MEDIA).onDelete('SET NULL')
+      table.foreign('thumbnail_id').references('id').inTable(Tables.MEDIAS).onDelete('SET NULL')
       table.text('description').nullable()
       table.json('content').notNullable()
       table.json('tags').nullable()

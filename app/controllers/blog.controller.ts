@@ -6,6 +6,6 @@ export default class BlogController {
   constructor() {}
 
   async view({ inertia }: HttpContext) {
-    return inertia.render('blogs/index')
+    return inertia.render('blog/index')
   }
 }
