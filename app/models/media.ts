@@ -1,13 +1,14 @@
 import Tables from '#enums/tables'
 
-import { BaseModel, column } from '@adonisjs/lucid/orm'
+import { BaseModel, beforeCreate, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
+import { randomUUID } from 'node:crypto'
 
 export default class Media extends BaseModel {
   static table = Tables.MEDIAS
 
   @column({ isPrimary: true })
-  declare id: number
+  declare id: string
 
   @column()
   declare drive_key: string
@@ -32,4 +33,9 @@ export default class Media extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updated_at: DateTime | null
+
+  @beforeCreate()
+  static assignUuid(self: Media) {
+    self.id = randomUUID()
+  }
 }

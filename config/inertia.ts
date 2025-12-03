@@ -1,3 +1,4 @@
+import User from '#models/user'
 import env from '#start/env'
 import { FlashAlertType } from '#types/app'
 
@@ -14,7 +15,8 @@ const inertiaConfig = defineConfig({
    * Data that should be shared with all rendered pages
    */
   sharedData: {
-    user: (ctx) => ctx.inertia.always(() => (ctx.auth ? ctx.auth.user : null)),
+    user: (ctx) =>
+      ctx.inertia.always(() => (ctx.auth ? ctx.auth.user : null)) as unknown as null | User,
     flashMessages: (ctx) => (ctx.session ? (ctx.session.flashMessages as FlashAlertType) : null),
     currentPath: (ctx) => ctx.request.url(false),
     previousPath: (ctx) => {

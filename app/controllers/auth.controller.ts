@@ -47,27 +47,38 @@ export default class AuthController {
     return inertia.render('auth/resetPassword', { token, ...this.baseProp })
   }
 
-  async viewVerifyMail({ inertia, params }: HttpContext) {
-    const token: string = params.token || ''
-    return inertia.render('auth/verifyMail', { token, ...this.baseProp })
+  async viewVerifyEmail({ inertia, response, auth }: HttpContext) {
+    // if already verified, redirect to dashboard
+    if (auth.user?.is_email_verified) return response.redirect().toRoute('dashboard')
+    return inertia.render('auth/verifyEmail', { ...this.baseProp })
   }
 
-  async login({ request, response }: HttpContext) {
+  async login({ request, response, auth }: HttpContext) {
     try {
       const payload = await request.validateUsing(loginValidator, {
         messagesProvider: authValidatorMessage,
       })
+
       if (!this.bypassCaptcha) await this.service.verifyCFToken(payload.cf_token!)
-      const { accessToken, user } = await this.service.login(payload)
+      const { user } = await this.service.login(payload)
+
+      // set the current login user to web
+      await auth.use('web').login(user)
 
       // if user is not verified, redirect to verify email page
-      if (!user.is_email_verified) return response.redirect().toRoute('auth.verifyMail')
+      if (!user.is_email_verified)
+        return response.status(200).json({
+          status: 'success',
+          message: 'Login successful, but need to verify email',
+          data: { user: user.toJSON() },
+          redirect_to: route('auth.verifyEmail').path,
+        })
 
       return response.status(200).json({
         status: 'success',
         message: 'Login successful',
-        data: { accessToken, user: user.toJSON() },
-        redirect_to: route('auth.login').path,
+        data: { user: user.toJSON() },
+        redirect_to: route('dashboard').path,
       })
     } catch (error) {
       if (error.type !== 'ValidationError') logger.error(error, 'AUTH_LOGIN_USER')
@@ -122,7 +133,16 @@ export default class AuthController {
         messagesProvider: authValidatorMessage,
       })
       if (!this.bypassCaptcha) await this.service.verifyCFToken(payload.cf_token!)
+
+      // first check if user is already verified
       const user = auth.getUserOrFail()
+      if (user.is_email_verified)
+        return response.status(200).json({
+          status: 'success',
+          message: 'User is already verified',
+          redirect_to: route('dashboard').path,
+        })
+
       await this.service.requestEmail(user)
 
       return response.status(200).json({
@@ -142,23 +162,20 @@ export default class AuthController {
   /**
    * Verify email verification token
    *
-   * @param {HttpContext} { response, params, auth }
+   * @param {HttpContext} { response, params, auth, session }
    * @return {*}
    * @memberof AuthController
    */
-  async verifyEmail({ response, params, auth }: HttpContext) {
+  async verifyEmail({ response, params, auth, session }: HttpContext) {
     try {
       const token = params.token
       const user = auth.getUserOrFail()
 
-      const isAdmin = user.isAdmin
       await this.service.verifyEmail(token, user)
 
-      return response.status(200).json({
-        status: 'success',
-        message: 'Email verified successfully',
-        data: isAdmin,
-      })
+      // redirect to dashboard immediately, because this is a one time request that is only a link
+      session.flash('success', 'Email verified successfully')
+      return response.redirect().toRoute('dashboard')
     } catch (error) {
       logger.error(error, 'AUTH_VERIFY_EMAIL')
       return response.status(error.status || 500).json({
@@ -204,6 +221,7 @@ export default class AuthController {
       const { email, password, token, cf_token } =
         await request.validateUsing(resetPasswordValidator)
       if (!this.bypassCaptcha) await this.service.verifyCFToken(cf_token!)
+
       await this.service.resetPassword(token, password, email)
     } catch (error) {
       if (error.type !== 'ValidationError') logger.error(error, 'AUTH_RESET_PASSWORD')
@@ -218,24 +236,27 @@ export default class AuthController {
   /**
    * Logout a user by invalidating their access token and loging out the auth
    *
-   * @param {HttpContext} { auth, response }
+   * @param {HttpContext} { auth, response, session }
    * @return {*}
    * @memberof AuthController
    */
-  async logout({ auth, response }: HttpContext) {
+  async logout({ auth, response, session }: HttpContext) {
     try {
       const user = auth.getUserOrFail()
       if (auth.authenticatedViaGuard === 'web') {
         await auth.use('web').logout()
+
+        session.flash('success', 'Logged out successfully')
+        return response.redirect().toRoute('auth.login')
       } else {
         const token = user.currentAccessToken
         await this.service.deleteToken(user, token!)
-      }
 
-      return response.status(200).json({
-        status: 'success',
-        message: 'Logged out successfully',
-      })
+        return response.status(200).json({
+          status: 'success',
+          message: 'Logged out successfully',
+        })
+      }
     } catch (error) {
       logger.error(error, 'AUTH_LOGOUT')
       return response.status(error.status || 500).json({

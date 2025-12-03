@@ -3,33 +3,33 @@ import type AuthController from '@app/controllers/auth.controller.ts'
 import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
 import { route } from '@izzyjs/route/client'
-import { Box, Loader, Popover, Progress, Text } from '@mantine/core'
+import { Box, Loader, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useLocalStorage } from '@mantine/hooks'
 import { Turnstile } from '@marsidev/react-turnstile'
 import { IconArrowLeft } from '@tabler/icons-react'
 import { useState } from 'react'
-import PasswordRequirement, {
+import {
   PasswordPopover,
+  PasswordStrengthDropdown,
   getPasswordStrength,
 } from '~/components/auth/password'
-import { ConfirmModal } from '~/components/core/modals'
+import { useModals } from '~/components/core/modal-hooks'
 import { NotifyError } from '~/components/core/notify'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
 import { Input } from '~/components/ui/input'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import AuthLayout from '~/layouts/auth'
-import { PASS_REGEX, PASS_REQ } from '~/lib/constants'
+import { PASS_REGEX } from '~/lib/constants'
 import { checkForm, cn } from '~/lib/utils'
 
 export default function Page(props: SharedProps & InferPageProps<AuthController, 'viewRegister'>) {
-  const [openPW, setOpenPW] = useState(false)
-  const [openPWConfirm, setOpenPWConfirm] = useState(false)
   const [_, setEmailTimeoutNewFlag] = useLocalStorage({
     key: 'timeout_verify_email_new', // key for new email verification timeout
     defaultValue: true,
   })
+  const { ConfirmModal } = useModals()
   const form = useForm({
     initialValues: {
       full_name: '',
@@ -52,6 +52,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
       cf_token: (value) => (value.length > 0 ? null : 'Captcha is required'),
     },
   })
+
   const mutation = useGenericMutation('POST', route('auth.register.post').path, {
     onError(error, _variables, _context) {
       if (error.response?.data.form_errors) {
@@ -62,26 +63,11 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
       setEmailTimeoutNewFlag(true)
     },
   })
+
   const doMutate = () => {
     if (!checkForm(form, { bypass_captcha: props.bypass_captcha })) return
     mutation.mutate(form.values)
   }
-
-  const checks = PASS_REQ.map((requirement, index) => (
-    <PasswordRequirement
-      key={index}
-      label={requirement.label}
-      meets={requirement.re.test(form.values.password)}
-    />
-  ))
-  const strength = getPasswordStrength(form.values.password)
-  const color = strength === 100 ? 'teal' : strength > 50 ? 'yellow' : 'red'
-  const passwordDropdown = (
-    <Popover.Dropdown className="bg-background!">
-      <Progress color={color} value={strength} size={5} mb="xs" />
-      {checks}
-    </Popover.Dropdown>
-  )
 
   const confirm = ConfirmModal({
     message: 'Are you sure you want to register with this data?',
@@ -89,6 +75,18 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
       doMutate()
     },
   })
+
+  // ---------------------------
+  // Password strength
+  const [openPW, setOpenPW] = useState(false)
+  const [openPWConfirm, setOpenPWConfirm] = useState(false)
+
+  const password = form.values.password
+  const confirmation = form.values.password_confirmation
+  const confirmationMatch = password === confirmation
+
+  const strengthPass = getPasswordStrength(password, confirmationMatch, false)
+  const strengthPassConfirm = getPasswordStrength(confirmation, confirmationMatch, true)
 
   return (
     <AuthLayout>
@@ -107,7 +105,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
         </Button>
       </Box>
 
-      <div className={cn('flex flex-col gap-4')}>
+      <div className={cn('flex flex-col gap-4 max-w-md mx-auto')}>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-xl">Register</CardTitle>
@@ -117,13 +115,13 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
             <div className="grid gap-4">
               <Input
                 label="Full Name"
-                id="fullName"
+                id="full_name"
                 type="text"
                 placeholder="John Smith"
                 required
                 value={form.values.full_name}
-                error={form.errors.fullName}
-                onChange={(e) => form.setFieldValue('fullName', e.target.value)}
+                error={form.errors.full_name}
+                onChange={(e) => form.setFieldValue('full_name', e.target.value)}
               />
 
               <Input
@@ -163,7 +161,13 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
                 }
                 popoverOpened={openPW}
                 setPopoverOpened={setOpenPW}
-                popoverDropdown={passwordDropdown}
+                popoverDropdown={
+                  <PasswordStrengthDropdown
+                    strength={strengthPass}
+                    password={password}
+                    confirmation={confirmation}
+                  />
+                }
               />
 
               <PasswordPopover
@@ -181,7 +185,14 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
                 }
                 popoverOpened={openPWConfirm}
                 setPopoverOpened={setOpenPWConfirm}
-                popoverDropdown={passwordDropdown}
+                popoverDropdown={
+                  <PasswordStrengthDropdown
+                    strength={strengthPassConfirm}
+                    password={password}
+                    confirmation={confirmation}
+                    isConfirmation
+                  />
+                }
               />
 
               {props.site_key && !props.bypass_captcha && (

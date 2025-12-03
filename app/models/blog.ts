@@ -1,8 +1,9 @@
 import Tables from '#enums/tables'
 
-import { BaseModel, belongsTo, column, manyToMany } from '@adonisjs/lucid/orm'
+import { BaseModel, beforeCreate, belongsTo, column, manyToMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, ManyToMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
+import { randomUUID } from 'node:crypto'
 
 import Media from './media.js'
 import Project from './project.js'
@@ -11,7 +12,7 @@ export default class Blog extends BaseModel {
   static table = Tables.BLOGS
 
   @column({ isPrimary: true })
-  declare id: number
+  declare id: string
 
   @column()
   declare slug_id: string
@@ -52,4 +53,9 @@ export default class Blog extends BaseModel {
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updated_at: DateTime | null
+
+  @beforeCreate()
+  static assignUuid(self: Blog) {
+    self.id = randomUUID()
+  }
 }

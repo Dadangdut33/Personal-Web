@@ -7,7 +7,7 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id')
+      table.uuid('id').primary()
       // key stored in drive to get the file
       table.string('drive_key').notNullable()
 

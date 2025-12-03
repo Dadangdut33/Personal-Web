@@ -51,7 +51,10 @@ export function checkForm<TValues extends Record<string, unknown> = Record<strin
   if (hasErrors) {
     // if we bypass captcha check we want to allow the form to submit so We:
     // check if the errors is only 1 error and its captcha error and bypass_captcha is true
-    if (bypass_captcha && Object.keys(errors).length === 1 && errors.cf_token) return false
+    if (bypass_captcha && Object.keys(errors).length === 1 && errors.cf_token) {
+      console.log('Captcha bypassed because bypass_captcha is true')
+      return true
+    }
     // else we notify the user and return false
     NotifyError('Error in form', formErrorsToString(errors))
   }

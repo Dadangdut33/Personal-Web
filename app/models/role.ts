@@ -28,7 +28,7 @@ export default class Role extends BaseModel {
   declare created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare update_at: DateTime
+  declare updated_at: DateTime
 
   @manyToMany(() => User, {
     pivotTable: Tables.USER_ROLES,

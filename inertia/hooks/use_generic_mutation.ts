@@ -11,9 +11,16 @@ export function useGenericMutation<
 >(
   method: Method,
   url: string,
-  options?: UseMutationOptions<TResponse, AxiosError<TResponse>, TData>
+  options?: UseMutationOptions<TResponse, AxiosError<TResponse>, TData> & { doRedirect?: boolean }
 ): UseMutationResult<TResponse, AxiosError<TResponse>, TData> {
+  const { onSuccess, onError, doRedirect = true, ...rest } = options ?? {}
+
+  // Track if onError has already fired
+  let errorHandled = false
+
   return useMutation({
+    ...rest,
+
     mutationFn: async (data: TData): Promise<TResponse> => {
       const res = await axios.request<TResponse>({
         method,
@@ -24,7 +31,6 @@ export function useGenericMutation<
     },
 
     onSuccess: (res, variables, results, context) => {
-      console.log(res)
       if (res.status === 'success') {
         NotifySuccess('Success', res.message)
       } else {
@@ -32,25 +38,28 @@ export function useGenericMutation<
         NotifyError('Error', res.message)
       }
 
-      options?.onSuccess?.(res, variables, results, context)
-      if (res.status === 'success' && res.redirect_to) router.visit(res.redirect_to)
-    },
-
-    // Some error might not get onto onError, so we need to handle it here
-    onSettled(_data, error, variables, results, context) {
-      if (error?.response) {
-        console.error(error)
-        NotifyError('Error', error.response?.data.message || error.message)
-        options?.onError?.(error, variables, results, context)
-      }
+      onSuccess?.(res, variables, results, context)
+      if (doRedirect && res.status === 'success' && res.redirect_to) router.visit(res.redirect_to)
     },
 
     onError: (error, variables, results, context) => {
+      errorHandled = true // mark as handled
+
       console.error(error)
       NotifyError('Error', error.response?.data.message || error.message)
-      options?.onError?.(error, variables, results, context)
+      onError?.(error, variables, results, context)
     },
 
-    ...options,
+    onSettled(_data, error, variables, results, context) {
+      // Run fallback only if an error exists AND onError didn't handle it
+      if (error && !errorHandled) {
+        console.error(error)
+        NotifyError('Error', error.response?.data.message || error.message)
+        onError?.(error, variables, results, context)
+      }
+
+      // reset for next mutation
+      errorHandled = false
+    },
   })
 }

@@ -61,7 +61,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true, serializeAs: null })
-  declare update_at: DateTime | null
+  declare updated_at: DateTime | null
 
   @computed()
   public get isAdmin() {
@@ -95,7 +95,7 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare profile: HasOne<typeof Profile>
 
   @beforeCreate()
-  static assignUuid(user: User) {
-    user.id = randomUUID()
+  static assignUuid(self: User) {
+    self.id = randomUUID()
   }
 }

@@ -17,4 +17,5 @@ export const policies = {
   UserPolicy: () => import('#policies/user_policy'),
   PermissionPolicy: () => import('#policies/permission_policy'),
   ProfilePolicy: () => import('#policies/profile_policy'),
+  DashboardPolicy: () => import('#policies/dashboard_policy'),
 }

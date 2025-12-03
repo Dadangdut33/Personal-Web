@@ -36,6 +36,8 @@ export default class extends BaseSchema {
           is_protected: true,
         },
       ])
+
+      console.log('Roles created')
     })
   }
 

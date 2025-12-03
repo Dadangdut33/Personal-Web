@@ -13,7 +13,7 @@ import type { Config } from '@japa/runner/types'
  * Configure Japa plugins in the plugins array.
  * Learn more - https://japa.dev/docs/runner-config#plugins-optional
  */
-export const plugins: Config['plugins'] = [assert(), pluginAdonisJS(app), izzyRoutePlugin()]
+export const plugins: Config['plugins'] = [assert(), pluginAdonisJS(app), izzyRoutePlugin(app)]
 
 /**
  * Configure lifecycle function to run before and after all the

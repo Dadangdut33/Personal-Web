@@ -15,10 +15,23 @@ export default class PermissionCheckService {
    * @returns A promise that resolves to `true` if the user has the permission, otherwise `false`.
    */
   async check(user: User, permissionName: string): Promise<boolean> {
+    // Load roles with their permissions
     await user.load('roles', (query) => {
       query.preload('permissions')
     })
 
+    // Debug logging - check if roles and permissions are loaded
+    // console.log('User roles loaded:', user.roles.length)
+    // console.log(
+    //   'Roles:',
+    //   user.roles.map((role) => ({
+    //     name: role.name,
+    //     permissionsCount: role.permissions.length,
+    //     permissions: role.permissions.map((p) => p.name),
+    //   }))
+    // )
+
+    // Check if user has the permission through any of their roles
     return user.roles.some((role) => {
       return role.permissions.some((permission) => permission.name === permissionName)
     })

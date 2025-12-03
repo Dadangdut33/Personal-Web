@@ -58,7 +58,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
         </Button>
       </Box>
 
-      <div className={cn('flex flex-col gap-4')}>
+      <div className={cn('flex flex-col gap-4 max-w-md mx-auto')}>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-xl">Welcome</CardTitle>

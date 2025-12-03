@@ -25,6 +25,8 @@ export default class extends BaseSchema {
       )
 
       await query.table(this.tableName).multiInsert(permissions)
+
+      console.log('Permissions created')
     })
   }
 

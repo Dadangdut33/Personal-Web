@@ -1,6 +1,7 @@
 import PreDefinedRolesId from '#enums/roles'
 import PasswordResetNotification from '#mails/password_reset_notification'
-import VerifyEmailNotification from '#mails/verify_e_notification'
+import VerifyEmailNotification from '#mails/verify_email_notification'
+import Profile from '#models/profile'
 import User from '#models/user'
 import AuthRepository from '#repositories/auth.repository'
 import TokenRepository from '#repositories/token.repository'
@@ -48,11 +49,15 @@ export default class AuthService {
       user = new User()
       user.useTransaction(trx)
       user.fill(payload)
-      await user.save()
+      user = await user.save()
 
       await user.related('roles').attach([PreDefinedRolesId.USER])
-      await user.related('profile').create({})
-      console.log(user)
+
+      const profile = new Profile()
+      profile.fill({
+        user_id: user.id,
+      })
+      console.log('created profile for user')
 
       await trx.commit()
     } catch (error) {
@@ -60,9 +65,10 @@ export default class AuthService {
       throw error
     }
 
+    // login the user after creating
     const accessToken = await User.accessTokens.create(user)
-    const emailVerifyToken = await this.tokenRepo.generateToken(user, 'VERIFY_EMAIL')
-    await mail.send(new VerifyEmailNotification(user, emailVerifyToken))
+    const emailVerifyToken = await this.tokenRepo.generateTokenForUser(user, 'VERIFY_EMAIL') // make verify email token
+    await mail.send(new VerifyEmailNotification(user, emailVerifyToken)) // email verify notification
 
     return { accessToken, user }
   }
@@ -112,7 +118,7 @@ export default class AuthService {
         status: 429,
       })
 
-    const token = await this.tokenRepo.generateToken(user, 'VERIFY_EMAIL')
+    const token = await this.tokenRepo.generateTokenForUser(user, 'VERIFY_EMAIL')
     await mail.sendLater(new VerifyEmailNotification(user, token))
   }
 
@@ -120,21 +126,20 @@ export default class AuthService {
    * Verify email requesst verification
    *
    * @param {string} token
-   * @param {User} auth
+   * @param {User} authUser
    * @memberof AuthService
    */
-  async verifyEmail(token: string, auth: User) {
-    const user = await this.tokenRepo.getTokenWithUser(token, 'VERIFY_EMAIL')
-    const isMatch = user?.id === auth?.id // making sure that the one in auth is the user
+  async verifyEmail(token: string, authUser: User) {
+    const validToken = await this.tokenRepo.verifyTokenWithUser(token, 'VERIFY_EMAIL', authUser.id)
 
-    if (!user || !isMatch)
+    if (!validToken)
       throw new Exception('Invalid token or token does not belong to the authenticated user.', {
         status: 401,
       })
 
-    user.is_email_verified = true
-    await user.save()
-    await this.tokenRepo.expireTokens(user, 'verifyEmailTokens')
+    authUser.is_email_verified = true
+    await authUser.save()
+    await this.tokenRepo.expireUserTokens(authUser, 'VERIFY_EMAIL') // expire all verify email tokens
   }
 
   /**
@@ -153,7 +158,7 @@ export default class AuthService {
         status: 429,
       })
 
-    const token = await this.tokenRepo.generateToken(user, 'PASSWORD_RESET')
+    const token = await this.tokenRepo.generateTokenForUser(user, 'PASSWORD_RESET')
     await mail.sendLater(new PasswordResetNotification(user, token))
   }
 
@@ -166,16 +171,18 @@ export default class AuthService {
    * @memberof AuthService
    */
   async resetPassword(token: string, password: string, email: string) {
-    const user = await this.tokenRepo.getTokenWithUser(token, 'PASSWORD_RESET')
-    const isMatch = user?.email === email
-    if (!user || !isMatch)
+    const user = await User.query().where('email', email).first()
+    if (!user) throw new Exception('User with this email does not exist.', { status: 404 })
+
+    const validToken = await this.tokenRepo.getTokenWithUser(token, 'PASSWORD_RESET', user.id)
+    if (!validToken)
       throw new Exception('Invalid token or token does not belong to the authenticated user.', {
         status: 401,
       })
 
-    user.password = password
+    user.fill({ password })
     await user.save()
-    await this.tokenRepo.expireTokens(user, 'passwordResetTokens')
+    await this.tokenRepo.expireUserTokens(user, 'PASSWORD_RESET') // expire all password reset tokens
   }
 
   async fetchVerifyCFToken(token: string) {

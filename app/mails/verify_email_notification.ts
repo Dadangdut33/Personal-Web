@@ -2,10 +2,11 @@ import User from '#models/user'
 import env from '#start/env'
 
 import { BaseMail } from '@adonisjs/mail'
+import { route } from '@izzyjs/route/client'
 
 import { head } from './_shared.js'
 
-export default class PasswordResetNotification extends BaseMail {
+export default class VerifyEmailNotification extends BaseMail {
   constructor(
     private user: User,
     private token: string
@@ -13,15 +14,17 @@ export default class PasswordResetNotification extends BaseMail {
     super()
   }
 
-  from = env.get('MAIL_FROM')
-  subject = 'Reset Your Password'
+  from = env.get('SMTP_FROM')
+  subject = `Please Verify Your Email - ${env.get('VITE_APP_NAME') ?? 'My Website'}`
 
   /**
    * The "prepare" method is called automatically when
    * the email is sent or queued.
    */
   prepare() {
-    const resetLink = `${env.get('APP_URL')}/forgot-password/verify/${this.token}`
+    if (!this.from) throw new Error('SMTP_FROM is not set')
+
+    const verificationLink = `${env.get('APP_URL')}${route('auth.verifyEmail.verify', { params: { token: this.token } }).path}`
 
     this.message.to(this.user.email).html(`
       <html>
@@ -29,13 +32,13 @@ export default class PasswordResetNotification extends BaseMail {
         <body>
           <div class="container">
             <div class="header">
-              <h1>Password Reset Request</h1>
+              <h1>Email Verification Request</h1>
             </div>
             <div class="content">
               <p>Hi ${this.user.full_name},</p>
-              <p>We received a request to reset your password. If you made this request, you can reset your password by clicking the button below:</p>
-              <a href="${resetLink}" class="button">Reset Your Password</a>
-              <p>If you didn't request a password reset, please ignore this email.</p>
+              <p>Thank you for registering with us! To complete your registration, please verify your email address by clicking the button below:</p>
+              <a href="${verificationLink}" class="button">Verify Your Email</a>
+              <p>If you didn't create an account with us, please ignore this email.</p>
             </div>
             <div class="footer">
               <p>Need help? Contact our support team at <a href="mailto:contact@dadangdut33.my.id">contact@dadangdut33.my.id</a>.</p>

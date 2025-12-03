@@ -7,7 +7,6 @@ import { DateTime } from 'luxon'
 import BaseRepository from './_base_repository.js'
 
 type TokenType = 'PASSWORD_RESET' | 'VERIFY_EMAIL'
-type RelationNameType = 'passwordResetTokens' | 'verifyEmailTokens'
 
 /**
  * Repository class for managing user tokens such as email verification and password reset tokens.
@@ -56,40 +55,55 @@ export default class TokenRepository extends BaseRepository<typeof Token> {
       .first()
   }
 
-  async generateToken(user: User, type: TokenType) {
+  async generateTokenForUser(user: User, type: TokenType) {
     const token = stringHelpers.generateRandom(64)
     const expirationTime = DateTime.now().plus(this.getTokenTimeLimit(type))
 
-    const record = await user.related('tokens').create({
+    const record = new Token()
+    record.fill({
       type,
       expiresAt: expirationTime,
       token,
+      user_id: user.id,
     })
+    await record.save()
 
     return record.token
   }
 
-  async expireTokens(user: User, relationName: RelationNameType) {
-    await user.related(relationName).query().update({
+  async expireUserTokens(user: User, type: TokenType) {
+    await this.model.query().where('user_id', user.id).where('type', type).update({
       expiresAt: DateTime.now(),
     })
   }
 
-  async deleteTokens(user: User, relationName: RelationNameType) {
-    await user.related(relationName).query().delete()
+  async deleteUserTokens(user: User, type: TokenType) {
+    await this.model.query().where('user_id', user.id).where('type', type).delete()
   }
 
-  async getTokenWithUser(token: string, type: TokenType) {
+  async getToken(token: string, type: TokenType) {
     const record = await this.model
       .query()
-      .preload('user')
       .where('token', token)
       .where('type', type)
       .where('expiresAt', '>', DateTime.now().toSQL())
       .orderBy('created_at', 'desc')
       .first()
 
-    return record?.user
+    return record
+  }
+
+  async getTokenWithUser(token: string, type: TokenType, user_id: string) {
+    const record = await this.model
+      .query()
+      .where('user_id', user_id)
+      .where('token', token)
+      .where('type', type)
+      .where('expiresAt', '>', DateTime.now().toSQL())
+      .orderBy('created_at', 'desc')
+      .first()
+
+    return record
   }
 
   async verifyToken(token: string, type: TokenType) {
@@ -98,6 +112,18 @@ export default class TokenRepository extends BaseRepository<typeof Token> {
       .where('expiresAt', '>', DateTime.now().toSQL())
       .where('token', token)
       .where('type', type)
+      .first()
+
+    return !!record
+  }
+
+  async verifyTokenWithUser(token: string, type: TokenType, user_id: string) {
+    const record = await this.model
+      .query()
+      .where('expiresAt', '>', DateTime.now().toSQL())
+      .where('token', token)
+      .where('type', type)
+      .where('user_id', user_id)
       .first()
 
     return !!record

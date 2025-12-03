@@ -3,13 +3,13 @@ import type AuthController from '@app/controllers/auth.controller.ts'
 import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
 import { route } from '@izzyjs/route/client'
-import { Alert, Box, Group, Loader, Text } from '@mantine/core'
+import { Alert, Group, Loader, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useInterval, useLocalStorage, useTimeout } from '@mantine/hooks'
 import { Turnstile } from '@marsidev/react-turnstile'
-import { IconArrowLeft, IconMessageCircle, IconTimeDuration30 } from '@tabler/icons-react'
+import { IconMessageCircle, IconTimeDuration30 } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
-import { ConfirmLogoutModal, ConfirmModal } from '~/components/core/modals'
+import { useModals } from '~/components/core/modal-hooks'
 import { NotifyError } from '~/components/core/notify'
 import { Button } from '~/components/ui/button'
 import {
@@ -26,56 +26,63 @@ import { TIMEOUT_SHORT } from '~/lib/constants'
 import { checkForm, cn } from '~/lib/utils'
 
 export default function Page(
-  props: SharedProps & InferPageProps<AuthController, 'viewResetPassword'>
+  props: SharedProps & InferPageProps<AuthController, 'viewVerifyEmail'>
 ) {
-  const [timedOut, setTimedOut] = useLocalStorage({
+  const [isTimedOut, setIsTimedOut] = useLocalStorage({
     key: 'timeout_verify_email',
     defaultValue: false,
   })
-  const [timedOutStart, setTimedOutStart] = useLocalStorage<null | number>({
+  const [timedOutStartTime, setTimedOutStartTime] = useLocalStorage<null | number>({
     key: 'timeout_verify_email_start',
     defaultValue: null,
   })
-  const [timedOutIsNew, setTimedOutIsNew] = useLocalStorage({
+  const [isNewlyRegistered, setIsNewlyRegistered] = useLocalStorage({
     key: 'timeout_verify_email_new',
     defaultValue: true,
   })
-  const { start } = useTimeout(() => setTimedOut(false), TIMEOUT_SHORT) // after send, timeout for 3 minute
-  const [timerSec, setTimerSec] = useState(TIMEOUT_SHORT)
+  const { start: startTimeout } = useTimeout(() => setIsTimedOut(false), TIMEOUT_SHORT) // after send, timeout for 3 minute
+  const [timerMs, setTimerSec] = useState(TIMEOUT_SHORT)
   const interval = useInterval(() => {
-    if (timerSec <= 0) {
+    interval.stop()
+    if (timerMs <= 0) {
       setTimerSec(TIMEOUT_SHORT)
       interval.stop()
+      setIsNewlyRegistered(false)
     } else {
       setTimerSec((s) => s - 1000)
     }
   }, 1000)
 
   const startTimeoutAndTimer = () => {
-    setTimedOutIsNew(true)
+    setIsNewlyRegistered(true)
     interval.start()
-    setTimedOut(true)
-    setTimedOutStart(Date.now())
-    start()
+    setIsTimedOut(true)
+    setTimedOutStartTime(Date.now())
+    startTimeout()
   }
 
   const form = useForm({
     initialValues: {
-      email: '',
+      email: props.user?.email,
       cf_token: '',
     },
 
     validate: {
-      email: (value) => (value.length > 0 ? null : 'Email is required'),
+      email: (value) =>
+        value
+          ? value.length > 0
+            ? null
+            : 'Email is required'
+          : 'EMAIL_REQUIRED. THIS ERROR SHOULD NOT HAPPEN',
       cf_token: (value) => (value.length > 0 ? null : 'Captcha is required'),
     },
   })
-  const mutation = useGenericMutation('POST', route('auth.verifyMail.post').path, {
+  const mutation = useGenericMutation('POST', route('auth.verifyEmail.request').path, {
     onError(error, _variables, _context) {
       if (error.response?.data.form_errors) {
         form.setErrors(error.response?.data.form_errors)
       }
-      setTimedOutIsNew(false)
+      setIsNewlyRegistered(false)
     },
     onSuccess() {
       startTimeoutAndTimer()
@@ -84,29 +91,34 @@ export default function Page(
   })
   const doMutate = () => {
     if (!checkForm(form, { bypass_captcha: props.bypass_captcha })) return
-    if (timedOut)
-      return NotifyError('Error', 'Please wait until you can request another password reset email.')
+    if (isTimedOut)
+      return NotifyError('Error', 'Please wait until you can request another email verification.')
 
     mutation.mutate(form.values)
   }
 
-  // if just came from register
+  // ---------------------------
+  // Timeout
+  // ---------------------------
+  // if just came from register / login
   useEffect(() => {
+    const timeIsvalid = timedOutStartTime && Date.now() - timedOutStartTime > TIMEOUT_SHORT
     // start timeout immediately
-    if (timedOutIsNew) {
+    if (isNewlyRegistered && timeIsvalid) {
       startTimeoutAndTimer()
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // init timeout
-  // if timeout already passed, reset
+  // if timeout already passed, reset the timer / turn off the timeout
   useEffect(() => {
-    if (timedOutStart && Date.now() - timedOutStart > TIMEOUT_SHORT) {
-      setTimedOut(false)
-      setTimedOutStart(null)
+    if (timedOutStartTime && Date.now() - timedOutStartTime > TIMEOUT_SHORT) {
+      setIsTimedOut(false)
+      setTimedOutStartTime(null)
     }
-  }, [timedOutStart, setTimedOut, setTimedOutStart])
+  }, [timedOutStartTime, setIsTimedOut, setTimedOutStartTime])
+
+  const { ConfirmModal, ConfirmLogoutModal } = useModals()
 
   const confirm = ConfirmModal({
     message: 'Are you sure you want to resend the verification email?',
@@ -126,20 +138,8 @@ export default function Page(
         <title>Verify Email</title>
       </Head>
 
-      <Box pos={'absolute'} top={10} left={10}>
-        <Button
-          disabled={mutation.isPending}
-          onClick={() => {
-            router.visit(route('auth.login').path)
-          }}
-        >
-          {mutation.isPending ? <Loader size={16} color="black" /> : <IconArrowLeft stroke={2} />}
-          Back to Login
-        </Button>
-      </Box>
-
       <div className={cn('flex flex-col gap-4')}>
-        {timedOut && (
+        {isTimedOut && (
           <Alert
             title="Notice"
             color="blue"
@@ -147,7 +147,7 @@ export default function Page(
             mt={'md'}
             className={cardClass}
           >
-            {timedOutIsNew ? (
+            {isNewlyRegistered ? (
               <>
                 Email verification has been sent to your email address. Please check your email and
                 click the verification link that we sent to you to continue using our services.
@@ -160,16 +160,17 @@ export default function Page(
             )}
           </Alert>
         )}
+
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-xl">Verify Email</CardTitle>
             <CardDescription>
-              We have sent a verification email to your email address. Please check your email and
-              click on the verification link to continue.
+              We have sent a verification email to your email address. <br /> Please check your
+              email and click on the verification link to continue.
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="grid gap-4">
+            <div className="grid gap-4 mt-4">
               {props.site_key && !props.bypass_captcha && (
                 <>
                   <Turnstile
@@ -188,23 +189,23 @@ export default function Page(
               )}
 
               <Group justify="space-between">
-                <Button disabled={mutation.isPending || timedOut} onClick={() => confirm()}>
+                <Button disabled={mutation.isPending || isTimedOut} onClick={() => confirm()}>
                   {mutation.isPending && <Loader size={16} color="black" />}
-                  {timedOut ? (
+                  {isTimedOut ? (
                     <>
                       <IconTimeDuration30 />
-                      Please wait for {timerSec} seconds
+                      Please wait for {timerMs / 1000} seconds
                     </>
                   ) : (
-                    <>Request Email Verification</>
+                    <>Request Verification</>
                   )}
                 </Button>
 
                 {/* logout btn */}
                 <Button
-                  disabled={mutation.isPending || timedOut}
+                  disabled={mutation.isPending}
                   onClick={() => confirmLogout()}
-                  color="red"
+                  className="bg-red-400"
                 >
                   Logout
                 </Button>

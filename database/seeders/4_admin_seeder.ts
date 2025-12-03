@@ -8,11 +8,13 @@ export default class extends BaseSeeder {
     const user = await User.create({
       full_name: 'Super Admin',
       username: 'SuperAdmin',
-      email: 'admin@admin.com',
+      email: 'superadmin@example.local',
       password: 'Password@123',
       is_email_verified: true,
     })
 
-    await user.related('roles').attach([PreDefinedRolesId.ADMIN])
+    await user.related('roles').attach([PreDefinedRolesId.SUPER_ADMIN])
+
+    console.log('Super admin user created')
   }
 }

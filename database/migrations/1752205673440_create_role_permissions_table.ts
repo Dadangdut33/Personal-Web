@@ -1,3 +1,4 @@
+import Roles from '#enums/roles'
 import Tables from '#enums/tables'
 
 import { BaseSchema } from '@adonisjs/lucid/schema'
@@ -18,6 +19,22 @@ export default class extends BaseSchema {
 
       table.timestamp('created_at')
       table.timestamp('updated_at')
+    })
+
+    // Assign the super admin role to all permission that we created
+    this.defer(async (query) => {
+      const permissions = await query.table(Tables.PERMISSIONS)
+      const superAdminId = Roles.SUPER_ADMIN
+
+      // Data
+      const data = permissions.map((permission) => ({
+        role_id: superAdminId,
+        permission_id: permission.id,
+      }))
+
+      await query.table(this.tableName).multiInsert(data)
+
+      console.log('Permissions assigned to super admin role')
     })
   }
 

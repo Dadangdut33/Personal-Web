@@ -26,7 +26,7 @@ export default class Profile extends BaseModel {
   declare created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true, serializeAs: null })
-  declare update_at: DateTime | null
+  declare updated_at: DateTime | null
 
   @beforeCreate()
   static assignUuid(profile: Profile) {

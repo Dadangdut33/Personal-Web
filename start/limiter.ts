@@ -10,9 +10,19 @@
 */
 import limiter from '@adonisjs/limiter/services/main'
 
-export const reAskEmailVerifThrottle = limiter.define('email_verification', () => {
+export const reAskEmailVerifThrottle = limiter.define('request_email_verification', () => {
   return limiter
     .allowRequests(10)
+    .every('1 minute')
+    .blockFor('3 minute')
+    .limitExceeded((error) => {
+      error.setMessage('Too many requests, please try again later')
+    })
+})
+
+export const verifEmailThrottle = limiter.define('email_verification', () => {
+  return limiter
+    .allowRequests(20)
     .every('1 minute')
     .blockFor('3 minute')
     .limitExceeded((error) => {

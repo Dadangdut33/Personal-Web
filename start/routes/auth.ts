@@ -4,6 +4,7 @@ import {
   reAskEmailVerifThrottle,
   registerThrottle,
   resetPasswordThrottle as resetPasswordRequestThrottle,
+  verifEmailThrottle,
 } from '#start/limiter'
 
 import router from '@adonisjs/core/services/router'
@@ -42,16 +43,16 @@ router
     router.post('/reset-password', [AuthController, 'resetPassword']).as('auth.resetPassword.post')
 
     router
-      .get('/verify-email/:token?', [AuthController, 'viewVerifyMail'])
-      .as('auth.verifyMail')
+      .get('/verify-email', [AuthController, 'viewVerifyEmail'])
+      .as('auth.verifyEmail')
       .use(middleware.auth())
     router
-      .post('/verify-email', [AuthController, 'verifyEmail'])
-      .as('auth.verifyMail.post')
-      .use(middleware.auth())
+      .get('/verify-email/verify/:token', [AuthController, 'verifyEmail'])
+      .as('auth.verifyEmail.verify')
+      .use([verifEmailThrottle, middleware.auth()])
     router
       .post('/verify-email/request', [AuthController, 'requestVerifyEmail'])
-      .as('auth.verifyMail.request')
+      .as('auth.verifyEmail.request')
       .use([reAskEmailVerifThrottle, middleware.auth()])
   })
   .prefix('/auth')

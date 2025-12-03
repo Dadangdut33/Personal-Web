@@ -22,7 +22,7 @@ export default class Permission extends BaseModel {
   declare created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare update_at: DateTime
+  declare updated_at: DateTime
 
   @manyToMany(() => Role, {
     pivotTable: Tables.ROLE_PERMISSIONS,

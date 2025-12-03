@@ -29,7 +29,7 @@ export default class Token extends BaseModel {
   declare created_at: DateTime
 
   @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare update_at: DateTime
+  declare updated_at: DateTime
 
   @belongsTo(() => User)
   declare user: BelongsTo<typeof User>

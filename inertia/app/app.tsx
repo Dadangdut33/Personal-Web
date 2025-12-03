@@ -6,8 +6,6 @@ import { ColorSchemeScript, MantineProvider } from '@mantine/core'
 import '@mantine/core/styles.css'
 import '@mantine/dates/styles.css'
 import '@mantine/dropzone/styles.css'
-import { ModalsProvider } from '@mantine/modals'
-import { Notifications } from '@mantine/notifications'
 import '@mantine/notifications/styles.css'
 import { NavigationProgress } from '@mantine/nprogress'
 import '@mantine/nprogress/styles.css'
@@ -30,16 +28,9 @@ createInertiaApp({
       <MantineProvider theme={theme}>
         <ColorSchemeScript defaultColorScheme="dark" />
         <NavigationProgress />
-        <Notifications position="top-right" zIndex={1000} />
-        <ModalsProvider
-          modalProps={{
-            zIndex: 1000,
-          }}
-        >
-          <AppProvider>
-            <App {...props} />
-          </AppProvider>
-        </ModalsProvider>
+        <AppProvider>
+          <App {...props} />
+        </AppProvider>
       </MantineProvider>
     )
 

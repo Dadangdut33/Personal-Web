@@ -20,7 +20,7 @@ export default class VerifyEmailMiddleware {
 
     if (!isEmailVerified) {
       session.flash('error', 'Please verify your email address to proceed.')
-      return response.redirect().toRoute('auth.verifyMail')
+      return response.redirect().toRoute('auth.verifyEmail')
     }
 
     const output = await next()

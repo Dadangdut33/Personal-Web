@@ -1,4 +1,4 @@
-import { Box, Popover, Text, rem } from '@mantine/core'
+import { Box, Popover, Progress, Text, rem } from '@mantine/core'
 import { IconCheck, IconX } from '@tabler/icons-react'
 import { PASS_REQ } from '~/lib/constants'
 
@@ -22,16 +22,66 @@ export default function PasswordRequirement({ meets, label }: { meets: boolean; 
   )
 }
 
-export function getPasswordStrength(password: string) {
-  let multiplier = password.length > 8 ? 0 : 1
+const WITH_CONFIRMATION = 1
 
-  PASS_REQ.forEach((requirement) => {
-    if (!requirement.re.test(password)) {
-      multiplier += 1
-    }
-  })
+export function getPasswordStrength(
+  password: string,
+  confirmationMatch: boolean,
+  countConfirmation: boolean = true
+) {
+  const totalRequirements = PASS_REQ.length + 1 + (countConfirmation ? WITH_CONFIRMATION : 0)
 
-  return Math.max(100 - (100 / (PASS_REQ.length + 1)) * multiplier, 10)
+  let fails = password.length > 8 ? 0 : 1
+
+  for (const req of PASS_REQ) {
+    if (!req.re.test(password)) fails++
+  }
+
+  if (countConfirmation && !confirmationMatch) {
+    fails++
+  }
+
+  const score = 100 - (100 / totalRequirements) * fails
+  return Math.max(score, 10)
+}
+
+export function strengthColor(strength: number) {
+  if (strength === 100) return 'teal'
+  if (strength > 50) return 'yellow'
+  return 'red'
+}
+
+export function PasswordStrengthDropdown({
+  strength,
+  isConfirmation,
+  password,
+  confirmation,
+}: {
+  strength: number
+  isConfirmation?: boolean
+  password: string
+  confirmation: string
+}) {
+  return (
+    <Popover.Dropdown className="bg-background!">
+      <Progress color={strengthColor(strength)} value={strength} size={5} mb="xs" />
+
+      {PASS_REQ.map((r, i) => (
+        <PasswordRequirement
+          key={i}
+          label={r.label}
+          meets={r.re.test(isConfirmation ? confirmation : password)}
+        />
+      ))}
+
+      {isConfirmation && (
+        <PasswordRequirement
+          label="Password matches confirmation"
+          meets={password.length > 0 && password === confirmation}
+        />
+      )}
+    </Popover.Dropdown>
+  )
 }
 
 export function PasswordPopover({

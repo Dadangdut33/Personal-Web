@@ -9,7 +9,7 @@ import { useInterval, useLocalStorage, useTimeout } from '@mantine/hooks'
 import { Turnstile } from '@marsidev/react-turnstile'
 import { IconArrowLeft, IconTimeDuration30 } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
-import { ConfirmModal } from '~/components/core/modals'
+import { useModals } from '~/components/core/modal-hooks'
 import { NotifyError } from '~/components/core/notify'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
@@ -20,7 +20,7 @@ import { TIMEOUT_NORMAL, TIMEOUT_SHORT } from '~/lib/constants'
 import { checkForm, cn } from '~/lib/utils'
 
 export default function Page(
-  props: SharedProps & InferPageProps<AuthController, 'viewResetPassword'>
+  props: SharedProps & InferPageProps<AuthController, 'viewRequestResetPassword'>
 ) {
   const [timedOut, setTimedOut] = useLocalStorage({
     key: 'reset_password_request_timed_out',
@@ -31,6 +31,7 @@ export default function Page(
     defaultValue: null,
   })
   const { start, clear } = useTimeout(() => setTimedOut(false), TIMEOUT_NORMAL) // after 5 minutes, reset timedOut
+  const { ConfirmModal } = useModals()
   const [timerSec, setTimerSec] = useState(TIMEOUT_SHORT)
   const interval = useInterval(() => {
     if (timerSec <= 0) {
@@ -111,7 +112,7 @@ export default function Page(
         </Button>
       </Box>
 
-      <div className={cn('flex flex-col gap-4')}>
+      <div className={cn('flex flex-col gap-4 max-w-md mx-auto')}>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-xl">Request Password Reset</CardTitle>

@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/naming-convention */
 import env from '#start/env'
-import { emailValidator, passwordValidator } from '#validators/_shared'
+import { emailValidator } from '#validators/_shared'
 
 import vine, { SimpleMessagesProvider } from '@vinejs/vine'
 
@@ -21,7 +21,12 @@ export const registerValidator = vine.compile(
     full_name: vine.string().minLength(3).maxLength(128),
     username: vine.string().minLength(1).maxLength(64),
     email: emailValidator,
-    password: passwordValidator.confirmed({ confirmationField: 'password_confirmation' }),
+    password: vine
+      .string()
+      .minLength(8)
+      .maxLength(255)
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,255}$/)
+      .confirmed({ confirmationField: 'password_confirmation' }),
     cf_token,
   })
 )
@@ -29,7 +34,11 @@ export const registerValidator = vine.compile(
 export const loginValidator = vine.compile(
   vine.object({
     email: vine.string().email().normalizeEmail(),
-    password: passwordValidator,
+    password: vine
+      .string()
+      .minLength(8)
+      .maxLength(255)
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,255}$/),
     cf_token,
   })
 )
@@ -50,7 +59,12 @@ export const askResetPasswordValidator = vine.compile(
 export const resetPasswordValidator = vine.compile(
   vine.object({
     email: emailValidator,
-    password: passwordValidator.confirmed({ confirmationField: 'password_confirmation' }),
+    password: vine
+      .string()
+      .minLength(8)
+      .maxLength(255)
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,255}$/)
+      .confirmed({ confirmationField: 'password_confirmation' }),
     token: vine.string().minLength(1),
     cf_token,
   })
