@@ -1,12 +1,11 @@
 import Token from '#models/token'
 import User from '#models/user'
+import { TokenType } from '#types/models'
 
 import stringHelpers from '@adonisjs/core/helpers/string'
 import { DateTime } from 'luxon'
 
 import BaseRepository from './_base_repository.js'
-
-type TokenType = 'PASSWORD_RESET' | 'VERIFY_EMAIL'
 
 /**
  * Repository class for managing user tokens such as email verification and password reset tokens.
@@ -62,7 +61,7 @@ export default class TokenRepository extends BaseRepository<typeof Token> {
     const record = new Token()
     record.fill({
       type,
-      expiresAt: expirationTime,
+      expires_at: expirationTime,
       token,
       user_id: user.id,
     })
@@ -73,7 +72,7 @@ export default class TokenRepository extends BaseRepository<typeof Token> {
 
   async expireUserTokens(user: User, type: TokenType) {
     await this.model.query().where('user_id', user.id).where('type', type).update({
-      expiresAt: DateTime.now(),
+      expires_at: DateTime.now(),
     })
   }
 
@@ -86,7 +85,7 @@ export default class TokenRepository extends BaseRepository<typeof Token> {
       .query()
       .where('token', token)
       .where('type', type)
-      .where('expiresAt', '>', DateTime.now().toSQL())
+      .where('expires_at', '>', DateTime.now().toSQL())
       .orderBy('created_at', 'desc')
       .first()
 
@@ -99,7 +98,7 @@ export default class TokenRepository extends BaseRepository<typeof Token> {
       .where('user_id', user_id)
       .where('token', token)
       .where('type', type)
-      .where('expiresAt', '>', DateTime.now().toSQL())
+      .where('expires_at', '>', DateTime.now().toSQL())
       .orderBy('created_at', 'desc')
       .first()
 
@@ -109,7 +108,7 @@ export default class TokenRepository extends BaseRepository<typeof Token> {
   async verifyToken(token: string, type: TokenType) {
     const record = await this.model
       .query()
-      .where('expiresAt', '>', DateTime.now().toSQL())
+      .where('expires_at', '>', DateTime.now().toSQL())
       .where('token', token)
       .where('type', type)
       .first()
@@ -120,7 +119,7 @@ export default class TokenRepository extends BaseRepository<typeof Token> {
   async verifyTokenWithUser(token: string, type: TokenType, user_id: string) {
     const record = await this.model
       .query()
-      .where('expiresAt', '>', DateTime.now().toSQL())
+      .where('expires_at', '>', DateTime.now().toSQL())
       .where('token', token)
       .where('type', type)
       .where('user_id', user_id)

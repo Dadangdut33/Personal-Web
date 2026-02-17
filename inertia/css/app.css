@@ -1,8 +1,40 @@
 @import 'tailwindcss';
-@source "../views";
-@plugin 'tailwindcss-animate';
+@import 'tw-animate-css';
 
 @custom-variant dark (&:where([data-mantine-color-scheme=dark], [data-mantine-color-scheme=dark] *));
+
+@font-face {
+  font-family: 'Open Sans';
+  src: url('/media/OpenSans-VariableFont_wdth,wght.ttf') format('truetype');
+  font-weight: 100 900; /* variable range */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geist';
+  src: url('/media/Geist-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900; /* variable range */
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Geist Mono';
+  src: url('/media/GeistMono-VariableFont_wght.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+}
+
+.font-opensans {
+  font-family: 'Open Sans', sans-serif;
+}
+
+.font-geist {
+  font-family: 'Geist', sans-serif;
+}
+
+.font-geistmono {
+  font-family: 'Geist Mono', monospace;
+}
 
 :root {
   --background: oklch(94.61% 0.043 211.12);
@@ -128,8 +160,6 @@
 }
 
 @theme {
-  /* --font-mono: 'Geist Mono', 'Fira Code', monospace; */
-
   /* Custom Animations */
   --animate-marquee: marquee 5s linear infinite;
   --animate-marquee2: marquee2 5s linear infinite;
@@ -160,82 +190,6 @@
   --breakpoint-m350: 350px;
 }
 
-/* Define keyframes */
-@keyframes marquee {
-  0% {
-    transform: translateX(0%);
-  }
-  100% {
-    transform: translateX(-100%);
-  }
-}
-
-@keyframes marquee2 {
-  0% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(0%);
-  }
-}
-
-@keyframes accordion-down {
-  from {
-    height: 0;
-  }
-  to {
-    height: var(--radix-accordion-content-height);
-  }
-}
-
-@keyframes accordion-up {
-  from {
-    height: var(--radix-accordion-content-height);
-  }
-  to {
-    height: 0;
-  }
-}
-
-@keyframes caret-blink {
-  0%,
-  70%,
-  100% {
-    opacity: 1;
-  }
-  20%,
-  50% {
-    opacity: 0;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@layer utilities {
-  .animate-indeterminate-progress {
-    width: 50%;
-    animation: indeterminate 1.5s infinite cubic-bezier(0.65, 0.815, 0.735, 0.395);
-  }
-
-  @keyframes indeterminate {
-    0% {
-      transform: translateX(-100%);
-    }
-    100% {
-      transform: translateX(200%);
-    }
-  }
-}
-
 @layer base {
   *,
   ::after,
@@ -244,8 +198,13 @@
   ::file-selector-button {
     border-color: var(--color-gray-200, currentColor);
   }
+
+  * {
+    @apply border-border outline-ring/50;
+  }
+
   body {
-    @apply text-foreground font-base bg-background;
+    @apply bg-background text-foreground;
   }
 
   h1,
@@ -260,52 +219,51 @@
   p {
     @apply text-base;
   }
-  .btn-active {
-    @apply shadow-none translate-x-boxShadowX translate-y-boxShadowY;
-  }
-  .bg-disabled {
-    background-color: rgba(19, 1, 1, 0.3);
-    color: rgba(16, 16, 16, 0.3);
-  }
-  .btn-size-xs {
-    @apply p-0.5;
-  }
-  .btn-size-sm {
-    @apply p-1;
-  }
-  .btn-size-default {
-    @apply px-4 py-2;
-  }
-  .btn-size-lg {
-    @apply h-11 px-8 text-base;
-  }
-  /* .btn-size-icon {
-    @apply p-2.5 m900:p-2;
-  } */
-  .darkText {
-    /* using var does not work? */
-    /* color: var(--darkText); */
-    color: #eeefe9;
-  }
-  .no-shadow {
-    box-shadow: none !important;
-  }
 }
 
 @layer mantine, mantine-datatable;
 
-@layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+/* Critical for flex layouts */
+main,
+.mantine-AppShell-main,
+.mantine-Container-root {
+  min-width: 0;
+}
+
+/* Box sizing */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
 }
 
 /* ------------------------------------------- */
 /* custom */
 /* ------------------------------------------- */
+.link-underline {
+  @apply relative
+         after:absolute after:left-0 after:-bottom-1 after:h-[2px]
+         after:w-full
+         after:scale-x-0
+         after:origin-right
+         after:bg-current
+         after:transition-transform after:duration-300
+         hover:after:scale-x-100
+         hover:after:origin-left
+         data-[active=true]:after:scale-x-100
+         data-[active=true]:after:origin-left;
+}
+
+.link-highlight {
+  @apply relative inline-block px-2 py-1 z-0
+         before:absolute before:inset-0 before:-z-10 before:rounded-md
+         before:scale-x-0
+         before:origin-right
+         before:transition-transform before:duration-300
+         before:bg-neutral-200 dark:before:bg-neutral-700
+         hover:before:scale-x-100
+         hover:before:origin-left;
+}
 
 .hr-error {
   width: 100%; /* Initial width */
@@ -351,7 +309,6 @@
 /* ------------------------------------------- */
 /* Tiptap Editor */
 /* ------------------------------------------- */
-
 .ProseMirror ul {
   list-style-type: disc;
   padding-left: 1.5rem;
@@ -506,4 +463,82 @@
 .ProseMirror-focused {
   outline: 0.5px solid var(--mantine-color-blue-3);
   transition: outline 0.2s ease-in-out;
+}
+
+/* Keyframes */
+
+/* Define keyframes */
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+@keyframes marquee2 {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+@keyframes accordion-down {
+  from {
+    height: 0;
+  }
+  to {
+    height: var(--radix-accordion-content-height);
+  }
+}
+
+@keyframes accordion-up {
+  from {
+    height: var(--radix-accordion-content-height);
+  }
+  to {
+    height: 0;
+  }
+}
+
+@keyframes caret-blink {
+  0%,
+  70%,
+  100% {
+    opacity: 1;
+  }
+  20%,
+  50% {
+    opacity: 0;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@layer utilities {
+  .animate-indeterminate-progress {
+    width: 50%;
+    animation: indeterminate 1.5s infinite cubic-bezier(0.65, 0.815, 0.735, 0.395);
+  }
+
+  @keyframes indeterminate {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(200%);
+    }
+  }
 }

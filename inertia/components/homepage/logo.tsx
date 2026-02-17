@@ -5,7 +5,13 @@ import { animate, motion, useMotionValue, useTransform } from 'framer-motion'
 import { useEffect } from 'react'
 import DotPattern from '~/components/ui/dot-pattern'
 
-export default function Logo() {
+export default function Logo({
+  CustomWrapper,
+  imgClassname,
+}: {
+  CustomWrapper?: React.ComponentType<{ children: React.ReactNode }>
+  imgClassname?: string
+}) {
   const cardX = useMotionValue(0)
   const cardY = useMotionValue(0)
   const rotateX = useTransform(cardY, [-300, 300], [10, -10]) // Reversed values
@@ -38,44 +44,54 @@ export default function Logo() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  return (
-    <DotPattern classname="mb-6 max-h-[300px] max-w-[400px] mx-auto shadow-nav dark:shadow-navDark">
+  const comp = (
+    <motion.div
+      style={{
+        perspective: 800,
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}
+    >
       <motion.div
         style={{
+          width: '100%',
+          height: '100%',
+          transformStyle: 'preserve-3d',
           perspective: 800,
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          rotateX,
+          rotateY,
         }}
+        transition={{ velocity: 0 }}
+        className="m-5"
       >
         <motion.div
+          key="card"
           style={{
-            width: '100%',
-            height: '100%',
             transformStyle: 'preserve-3d',
-            perspective: 800,
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-            rotateX,
-            rotateY,
+            perspective: 800, // Set perspective on the card
           }}
           transition={{ velocity: 0 }}
-          className="m-5"
+          className="mx-auto w-container max-w-full px-5 text-center"
         >
-          <motion.div
-            key="card"
-            style={{
-              transformStyle: 'preserve-3d',
-              perspective: 800, // Set perspective on the card
-            }}
-            transition={{ velocity: 0 }}
-            className="mx-auto w-container max-w-full px-5 text-center"
-          >
-            <Image src={'/assets/logo-transparent.png'} alt="Logo" className="w-[300px]" />
-          </motion.div>
+          <Image
+            src={'/media/logo-transparent.png'}
+            alt="Logo"
+            className={imgClassname || 'w-[300px]'}
+          />
         </motion.div>
       </motion.div>
+    </motion.div>
+  )
+
+  if (CustomWrapper) return <CustomWrapper>{comp}</CustomWrapper>
+
+  return (
+    <DotPattern classname="mb-6 max-h-[300px] max-w-[400px] mx-auto shadow-nav dark:shadow-navDark">
+      {comp}
     </DotPattern>
   )
 }

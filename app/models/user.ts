@@ -17,6 +17,7 @@ import type { HasMany, HasOne, ManyToMany } from '@adonisjs/lucid/types/relation
 import { DateTime } from 'luxon'
 import { randomUUID } from 'node:crypto'
 
+import SnakeCaseNamingStrategy from './_naming_strategy.js'
 import Profile from './profile.js'
 import Role from './role.js'
 import Token from './token.js'
@@ -27,6 +28,7 @@ const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
 })
 
 export default class User extends compose(BaseModel, AuthFinder) {
+  static namingStrategy = new SnakeCaseNamingStrategy()
   static selfAssignPrimaryKey = true
   static accessTokens = DbAccessTokensProvider.forModel(User, {
     table: Tables.ACCESS_TOKEN,
@@ -65,12 +67,12 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @computed()
   public get isAdmin() {
-    return this.roles?.some((role) => role.name === 'ADMIN') ?? false
+    return this.roles?.some((role) => role.name === 'Admin') ?? false
   }
 
   @computed()
   public get isSuperAdmin() {
-    return this.roles?.some((role) => role.name === 'SUPER_ADMIN') ?? false
+    return this.roles?.some((role) => role.name === 'Super Admin') ?? false
   }
 
   @manyToMany(() => Role, {
@@ -91,7 +93,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
   })
   declare verifyEmailTokens: HasMany<typeof Token>
 
-  @hasOne(() => Profile)
+  @hasOne(() => Profile, {
+    foreignKey: 'user_id',
+  })
   declare profile: HasOne<typeof Profile>
 
   @beforeCreate()

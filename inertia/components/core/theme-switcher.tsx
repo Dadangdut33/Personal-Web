@@ -3,10 +3,18 @@
 import { useMantineColorScheme } from '@mantine/core'
 import { Moon, Sun } from 'lucide-react'
 import { useEffect } from 'react'
-import { Button } from '~/components/ui/button'
+import { Button, btnVariant } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
 
-export function ThemeSwitcher({ hidden }: { hidden?: boolean }) {
+export function ThemeSwitcher({
+  hidden,
+  variant,
+  className,
+}: {
+  hidden?: boolean
+  variant?: btnVariant
+  className?: string
+}) {
   const { toggleColorScheme, colorScheme } = useMantineColorScheme()
 
   // sync to html class
@@ -17,11 +25,9 @@ export function ThemeSwitcher({ hidden }: { hidden?: boolean }) {
   return (
     <>
       <Button
-        className={cn(
-          'size-9 p-0 [&_svg]:size-5 shadow-nav hover:translate-x-[4px]! hover:translate-y-[4px]! hover:shadow-none bg-secondary-background',
-          hidden && 'hidden'
-        )}
+        className={cn('size-9 p-0 [&_svg]:size-5', hidden && 'hidden', className)}
         onClick={hidden ? undefined : toggleColorScheme}
+        variant={variant || 'neutral'}
       >
         <Sun className="hidden dark:inline stroke-foreground" />
         <Moon className="inline dark:hidden stroke-foreground" />

@@ -1,4 +1,5 @@
-import { Check, Plus, Trash2, UserX, X } from 'lucide-react'
+import { Check, RefreshCcwIcon, Trash2, UserX, X } from 'lucide-react'
+import { btnVariant } from '~/components/ui/button'
 
 import { useConfirmModal } from './modal-context'
 
@@ -7,6 +8,21 @@ export function useModals() {
   const confirmModal = useConfirmModal()
 
   return {
+    InfoModal: (config: {
+      message: string | React.ReactNode
+      title?: string | React.ReactNode
+      onConfirm?: () => void | Promise<void>
+      confirmText?: string
+      confirmVariant?: btnVariant
+      width?: string
+    }) => {
+      return confirmModal({
+        ...config,
+        withCancel: false,
+        confirmText: config.confirmText || 'Ok',
+      })
+    },
+
     ConfirmModal: (config: {
       message: string | React.ReactNode
       title?: string | React.ReactNode
@@ -14,56 +30,61 @@ export function useModals() {
       onCancel?: () => void | Promise<void>
       confirmText?: string
       cancelText?: string
-      confirmVariant?: 'default' | 'noShadow' | 'neutral' | 'reverse' | 'active' | 'disabled'
-      cancelVariant?: 'default' | 'noShadow' | 'neutral' | 'reverse' | 'active' | 'disabled'
+      confirmVariant?: btnVariant
+      cancelVariant?: btnVariant
       width?: string
     }) => {
       return confirmModal(config)
     },
 
     ConfirmAddModal: (config: {
-      data?: string
+      title?: string | React.ReactNode
+      name?: string
+      message?: string | React.ReactNode
       onConfirm?: () => void | Promise<void>
       onCancel?: () => void | Promise<void>
       confirmText?: string
       cancelText?: string
-      confirmVariant?: 'default' | 'noShadow' | 'neutral' | 'reverse' | 'active' | 'disabled'
-      cancelVariant?: 'default' | 'noShadow' | 'neutral' | 'reverse' | 'active' | 'disabled'
+      confirmVariant?: btnVariant
+      cancelVariant?: btnVariant
     }) => {
       return confirmModal({
-        title: (
+        title: config.title || (
           <div className="flex items-center gap-2">
             <Check className="size-5 text-green-600" />
-            <span>Save {config.data || 'Data'}</span>
+            <span>Save {config.name || 'Data'}</span>
           </div>
         ),
-        message: `Are you sure you want to save ${config.data || 'this data'}?`,
+        message: config.message || `Are you sure you want to save ${config.name || 'this data'}?`,
         onConfirm: config.onConfirm,
         onCancel: config.onCancel,
         confirmText: config.confirmText || 'Save',
         cancelText: config.cancelText || 'Cancel',
-        confirmVariant: config.confirmVariant,
-        cancelVariant: config.cancelVariant,
+        confirmVariant: 'green',
+        cancelVariant: 'destructive',
       })
     },
 
     ConfirmCancelModal: (config: {
-      data?: string
+      title?: string | React.ReactNode
+      name?: string
+      message?: string | React.ReactNode
       onConfirm?: () => void | Promise<void>
       onCancel?: () => void | Promise<void>
       confirmText?: string
       cancelText?: string
-      confirmVariant?: 'default' | 'noShadow' | 'neutral' | 'reverse' | 'active' | 'disabled'
-      cancelVariant?: 'default' | 'noShadow' | 'neutral' | 'reverse' | 'active' | 'disabled'
+      confirmVariant?: btnVariant
+      cancelVariant?: btnVariant
     }) => {
       return confirmModal({
-        title: (
+        title: config.title || (
           <div className="flex items-center gap-2">
             <X className="size-5 text-yellow-600" />
-            <span>Cancel {config.data || 'Action'}</span>
+            <span>Cancel {config.name || 'Action'}</span>
           </div>
         ),
-        message: `Are you sure you want to cancel ${config.data || 'this action'}?`,
+        message:
+          config.message || `Are you sure you want to cancel ${config.name || 'this action'}?`,
         onConfirm: config.onConfirm,
         onCancel: config.onCancel,
         confirmText: config.confirmText || 'Cancel',
@@ -74,49 +95,56 @@ export function useModals() {
     },
 
     ConfirmResetModal: (config: {
-      data?: string
+      title?: string | React.ReactNode
+      name?: string
+      message?: string | React.ReactNode
       onConfirm?: () => void | Promise<void>
       onCancel?: () => void | Promise<void>
       confirmText?: string
       cancelText?: string
-      confirmVariant?: 'default' | 'noShadow' | 'neutral' | 'reverse' | 'active' | 'disabled'
-      cancelVariant?: 'default' | 'noShadow' | 'neutral' | 'reverse' | 'active' | 'disabled'
+      confirmVariant?: btnVariant
+      cancelVariant?: btnVariant
     }) => {
       return confirmModal({
-        title: (
+        title: config.title || (
           <div className="flex items-center gap-2">
-            <Plus className="size-5 text-blue-600" />
-            <span>Reset {config.data || 'Data'}</span>
+            <RefreshCcwIcon className="size-5 text-blue-600" />
+            <span>Reset {config.name || 'Data'}</span>
           </div>
         ),
-        message: `Are you sure you want to reset ${config.data || 'this data'}?`,
+        message: config.message || `Are you sure you want to reset ${config.name || 'this data'}?`,
         onConfirm: config.onConfirm,
         onCancel: config.onCancel,
         confirmText: config.confirmText || 'Reset',
         cancelText: config.cancelText || 'Cancel',
-        confirmVariant: config.confirmVariant,
+        confirmVariant: 'destructive',
         cancelVariant: config.cancelVariant,
       })
     },
 
     ConfirmDeleteModal: (config: {
-      data?: string
+      title?: string | React.ReactNode
+      name?: string
+      message?: string | React.ReactNode
       extra?: string
       onConfirm?: () => void | Promise<void>
       onCancel?: () => void | Promise<void>
       confirmText?: string
       cancelText?: string
-      confirmVariant?: 'default' | 'noShadow' | 'neutral' | 'reverse' | 'active' | 'disabled'
-      cancelVariant?: 'default' | 'noShadow' | 'neutral' | 'reverse' | 'active' | 'disabled'
+      confirmVariant?: btnVariant
+      cancelVariant?: btnVariant
+      enablePin?: boolean
     }) => {
       return confirmModal({
-        title: (
+        title: config.title || (
           <div className="flex items-center gap-2">
             <Trash2 className="size-5 text-red-400" />
-            <span>Delete {config.data || 'Data'}</span>
+            <span>Delete {config.name || 'Data'}</span>
           </div>
         ),
-        message: `Are you sure you want to delete 🗑️ ${config.data || 'this data'}?${config.extra || ''}`,
+        message:
+          config.message ||
+          `Are you sure you want to delete 🗑️ ${config.name || 'this data'}?${config.extra || ''}`,
         onConfirm: config.onConfirm,
         onCancel: config.onCancel,
         confirmText: config.confirmText || 'Delete',
@@ -124,6 +152,7 @@ export function useModals() {
         confirmVariant: config.confirmVariant,
         cancelVariant: config.cancelVariant,
         confirmClassName: 'bg-red-500 hover:bg-red-600 text-white',
+        pinConfirmation: config.enablePin,
       })
     },
 
@@ -132,8 +161,8 @@ export function useModals() {
       onCancel?: () => void | Promise<void>
       confirmText?: string
       cancelText?: string
-      confirmVariant?: 'default' | 'noShadow' | 'neutral' | 'reverse' | 'active' | 'disabled'
-      cancelVariant?: 'default' | 'noShadow' | 'neutral' | 'reverse' | 'active' | 'disabled'
+      confirmVariant?: btnVariant
+      cancelVariant?: btnVariant
     }) => {
       return confirmModal({
         title: (

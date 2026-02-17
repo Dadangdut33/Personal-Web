@@ -7,7 +7,7 @@ export default class UserRepository extends BaseRepository<typeof User> {
     super(User)
   }
 
-  async updateOrCreateUser(data: UserPayload) {
+  async updateUser(data: UserPayload) {
     const { id } = data
 
     const user = await this.model.updateOrCreate(
@@ -19,5 +19,9 @@ export default class UserRepository extends BaseRepository<typeof User> {
     if (data.roleIds) await user.related('roles').sync(data.roleIds)
 
     return user
+  }
+
+  async getUserById(id: string) {
+    return await this.model.query().where('id', id).first()
   }
 }

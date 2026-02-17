@@ -9,6 +9,9 @@ export default class extends BaseSchema {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary()
       table.uuid('user_id').references('id').inTable(Tables.USERS).onDelete('CASCADE')
+      table.uuid('avatar_id').nullable()
+      table.foreign('avatar_id').references('id').inTable(Tables.MEDIAS).onDelete('SET NULL')
+
       table.text('bio').nullable()
 
       table.timestamp('created_at')

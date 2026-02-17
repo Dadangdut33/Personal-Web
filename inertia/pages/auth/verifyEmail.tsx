@@ -1,6 +1,5 @@
 import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import type AuthController from '@app/controllers/auth.controller.ts'
-import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
 import { route } from '@izzyjs/route/client'
 import { Alert, Group, Loader, Text } from '@mantine/core'
@@ -9,7 +8,7 @@ import { useInterval, useLocalStorage, useTimeout } from '@mantine/hooks'
 import { Turnstile } from '@marsidev/react-turnstile'
 import { IconMessageCircle, IconTimeDuration30 } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
-import { useModals } from '~/components/core/modal-hooks'
+import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyError } from '~/components/core/notify'
 import { Button } from '~/components/ui/button'
 import {
@@ -21,9 +20,11 @@ import {
   cardClass,
 } from '~/components/ui/card'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
+import { useIsReady } from '~/hooks/use_is_ready'
+import { useLogout } from '~/hooks/use_logout'
 import AuthLayout from '~/layouts/auth'
 import { TIMEOUT_SHORT } from '~/lib/constants'
-import { checkForm, cn } from '~/lib/utils'
+import { checkFormWithCaptcha, cn } from '~/lib/utils'
 
 export default function Page(
   props: SharedProps & InferPageProps<AuthController, 'viewVerifyEmail'>
@@ -36,30 +37,26 @@ export default function Page(
     key: 'timeout_verify_email_start',
     defaultValue: null,
   })
-  const [isNewlyRegistered, setIsNewlyRegistered] = useLocalStorage({
-    key: 'timeout_verify_email_new',
+  const [isNewlyRegistered, setIsNewlyRegistered] = useLocalStorage<boolean>({
+    key: 'newly_registered',
     defaultValue: true,
   })
-  const { start: startTimeout } = useTimeout(() => setIsTimedOut(false), TIMEOUT_SHORT) // after send, timeout for 3 minute
-  const [timerMs, setTimerSec] = useState(TIMEOUT_SHORT)
+  const isReady = useIsReady()
+  const { start: startTimeout, clear: clearTimeout } = useTimeout(() => {
+    setIsTimedOut(false)
+    setTimedOutStartTime(null)
+  }, TIMEOUT_SHORT)
+  const [timerMs, setTimerMs] = useState(TIMEOUT_SHORT)
+
   const interval = useInterval(() => {
-    interval.stop()
     if (timerMs <= 0) {
-      setTimerSec(TIMEOUT_SHORT)
+      setIsTimedOut(false)
+      setTimedOutStartTime(null)
       interval.stop()
-      setIsNewlyRegistered(false)
     } else {
-      setTimerSec((s) => s - 1000)
+      setTimerMs((s) => s - 1000)
     }
   }, 1000)
-
-  const startTimeoutAndTimer = () => {
-    setIsNewlyRegistered(true)
-    interval.start()
-    setIsTimedOut(true)
-    setTimedOutStartTime(Date.now())
-    startTimeout()
-  }
 
   const form = useForm({
     initialValues: {
@@ -82,15 +79,18 @@ export default function Page(
       if (error.response?.data.form_errors) {
         form.setErrors(error.response?.data.form_errors)
       }
-      setIsNewlyRegistered(false)
+      clearTimeout()
     },
     onSuccess() {
-      startTimeoutAndTimer()
+      interval.start()
+      setIsTimedOut(true)
+      setTimedOutStartTime(Date.now())
+      startTimeout()
       form.reset()
     },
   })
   const doMutate = () => {
-    if (!checkForm(form, { bypass_captcha: props.bypass_captcha })) return
+    if (!checkFormWithCaptcha(form, { bypass_captcha: props.bypass_captcha })) return
     if (isTimedOut)
       return NotifyError('Error', 'Please wait until you can request another email verification.')
 
@@ -100,35 +100,40 @@ export default function Page(
   // ---------------------------
   // Timeout
   // ---------------------------
-  // if just came from register / login
+  // on first load, check if timed out
   useEffect(() => {
-    const timeIsvalid = timedOutStartTime && Date.now() - timedOutStartTime > TIMEOUT_SHORT
-    // start timeout immediately
-    if (isNewlyRegistered && timeIsvalid) {
-      startTimeoutAndTimer()
+    if (!isReady) return
+
+    if (isTimedOut) {
+      // calculate remaining time
+      if (timedOutStartTime) {
+        const elapsedMs = Date.now() - timedOutStartTime
+        const remainingMs = TIMEOUT_SHORT - elapsedMs
+        setTimerMs(remainingMs)
+
+        interval.start()
+        setIsTimedOut(true) // start but dont update timed out start
+        startTimeout()
+      } else {
+        setIsTimedOut(false)
+      }
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [isReady])
 
-  // if timeout already passed, reset the timer / turn off the timeout
-  useEffect(() => {
-    if (timedOutStartTime && Date.now() - timedOutStartTime > TIMEOUT_SHORT) {
-      setIsTimedOut(false)
-      setTimedOutStartTime(null)
-    }
-  }, [timedOutStartTime, setIsTimedOut, setTimedOutStartTime])
-
-  const { ConfirmModal, ConfirmLogoutModal } = useModals()
-
+  const { ConfirmLogoutModal, ConfirmModal } = useModals()
+  const { mutate: logout } = useLogout()
   const confirm = ConfirmModal({
     message: 'Are you sure you want to resend the verification email?',
     onConfirm: () => {
       doMutate()
+
+      // once user have interacted, we reset newly registered flag
+      if (isNewlyRegistered) setIsNewlyRegistered(false)
     },
   })
   const confirmLogout = ConfirmLogoutModal({
     onConfirm: () => {
-      router.post(route('auth.logout'))
+      logout()
     },
   })
 
@@ -194,7 +199,7 @@ export default function Page(
                   {isTimedOut ? (
                     <>
                       <IconTimeDuration30 />
-                      Please wait for {timerMs / 1000} seconds
+                      Please wait for {Math.ceil(timerMs / 1000)} seconds
                     </>
                   ) : (
                     <>Request Verification</>

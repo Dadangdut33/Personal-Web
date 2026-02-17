@@ -1,7 +1,5 @@
-import User from '#models/user'
 import ProfileRepository from '#repositories/profile.repository'
-import { QueryBuilderParams } from '#types/app'
-import { ProfilePayload } from '#types/inferred'
+import { CreateProfilePayload, UpdateProfilePayload } from '#types/inferred'
 
 import { inject } from '@adonisjs/core'
 
@@ -9,11 +7,23 @@ import { inject } from '@adonisjs/core'
 export default class ProfileService {
   constructor(protected repo: ProfileRepository) {}
 
-  async index(queryParams: QueryBuilderParams<typeof User>) {
-    return await this.repo.query(queryParams)
+  async findByUid(id: string) {
+    return await this.repo.findBy('user_id', id)
   }
 
-  async update(user_id: string, data: ProfilePayload) {
+  async create(data: CreateProfilePayload) {
+    const { avatar, ...rest } = data
+    return this.repo.createGeneric({
+      ...rest,
+      user_id: data.user_id,
+    })
+  }
+
+  async update(user_id: string, data: UpdateProfilePayload) {
     return this.repo.updateProfile(user_id, data)
+  }
+
+  async getAvatar(user_id: string) {
+    return this.repo.getAvatar(user_id)
   }
 }

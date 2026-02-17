@@ -1,19 +1,17 @@
 import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import type AuthController from '@app/controllers/auth.controller.ts'
-import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
 import { route } from '@izzyjs/route/client'
-import { Box, Loader, Text } from '@mantine/core'
+import { Loader, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { Turnstile } from '@marsidev/react-turnstile'
-import { IconArrowLeft } from '@tabler/icons-react'
 import { useState } from 'react'
 import {
   PasswordPopover,
   PasswordStrengthDropdown,
   getPasswordStrength,
 } from '~/components/auth/password'
-import { useModals } from '~/components/core/modal-hooks'
+import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyError } from '~/components/core/notify'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
@@ -21,14 +19,14 @@ import { Input } from '~/components/ui/input'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import AuthLayout from '~/layouts/auth'
 import { PASS_REGEX } from '~/lib/constants'
-import { checkForm, cn } from '~/lib/utils'
+import { checkFormWithCaptcha, cn } from '~/lib/utils'
 
 export default function Page(
   props: SharedProps & InferPageProps<AuthController, 'viewResetPassword'>
 ) {
   const form = useForm({
     initialValues: {
-      email: '',
+      email: props.email,
       password: '',
       password_confirmation: '',
       token: props.token,
@@ -55,7 +53,7 @@ export default function Page(
     },
   })
   const doMutate = () => {
-    if (!checkForm(form, { bypass_captcha: props.bypass_captcha })) return
+    if (!checkFormWithCaptcha(form, { bypass_captcha: props.bypass_captcha })) return
     mutation.mutate(form.values)
   }
 
@@ -84,18 +82,6 @@ export default function Page(
         <title>Reset Password</title>
       </Head>
 
-      <Box pos={'absolute'} top={10} left={10}>
-        <Button
-          disabled={mutation.isPending}
-          onClick={() => {
-            router.visit(route('auth.login').path)
-          }}
-        >
-          {mutation.isPending ? <Loader size={16} color="black" /> : <IconArrowLeft stroke={2} />}
-          Back to Login
-        </Button>
-      </Box>
-
       <div className={cn('flex flex-col gap-4')}>
         <Card>
           <CardHeader className="text-center">
@@ -112,7 +98,10 @@ export default function Page(
                 required
                 value={form.values.email}
                 error={form.errors.email}
-                onChange={(e) => form.setFieldValue('email', e.target.value)}
+                // cannot be changed
+                // onChange={(e) => form.setFieldValue('email', e.target.value)}
+                readOnly
+                disabled
               />
 
               <PasswordPopover

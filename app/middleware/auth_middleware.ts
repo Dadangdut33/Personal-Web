@@ -12,7 +12,7 @@ export default class AuthMiddleware {
   /**
    * The URL to redirect to, when authentication fails
    */
-  redirect_to = route('auth.login')
+  redirect_to = route('auth.login').path
 
   async handle(
     { auth, session }: HttpContext,
@@ -22,7 +22,7 @@ export default class AuthMiddleware {
     } = {}
   ) {
     try {
-      await auth.authenticateUsing(options.guards, { loginRoute: this.redirect_to.path })
+      await auth.authenticateUsing(options.guards, { loginRoute: this.redirect_to })
     } catch (error) {
       if (error instanceof errors.E_UNAUTHORIZED_ACCESS) {
         session.flash('error', 'Unauthorized access. Please log in.')

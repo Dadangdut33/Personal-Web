@@ -2,6 +2,7 @@ import { type RequestError } from '#types/app'
 
 import { FormErrors, UseFormReturnType } from '@mantine/form'
 import { type ClassValue, clsx } from 'clsx'
+import { isString } from 'lodash-es'
 import { twMerge } from 'tailwind-merge'
 import { NotifyError } from '~/components/core/notify'
 
@@ -43,7 +44,9 @@ export function formErrorsToString(err: FormErrors) {
 // If there are errors, we notify the user and return false
 // If there are no errors, we return true
 // A simple captcha check is done if bypass_captcha is true
-export function checkForm<TValues extends Record<string, unknown> = Record<string, unknown>>(
+export function checkFormWithCaptcha<
+  TValues extends Record<string, unknown> = Record<string, unknown>,
+>(
   form: UseFormReturnType<TValues>,
   { bypass_captcha }: { bypass_captcha?: boolean } = { bypass_captcha: false }
 ) {
@@ -60,3 +63,67 @@ export function checkForm<TValues extends Record<string, unknown> = Record<strin
   }
   return !hasErrors // we return true if there are no errors
 }
+
+export function checkForm<TValues extends Record<string, unknown> = Record<string, unknown>>(
+  form: UseFormReturnType<TValues>
+) {
+  const { hasErrors, errors } = form.validate()
+  if (hasErrors) {
+    // else we notify the user and return false
+    NotifyError('Error in form', formErrorsToString(errors))
+  }
+  return !hasErrors // we return true if there are no errors
+}
+
+export function limitString(str: string, limit: number) {
+  if (str.length > limit) {
+    return str.slice(0, limit) + '...'
+  }
+  return str
+}
+
+export function getInitials(name: string) {
+  const [firstName, lastName] = name.split(' ')
+
+  const firstInitial = firstName ? firstName.charAt(0) : ''
+  const lastInitial = lastName ? lastName.charAt(0) : ''
+
+  if (firstInitial && lastInitial) {
+    return `${firstInitial}${lastInitial}`
+  }
+
+  return firstInitial || lastInitial || ''
+}
+
+export function getImageUrlOrCreateObjectUrl(url: string | File | null | undefined) {
+  if (!url) return null
+  if (isString(url)) return url
+  return URL.createObjectURL(url)
+}
+
+export function getImagePreviewURL(file: File | null, fallbackData?: string | null) {
+  if (file) return URL.createObjectURL(file)
+  if (fallbackData) return fallbackData
+  return null
+}
+
+export function formatBytes(bytes: number, decimals = 2) {
+  if (bytes === 0) return '0 Bytes'
+
+  const k = 1024
+  const dm = decimals < 0 ? 0 : decimals
+  const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB']
+
+  const i = Math.floor(Math.log(bytes) / Math.log(k))
+
+  return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(dm)) + ' ' + sizes[i]
+}
+
+export const transformUsername = (value: string) =>
+  value
+    .toLowerCase()
+    .replace(/\s+/g, '')
+    .replace(/[^a-z0-9._-]/g, '')
+
+export const transformFullName = (value: string) =>
+  value.replace(/\s+/g, ' ').replace(/[^\p{L}\p{M}.'\-() ]/gu, '')

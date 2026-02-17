@@ -19,8 +19,14 @@ export default await Env.create(new URL('../', import.meta.url), {
   VITE_APP_NAME: Env.schema.string.optional(),
   LOG_LEVEL: Env.schema.string(),
 
+  // Some auth feature that can be disabled
   ENABLE_REGISTRATION: Env.schema.boolean.optional(),
   HIDE_REGISTRATION: Env.schema.boolean.optional(),
+
+  ENABLE_FORGOT_PASSWORD: Env.schema.boolean.optional(),
+  HIDE_FORGOT_PASSWORD: Env.schema.boolean.optional(),
+
+  ENABLE_ACTIVITY_LOG: Env.schema.boolean.optional(),
 
   /*
   |----------------------------------------------------------
@@ -64,21 +70,21 @@ export default await Env.create(new URL('../', import.meta.url), {
   | Variables for configuring the drive package
   |----------------------------------------------------------
   */
-  DRIVE_DISK: Env.schema.enum(['fs', 's3', 'r2'] as const),
-  AWS_ACCESS_KEY_ID: Env.schema.string.optional(),
-  AWS_SECRET_ACCESS_KEY: Env.schema.string.optional(),
-  AWS_REGION: Env.schema.string.optional(),
+  DRIVE_DISK: Env.schema.enum(['fs', 's3'] as const),
+  S3_KEY: Env.schema.string.optional(),
+  S3_SECRET: Env.schema.string.optional(),
   S3_BUCKET: Env.schema.string.optional(),
-  R2_KEY: Env.schema.string.optional(),
-  R2_SECRET: Env.schema.string.optional(),
-  R2_BUCKET: Env.schema.string.optional(),
-  R2_ENDPOINT: Env.schema.string.optional(),
+  S3_ENDPOINT: Env.schema.string.optional(),
+  S3_REGION: Env.schema.string.optional(),
+  S3_VISIBILITY: Env.schema.enum(['public', 'private'] as const),
 
   /*
   |----------------------------------------------------------
   | Variables for configuring the mail package
   |----------------------------------------------------------
   */
+  SUPPORT_EMAIL: Env.schema.string.optional(),
+
   SMTP_HOST: Env.schema.string.optional(),
   SMTP_PORT: Env.schema.string.optional(),
   SMTP_USERNAME: Env.schema.string.optional(),

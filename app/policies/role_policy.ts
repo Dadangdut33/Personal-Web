@@ -12,6 +12,14 @@ export default class RolePolicy extends CustomBasePolicy {
     return await this.perm.check(user, `${this.base}.view`)
   }
 
+  async viewCreate(user: User) {
+    return await this.perm.check(user, `${this.base}.create`)
+  }
+
+  async viewEdit(user: User) {
+    return await this.perm.check(user, `${this.base}.update`)
+  }
+
   async create(user: User, request: HttpContext['request']) {
     return await this.perm.checkInMethod(user, `${this.base}.create`, request, 'POST')
   }
@@ -23,6 +31,13 @@ export default class RolePolicy extends CustomBasePolicy {
   // verify. Must not delete the role that is protected
   async delete(user: User, role: Role) {
     if (role.is_protected) return false // protected role
+
+    return await this.perm.check(user, `${this.base}.delete`)
+  }
+
+  async deleteBulk(user: User, roles: Role[]) {
+    const protectedRoles = roles.filter((role) => role.is_protected)
+    if (protectedRoles.length > 0) return false // protected role
 
     return await this.perm.check(user, `${this.base}.delete`)
   }

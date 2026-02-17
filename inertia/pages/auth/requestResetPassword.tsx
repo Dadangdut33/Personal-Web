@@ -9,45 +9,46 @@ import { useInterval, useLocalStorage, useTimeout } from '@mantine/hooks'
 import { Turnstile } from '@marsidev/react-turnstile'
 import { IconArrowLeft, IconTimeDuration30 } from '@tabler/icons-react'
 import { useEffect, useState } from 'react'
-import { useModals } from '~/components/core/modal-hooks'
+import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyError } from '~/components/core/notify'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
 import { Input } from '~/components/ui/input'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
+import { useIsReady } from '~/hooks/use_is_ready'
 import AuthLayout from '~/layouts/auth'
-import { TIMEOUT_NORMAL, TIMEOUT_SHORT } from '~/lib/constants'
-import { checkForm, cn } from '~/lib/utils'
+import { TIMEOUT_NORMAL } from '~/lib/constants'
+import { checkFormWithCaptcha, cn } from '~/lib/utils'
 
+const maxWidth = 'max-w-md'
 export default function Page(
   props: SharedProps & InferPageProps<AuthController, 'viewRequestResetPassword'>
 ) {
-  const [timedOut, setTimedOut] = useLocalStorage({
+  const [isTimedOut, setIsTimedOut] = useLocalStorage({
     key: 'reset_password_request_timed_out',
     defaultValue: false,
   })
-  const [timedOutStart, setTimedOutStart] = useLocalStorage<number | null>({
+  const [timedOutStartTime, setTimedOutStartTime] = useLocalStorage<number | null>({
     key: 'reset_password_request_timed_out_start',
     defaultValue: null,
   })
-  const { start, clear } = useTimeout(() => setTimedOut(false), TIMEOUT_NORMAL) // after 5 minutes, reset timedOut
+  const { start: startTimeout, clear: clearTimeout } = useTimeout(() => {
+    setIsTimedOut(false)
+    setTimedOutStartTime(null)
+  }, TIMEOUT_NORMAL)
   const { ConfirmModal } = useModals()
-  const [timerSec, setTimerSec] = useState(TIMEOUT_SHORT)
+  const isReady = useIsReady()
+  const [timerMs, setTimerMs] = useState(TIMEOUT_NORMAL)
+
   const interval = useInterval(() => {
-    if (timerSec <= 0) {
-      setTimerSec(TIMEOUT_SHORT)
+    if (timerMs <= 0) {
+      setIsTimedOut(false)
+      setTimedOutStartTime(null)
       interval.stop()
     } else {
-      setTimerSec((s) => s - 1000)
+      setTimerMs((s) => s - 1000)
     }
   }, 1000)
-
-  const startTimeoutAndTimer = () => {
-    interval.start()
-    setTimedOut(true)
-    setTimedOutStart(Date.now())
-    start()
-  }
 
   const form = useForm({
     initialValues: {
@@ -65,27 +66,43 @@ export default function Page(
       if (error.response?.data.form_errors) {
         form.setErrors(error.response?.data.form_errors)
       }
-      clear()
+      clearTimeout()
     },
     onSuccess() {
-      startTimeoutAndTimer()
+      setIsTimedOut(true)
+      setTimedOutStartTime(Date.now())
+      interval.start()
+      startTimeout()
       form.reset()
     },
   })
   const doMutate = () => {
-    if (!checkForm(form, { bypass_captcha: props.bypass_captcha })) return
-    if (timedOut)
+    if (!checkFormWithCaptcha(form, { bypass_captcha: props.bypass_captcha })) return
+    if (isTimedOut)
       return NotifyError('Error', 'Please wait until you can request another password reset email.')
 
     mutation.mutate(form.values)
   }
 
+  // on first load, check if timed out
   useEffect(() => {
-    if (timedOutStart && Date.now() - timedOutStart > TIMEOUT_NORMAL) {
-      setTimedOut(false)
-      setTimedOutStart(null)
+    if (!isReady) return
+
+    if (isTimedOut) {
+      // calculate remaining time
+      if (timedOutStartTime) {
+        const elapsedMs = Date.now() - timedOutStartTime
+        const remainingMs = TIMEOUT_NORMAL - elapsedMs
+        setTimerMs(remainingMs)
+
+        interval.start()
+        setIsTimedOut(true) // start but dont update timed out start
+        startTimeout()
+      } else {
+        setIsTimedOut(false)
+      }
     }
-  }, [timedOutStart])
+  }, [isReady])
 
   const confirm = ConfirmModal({
     message: 'Are you sure you want to request a password reset?',
@@ -95,7 +112,7 @@ export default function Page(
   })
 
   return (
-    <AuthLayout>
+    <AuthLayout alertClassName={cn(maxWidth, 'mx-auto px-1')}>
       <Head>
         <title>Request Password Reset</title>
       </Head>
@@ -112,7 +129,7 @@ export default function Page(
         </Button>
       </Box>
 
-      <div className={cn('flex flex-col gap-4 max-w-md mx-auto')}>
+      <div className={cn('flex flex-col gap-4', maxWidth, 'mx-auto')}>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-xl">Request Password Reset</CardTitle>
@@ -162,14 +179,14 @@ export default function Page(
 
                 <Button
                   className="w-full"
-                  disabled={mutation.isPending || timedOut}
+                  disabled={mutation.isPending || isTimedOut}
                   onClick={confirm}
                 >
                   {mutation.isPending && <Loader size={16} color="black" />}
-                  {timedOut ? (
+                  {isTimedOut ? (
                     <>
                       <IconTimeDuration30 />
-                      Please wait for {timerSec} seconds
+                      Please wait for {Math.ceil(timerMs / 1000)} seconds
                     </>
                   ) : (
                     <>Request Password Reset</>

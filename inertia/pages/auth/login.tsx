@@ -14,8 +14,9 @@ import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import AuthLayout from '~/layouts/auth'
-import { checkForm, cn } from '~/lib/utils'
+import { checkFormWithCaptcha, cn } from '~/lib/utils'
 
+const maxWidth = 'max-w-md'
 export default function Page(props: SharedProps & InferPageProps<AuthController, 'viewLogin'>) {
   const form = useForm({
     initialValues: {
@@ -29,6 +30,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
       cf_token: (value) => (value.length > 0 ? null : 'Captcha is required'),
     },
   })
+
   const mutation = useGenericMutation('POST', route('auth.login.post').path, {
     onError(error, _variables, _context) {
       if (error.response?.data.form_errors) {
@@ -36,13 +38,14 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
       }
     },
   })
+
   const doMutate = () => {
-    if (!checkForm(form, { bypass_captcha: props.bypass_captcha })) return
+    if (!checkFormWithCaptcha(form, { bypass_captcha: props.bypass_captcha })) return
     mutation.mutate(form.values)
   }
 
   return (
-    <AuthLayout>
+    <AuthLayout alertClassName={cn(maxWidth, 'mx-auto px-1')}>
       <Head>
         <title>Login</title>
       </Head>
@@ -58,7 +61,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
         </Button>
       </Box>
 
-      <div className={cn('flex flex-col gap-4 max-w-md mx-auto')}>
+      <div className={cn('flex flex-col gap-4', maxWidth, 'mx-auto')}>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-xl">Welcome</CardTitle>
@@ -75,16 +78,19 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
                 value={form.values.email}
                 error={form.errors.email}
                 onChange={(e) => form.setFieldValue('email', e.target.value)}
+                disabled={mutation.isPending}
               />
               <div className="grid gap-3">
                 <div className="flex items-center">
                   <Label htmlFor="password">Password*</Label>
-                  <Link
-                    href={route('auth.resetPassword', { params: { token: '' } }).path}
-                    className="ml-auto text-sm underline-offset-4 hover:underline"
-                  >
-                    Forgot your password?
-                  </Link>
+                  {!props.hide_forgot_password && (
+                    <Link
+                      href={route('auth.resetPassword', { params: { token: '' } }).path}
+                      className="ml-auto text-sm underline-offset-4 hover:underline"
+                    >
+                      Forgot your password?
+                    </Link>
+                  )}
                 </div>
                 <Input
                   id="password"
@@ -94,6 +100,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
                   value={form.values.password}
                   error={form.errors.password}
                   onChange={(e) => form.setFieldValue('password', e.target.value)}
+                  disabled={mutation.isPending}
                 />
               </div>
 

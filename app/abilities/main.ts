@@ -11,14 +11,7 @@
 | templates.
 |
 */
-import User from '#models/user'
+// honestly. Have no idea if we need abilities since we are already using policies.
+// But you can do stuff here too. Check out the official docs for more info.
 
-import { Bouncer } from '@adonisjs/bouncer'
-
-export const manageUser = Bouncer.ability((user: User) => {
-  return user.isAdmin
-})
-
-// export const isLoggedIn = Bouncer.ability((user: User) => {
-//   return user.
-// })
+// import { Bouncer } from '@adonisjs/bouncer'

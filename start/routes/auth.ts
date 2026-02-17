@@ -15,20 +15,23 @@ router
   .group(() => {
     router.post('/logout', [AuthController, 'logout']).as('auth.logout').use([middleware.auth()])
 
-    router.get('/login', [AuthController, 'viewLogin']).as('auth.login').use([middleware.guest()])
+    router
+      .get('/login', [AuthController, 'viewLogin'])
+      .as('auth.login')
+      .use([middleware.is_logged_in()])
     router
       .post('/login', [AuthController, 'login'])
       .as('auth.login.post')
-      .use([middleware.guest(), loginThrottle])
+      .use([middleware.is_logged_in(), loginThrottle])
 
     router
       .get('/register', [AuthController, 'viewRegister'])
       .as('auth.register')
-      .use([middleware.guest()])
+      .use([middleware.is_logged_in()])
     router
       .post('/register', [AuthController, 'register'])
       .as('auth.register.post')
-      .use([middleware.guest(), registerThrottle])
+      .use([middleware.is_logged_in(), registerThrottle])
 
     router
       .get('/reset-password', [AuthController, 'viewRequestResetPassword'])

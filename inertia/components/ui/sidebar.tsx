@@ -1,6 +1,6 @@
 import { Slot } from '@radix-ui/react-slot'
 import { VariantProps, cva } from 'class-variance-authority'
-import { PanelLeftIcon } from 'lucide-react'
+import { PanelLeftIcon, RotateCcw } from 'lucide-react'
 import * as React from 'react'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
@@ -13,11 +13,19 @@ import {
 } from '~/components/ui/sheet'
 import { Skeleton } from '~/components/ui/skeleton'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
-import { useIsMobile } from '~/hooks/use_mobile'
+import { useIsMobile } from '~/hooks/use_is_mobile'
 import { cn } from '~/lib/utils'
 
+import { Separator } from './separator'
+
 const SIDEBAR_COOKIE_NAME = 'sidebar_state'
+const SIDEBAR_WIDTH_COOKIE_NAME = 'sidebar_width'
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
+
+const SIDEBAR_WIDTH_DEFAULT = 256
+const SIDEBAR_MIN_WIDTH = 160
+const SIDEBAR_MAX_WIDTH = 480
+
 const SIDEBAR_WIDTH = '16rem'
 const SIDEBAR_WIDTH_MOBILE = '18rem'
 const SIDEBAR_WIDTH_ICON = '3rem'
@@ -31,6 +39,10 @@ type SidebarContextProps = {
   setOpenMobile: (open: boolean) => void
   isMobile: boolean
   toggleSidebar: () => void
+  width: number
+  isResizing: boolean
+  startResizing: (event: React.MouseEvent) => void
+  resetWidth: () => void
 }
 
 const SidebarContext = React.createContext<SidebarContextProps | null>(null)
@@ -59,32 +71,26 @@ function SidebarProvider({
 }) {
   const isMobile = useIsMobile()
   const [openMobile, setOpenMobile] = React.useState(false)
+  const [width, setWidth] = React.useState(SIDEBAR_WIDTH_DEFAULT)
+  const [isResizing, setIsResizing] = React.useState(false)
 
-  // This is the internal state of the sidebar.
-  // We use openProp and setOpenProp for control from outside the component.
   const [_open, _setOpen] = React.useState(defaultOpen)
   const open = openProp ?? _open
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
       const openState = typeof value === 'function' ? value(open) : value
-      if (setOpenProp) {
-        setOpenProp(openState)
-      } else {
-        _setOpen(openState)
-      }
+      if (setOpenProp) setOpenProp(openState)
+      else _setOpen(openState)
 
-      // This sets the cookie to keep the sidebar state.
       document.cookie = `${SIDEBAR_COOKIE_NAME}=${openState}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
     },
     [setOpenProp, open]
   )
 
-  // Helper to toggle the sidebar.
   const toggleSidebar = React.useCallback(() => {
-    return isMobile ? setOpenMobile((open) => !open) : setOpen((open) => !open)
-  }, [isMobile, setOpen, setOpenMobile])
+    return isMobile ? setOpenMobile((o) => !o) : setOpen((o) => !o)
+  }, [isMobile, setOpen])
 
-  // Adds a keyboard shortcut to toggle the sidebar.
   React.useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (event.key === SIDEBAR_KEYBOARD_SHORTCUT && (event.metaKey || event.ctrlKey)) {
@@ -92,13 +98,49 @@ function SidebarProvider({
         toggleSidebar()
       }
     }
-
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [toggleSidebar])
 
-  // We add a state so that we can do data-state="expanded" or "collapsed".
-  // This makes it easier to style the sidebar with Tailwind classes.
+  // ---------- RESIZE LOGIC ----------
+  const startResizing = React.useCallback((event: React.MouseEvent) => {
+    event.preventDefault()
+    setIsResizing(true)
+  }, [])
+
+  const stopResizing = React.useCallback(() => {
+    setIsResizing(false)
+    document.cookie = `${SIDEBAR_WIDTH_COOKIE_NAME}=${width}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+  }, [width])
+
+  const resize = React.useCallback(
+    (event: MouseEvent) => {
+      if (!isResizing) return
+      let newWidth = event.clientX
+      if (newWidth < SIDEBAR_MIN_WIDTH) newWidth = SIDEBAR_MIN_WIDTH
+      if (newWidth > SIDEBAR_MAX_WIDTH) newWidth = SIDEBAR_MAX_WIDTH
+      setWidth(newWidth)
+    },
+    [isResizing]
+  )
+
+  React.useEffect(() => {
+    if (isResizing) {
+      window.addEventListener('mousemove', resize)
+      window.addEventListener('mouseup', stopResizing)
+    }
+    return () => {
+      window.removeEventListener('mousemove', resize)
+      window.removeEventListener('mouseup', stopResizing)
+    }
+  }, [isResizing, resize, stopResizing])
+
+  const resetWidth = React.useCallback(() => {
+    setWidth(SIDEBAR_WIDTH_DEFAULT)
+    document.cookie = `${SIDEBAR_WIDTH_COOKIE_NAME}=${SIDEBAR_WIDTH_DEFAULT}; path=/; max-age=${SIDEBAR_COOKIE_MAX_AGE}`
+  }, [])
+  // ----------------------------------
+
   const state = open ? 'expanded' : 'collapsed'
 
   const contextValue = React.useMemo<SidebarContextProps>(
@@ -110,8 +152,23 @@ function SidebarProvider({
       openMobile,
       setOpenMobile,
       toggleSidebar,
+      width,
+      isResizing,
+      startResizing,
+      resetWidth,
     }),
-    [state, open, setOpen, isMobile, openMobile, setOpenMobile, toggleSidebar]
+    [
+      state,
+      open,
+      setOpen,
+      isMobile,
+      openMobile,
+      toggleSidebar,
+      width,
+      isResizing,
+      startResizing,
+      resetWidth,
+    ]
   )
 
   return (
@@ -121,13 +178,14 @@ function SidebarProvider({
           data-slot="sidebar-wrapper"
           style={
             {
-              '--sidebar-width': SIDEBAR_WIDTH,
+              '--sidebar-width': `${width}px`,
               '--sidebar-width-icon': SIDEBAR_WIDTH_ICON,
               ...style,
             } as React.CSSProperties
           }
           className={cn(
             'group/sidebar-wrapper has-data-[variant=inset]:bg-sidebar flex min-h-svh w-full',
+            isResizing && 'cursor-col-resize select-none',
             className
           )}
           {...props}
@@ -264,23 +322,18 @@ function SidebarTrigger({ className, onClick, ...props }: React.ComponentProps<t
 }
 
 function SidebarRail({ className, ...props }: React.ComponentProps<'button'>) {
-  const { toggleSidebar } = useSidebar()
+  const { toggleSidebar, startResizing } = useSidebar()
 
   return (
     <button
       data-sidebar="rail"
       data-slot="sidebar-rail"
-      aria-label="Toggle Sidebar"
+      aria-label="Resize Sidebar"
       tabIndex={-1}
-      onClick={toggleSidebar}
-      title="Toggle Sidebar"
+      onMouseDown={startResizing}
+      onDoubleClick={toggleSidebar}
       className={cn(
-        'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] sm:flex',
-        'in-data-[side=left]:cursor-w-resize in-data-[side=right]:cursor-e-resize',
-        '[[data-side=left][data-state=collapsed]_&]:cursor-e-resize [[data-side=right][data-state=collapsed]_&]:cursor-w-resize',
-        'hover:group-data-[collapsible=offcanvas]:bg-sidebar group-data-[collapsible=offcanvas]:translate-x-0 group-data-[collapsible=offcanvas]:after:left-full',
-        '[[data-side=left][data-collapsible=offcanvas]_&]:-right-2',
-        '[[data-side=right][data-collapsible=offcanvas]_&]:-left-2',
+        'absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear group-data-[side=left]:-right-4 group-data-[side=right]:left-0 sm:flex',
         className
       )}
       {...props}
@@ -645,6 +698,48 @@ function SidebarMenuSubButton({
   )
 }
 
+function SidebarWidthReset({ className, ...props }: React.ComponentProps<typeof Button>) {
+  const { resetWidth } = useSidebar()
+  return (
+    <Button
+      data-sidebar="width-reset"
+      variant="noShadow"
+      size="icon"
+      className={cn('size-7', className)}
+      onClick={resetWidth}
+      {...props}
+    >
+      <RotateCcw />
+      <span className="sr-only">Reset Width</span>
+    </Button>
+  )
+}
+
+function SidebarTriggerOrResetWidth({
+  className,
+  onClick,
+  ...props
+}: React.ComponentProps<typeof Button>) {
+  const { width, state, isMobile } = useSidebar()
+
+  if (width === SIDEBAR_WIDTH_DEFAULT || state === 'collapsed' || isMobile) {
+    return <SidebarTrigger className={className} onClick={onClick} {...props} />
+  }
+
+  return <SidebarWidthReset className={className} {...props} />
+}
+
+function SidebarSeparator({ className, ...props }: React.ComponentProps<typeof Separator>) {
+  return (
+    <Separator
+      data-slot="sidebar-separator"
+      data-sidebar="separator"
+      className={cn('mx-2 w-auto', className)}
+      {...props}
+    />
+  )
+}
+
 export {
   Sidebar,
   SidebarContent,
@@ -667,6 +762,9 @@ export {
   SidebarMenuSubItem,
   SidebarProvider,
   SidebarRail,
+  SidebarSeparator,
   SidebarTrigger,
+  SidebarTriggerOrResetWidth,
+  SidebarWidthReset,
   useSidebar,
 }

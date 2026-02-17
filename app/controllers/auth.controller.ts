@@ -1,4 +1,5 @@
-import { mapReqErrors, reqErrorsToString } from '#lib/utils'
+import { getRequestFingerprint, returnError, throwNotFound } from '#lib/utils'
+import ActivityLogService from '#services/activity_log.service'
 import AuthService from '#services/auth.service'
 import env from '#start/env'
 import {
@@ -12,7 +13,6 @@ import {
 
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import logger from '@adonisjs/core/services/logger'
 import { route } from '@izzyjs/route/client'
 
 @inject()
@@ -20,14 +20,20 @@ export default class AuthController {
   protected bypassCaptcha = env.get('BYPASS_CF_TURNSTILE')
   protected siteKey = env.get('TURNSTILE_SITE')
   protected enableRegistration = env.get('ENABLE_REGISTRATION')
+  protected enableForgotPassword = env.get('ENABLE_FORGOT_PASSWORD')
   protected hideRegistration = env.get('HIDE_REGISTRATION')
+  protected hideForgotPassword = env.get('HIDE_FORGOT_PASSWORD')
   protected baseProp = {
     site_key: this.siteKey,
     bypass_captcha: this.bypassCaptcha,
     hide_registration: this.hideRegistration,
+    hide_forgot_password: this.hideForgotPassword,
   }
 
-  constructor(protected service: AuthService) {}
+  constructor(
+    protected service: AuthService,
+    protected activityLogSvc: ActivityLogService
+  ) {}
 
   async viewLogin({ inertia }: HttpContext) {
     return inertia.render('auth/login', { ...this.baseProp })
@@ -38,18 +44,25 @@ export default class AuthController {
     return inertia.render('auth/register', { ...this.baseProp })
   }
 
-  async viewRequestResetPassword({ inertia }: HttpContext) {
+  async viewRequestResetPassword({ inertia, response }: HttpContext) {
+    if (!this.enableForgotPassword) return response.redirect().toRoute('auth.login')
     return inertia.render('auth/requestResetPassword', { ...this.baseProp })
   }
 
-  async viewResetPassword({ inertia, params }: HttpContext) {
+  async viewResetPassword({ inertia, params, response }: HttpContext) {
+    if (!this.enableForgotPassword) return response.redirect().toRoute('auth.login')
     const token: string = params.token || ''
-    return inertia.render('auth/resetPassword', { token, ...this.baseProp })
+
+    // get the email associated with the token
+    const user = await this.service.getUserByPasswordResetToken(token)
+    if (!user) return throwNotFound()
+
+    return inertia.render('auth/resetPassword', { token, ...this.baseProp, email: user.email })
   }
 
   async viewVerifyEmail({ inertia, response, auth }: HttpContext) {
     // if already verified, redirect to dashboard
-    if (auth.user?.is_email_verified) return response.redirect().toRoute('dashboard')
+    if (auth.user?.is_email_verified) return response.redirect().toRoute('dashboard.view')
     return inertia.render('auth/verifyEmail', { ...this.baseProp })
   }
 
@@ -62,7 +75,7 @@ export default class AuthController {
       if (!this.bypassCaptcha) await this.service.verifyCFToken(payload.cf_token!)
       const { user } = await this.service.login(payload)
 
-      // set the current login user to web
+      // *important: set the current login user to web
       await auth.use('web').login(user)
 
       // if user is not verified, redirect to verify email page
@@ -78,19 +91,16 @@ export default class AuthController {
         status: 'success',
         message: 'Login successful',
         data: { user: user.toJSON() },
-        redirect_to: route('dashboard').path,
+        redirect_to: route('dashboard.view').path,
       })
     } catch (error) {
-      if (error.type !== 'ValidationError') logger.error(error, 'AUTH_LOGIN_USER')
-      return response.status(error.status || 500).json({
-        status: 'error',
-        message: reqErrorsToString(error) || error.message || 'Something went wrong',
-        form_errorss: mapReqErrors(error),
-      })
+      return returnError(response, error, 'AUTH_LOGIN_USER', { logErrors: true })
     }
   }
 
   async register({ request, response, session }: HttpContext) {
+    if (!this.enableRegistration) return response.redirect().toRoute('auth.login')
+
     try {
       const payload = await request.validateUsing(registerValidator, {
         messagesProvider: authValidatorMessage,
@@ -103,6 +113,13 @@ export default class AuthController {
         'User registered successfully, please login and verify your email to continue'
       )
 
+      await this.activityLogSvc.log(
+        user.id,
+        'register_user',
+        `Registered user:\n\`\`\`\n${user.email} [${user.id}]\n\`\`\``,
+        getRequestFingerprint(request)
+      )
+
       return response.status(201).json({
         status: 'success',
         message: 'User registered successfully, please login and verify your email to continue',
@@ -110,12 +127,7 @@ export default class AuthController {
         redirect_to: route('auth.login').path,
       })
     } catch (error) {
-      if (error.type !== 'ValidationError') logger.error(error, 'AUTH_REGISTER_USER')
-      return response.status(error.status || 500).json({
-        status: 'error',
-        message: reqErrorsToString(error) || error.message || 'Something went wrong',
-        form_errors: mapReqErrors(error),
-      })
+      return returnError(response, error, 'AUTH_REGISTER_USER', { logErrors: true })
     }
   }
 
@@ -140,7 +152,7 @@ export default class AuthController {
         return response.status(200).json({
           status: 'success',
           message: 'User is already verified',
-          redirect_to: route('dashboard').path,
+          redirect_to: route('dashboard.view').path,
         })
 
       await this.service.requestEmail(user)
@@ -150,12 +162,7 @@ export default class AuthController {
         message: 'Request for new email verification sent successfully',
       })
     } catch (error) {
-      if (error.type !== 'ValidationError') logger.error(error, 'AUTH_REQUEST_VERIFY_EMAIL')
-      return response.status(error.status || 500).json({
-        status: 'error',
-        message: reqErrorsToString(error) || error.message || 'Something went wrong',
-        form_errors: mapReqErrors(error),
-      })
+      return returnError(response, error, 'AUTH_REQUEST_VERIFY_EMAIL', { logErrors: true })
     }
   }
 
@@ -175,14 +182,9 @@ export default class AuthController {
 
       // redirect to dashboard immediately, because this is a one time request that is only a link
       session.flash('success', 'Email verified successfully')
-      return response.redirect().toRoute('dashboard')
+      return response.redirect().toRoute('dashboard.view')
     } catch (error) {
-      logger.error(error, 'AUTH_VERIFY_EMAIL')
-      return response.status(error.status || 500).json({
-        status: 'error',
-        message: reqErrorsToString(error) || error.message || 'Something went wrong',
-        form_errors: mapReqErrors(error),
-      })
+      return returnError(response, error, 'AUTH_VERIFY_EMAIL', { logErrors: true })
     }
   }
 
@@ -194,6 +196,8 @@ export default class AuthController {
    * @memberof AuthController
    */
   async requestResetPassword({ request, response }: HttpContext) {
+    if (!this.enableForgotPassword) return response.redirect().toRoute('auth.login')
+
     try {
       const payload = await request.validateUsing(askResetPasswordValidator, {
         messagesProvider: authValidatorMessage,
@@ -206,16 +210,13 @@ export default class AuthController {
         message: 'Password reset email sent successfully',
       })
     } catch (error) {
-      if (error.type !== 'ValidationError') logger.error(error, 'AUTH_REQUEST_RESET_PASSWORD')
-      return response.status(error.status || 500).json({
-        status: 'error',
-        message: reqErrorsToString(error) || error.message || 'Something went wrong',
-        form_errors: mapReqErrors(error),
-      })
+      return returnError(response, error, 'AUTH_REQUEST_RESET_PASSWORD', { logErrors: true })
     }
   }
 
   async resetPassword({ request, response }: HttpContext) {
+    if (!this.enableForgotPassword) return response.redirect().toRoute('auth.login')
+
     try {
       // eslint-disable-next-line @typescript-eslint/naming-convention
       const { email, password, token, cf_token } =
@@ -223,13 +224,14 @@ export default class AuthController {
       if (!this.bypassCaptcha) await this.service.verifyCFToken(cf_token!)
 
       await this.service.resetPassword(token, password, email)
-    } catch (error) {
-      if (error.type !== 'ValidationError') logger.error(error, 'AUTH_RESET_PASSWORD')
-      return response.status(error.status || 500).json({
-        status: 'error',
-        message: reqErrorsToString(error) || error.message || 'Something went wrong',
-        form_errors: mapReqErrors(error),
+
+      return response.status(200).json({
+        status: 'success',
+        message: 'Password reset successfully, please login with your new password',
+        redirect_to: route('auth.login').path,
       })
+    } catch (error) {
+      return returnError(response, error, 'AUTH_RESET_PASSWORD', { logErrors: true })
     }
   }
 
@@ -247,7 +249,11 @@ export default class AuthController {
         await auth.use('web').logout()
 
         session.flash('success', 'Logged out successfully')
-        return response.redirect().toRoute('auth.login')
+        return response.status(200).json({
+          status: 'success',
+          message: 'Logged out successfully',
+          redirect_to: route('auth.login').path,
+        })
       } else {
         const token = user.currentAccessToken
         await this.service.deleteToken(user, token!)
@@ -258,12 +264,7 @@ export default class AuthController {
         })
       }
     } catch (error) {
-      logger.error(error, 'AUTH_LOGOUT')
-      return response.status(error.status || 500).json({
-        status: 'error',
-        message: reqErrorsToString(error) || error.message || 'Something went wrong',
-        form_errors: mapReqErrors(error),
-      })
+      return returnError(response, error, 'AUTH_LOGOUT', { logErrors: true })
     }
   }
 
@@ -277,11 +278,7 @@ export default class AuthController {
         data: user,
       })
     } catch (error) {
-      return response.status(error.status || 500).json({
-        status: 'error',
-        message: reqErrorsToString(error) || error.message || 'Something went wrong',
-        form_errors: mapReqErrors(error),
-      })
+      return returnError(response, error, 'AUTH_GET_USER', { logErrors: true })
     }
   }
 }

@@ -1,7 +1,8 @@
-import User from '#models/user'
 import env from '#start/env'
 import { FlashAlertType } from '#types/app'
+import { AuthUser } from '#types/models'
 
+import cache from '@adonisjs/cache/services/main'
 import { defineConfig } from '@adonisjs/inertia'
 import type { InferSharedProps } from '@adonisjs/inertia/types'
 
@@ -16,7 +17,34 @@ const inertiaConfig = defineConfig({
    */
   sharedData: {
     user: (ctx) =>
-      ctx.inertia.always(() => (ctx.auth ? ctx.auth.user : null)) as unknown as null | User,
+      ctx.inertia.always(async () => {
+        const u = ctx.auth ? ctx.auth.user : null
+        if (!u) return null
+
+        // get the user permissions in cache that is valid for 1 hour
+        const rolePerm = await cache.getOrSet({
+          key: `user_roles_permissions_${u.id}`,
+          ttl: '1h', // 1 hour
+          factory: async () => {
+            const roles = await u.related('roles').query().preload('permissions')
+            const flatPermissions = roles.flatMap((r) => r.permissions.map((p) => p.name))
+            return {
+              permissions: Array.from(new Set(flatPermissions)),
+              roles: roles.map((r) => r.name),
+            }
+          },
+        })
+
+        return {
+          id: u.id,
+          username: u.username,
+          full_name: u.full_name,
+          email: u.email,
+          is_email_verified: u.is_email_verified,
+          roles: rolePerm.roles,
+          permissions: rolePerm.permissions,
+        }
+      }) as unknown as null | AuthUser,
     flashMessages: (ctx) => (ctx.session ? (ctx.session.flashMessages as FlashAlertType) : null),
     currentPath: (ctx) => ctx.request.url(false),
     previousPath: (ctx) => {

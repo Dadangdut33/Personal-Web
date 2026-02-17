@@ -6,6 +6,7 @@ import { AnimatePresence, motion } from 'framer-motion'
 import { Code2Icon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { ThemeSwitcher } from '~/components/core/theme-switcher'
+import { NAVIGATION_LINKS } from '~/lib/constants'
 import { cn } from '~/lib/utils'
 
 import Search from './search'
@@ -22,7 +23,7 @@ export default function Navbar() {
 
   return (
     <nav className="fixed left-0 top-0 z-20 w-full border-b-4 border-border bg-secondary-background px-5">
-      <div className="mx-auto flex h-[70px] w-[1300px] max-w-full items-center justify-between text-foreground">
+      <div className="mx-auto flex h-[70px] w-[1300px] max-w-full items-center justify-between text-foreground font-geistmono">
         <div className="flex items-center gap-10">
           <MotionLink
             href={route('home').path}
@@ -42,7 +43,7 @@ export default function Navbar() {
               if (isHome) e.preventDefault() // don’t remount if already home
             }}
             className={cn(
-              'flex items-center justify-center overflow-hidden rounded-base border-2 border-black bg-main text-main-foreground',
+              'px-1 flex items-center justify-center overflow-hidden rounded-base border-2 border-black bg-main text-main-foreground',
               !isHome ? 'shadow-nav dark:shadow-navDark' : ''
             )}
           >
@@ -63,8 +64,11 @@ export default function Navbar() {
           </MotionLink>
 
           <div className="hidden items-center gap-5 text-base font-base sm:flex xl:gap-7">
-            <Link href={route('blog')}>Blog</Link>
-            <Link href={route('projects')}>Projects</Link>
+            {NAVIGATION_LINKS.map(({ text, href }) => (
+              <Link key={href} href={href} className="link-underline" data-active={url === href}>
+                {text}
+              </Link>
+            ))}
           </div>
         </div>
 

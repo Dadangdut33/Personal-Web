@@ -15,6 +15,7 @@ export default class VerifyEmailNotification extends BaseMail {
   }
 
   from = env.get('SMTP_FROM')
+  supportEmail = env.get('SUPPORT_EMAIL')
   subject = `Please Verify Your Email - ${env.get('VITE_APP_NAME') ?? 'My Website'}`
 
   /**
@@ -41,7 +42,7 @@ export default class VerifyEmailNotification extends BaseMail {
               <p>If you didn't create an account with us, please ignore this email.</p>
             </div>
             <div class="footer">
-              <p>Need help? Contact our support team at <a href="mailto:contact@dadangdut33.my.id">contact@dadangdut33.my.id</a>.</p>
+              <p>Need help? Contact our support team at <a href="mailto:${this.supportEmail}">${this.supportEmail}</a>.</p>
             </div>
           </div>
         </body>

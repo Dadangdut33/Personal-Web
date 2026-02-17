@@ -49,7 +49,8 @@ router.use([
 export const middleware = router.named({
   permission: () => import('#middleware/permission_middleware'),
   guest: () => import('#middleware/guest_middleware'),
-  verifyEmail: () => import('#middleware/verify_email_middleware'),
+  is_logged_in: () => import('#middleware/is_logged_in_middleware'),
+  verify_email: () => import('#middleware/verify_email_middleware'),
   auth: () => import('#middleware/auth_middleware'),
   silent_auth: () => import('#middleware/silent_auth_middleware'),
 })

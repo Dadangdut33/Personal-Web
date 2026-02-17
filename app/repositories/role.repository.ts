@@ -8,21 +8,34 @@ export default class RoleRepository extends BaseRepository<typeof Role> {
     super(Role)
   }
 
+  async getList() {
+    return this.model.query().orderBy('name', 'asc')
+  }
+
+  async getListNoAdmin() {
+    const dontIncludeNames = ['Super Admin', 'Admin']
+    return this.model.query().whereNotIn('name', dontIncludeNames).orderBy('name', 'asc')
+  }
+
   async createRole(data: RolePayload) {
-    const role = await this.model.create(data)
+    const { permissionIds = [], ...rest } = data
+
+    const role = await this.model.create(rest)
 
     // sync the roles
-    if (data.permissionIds) await role.related('permissions').sync(data.permissionIds)
+    await role.related('permissions').sync(permissionIds)
 
     return role
   }
 
-  async updateRoleWithModel(role: Role, data: RolePayload) {
-    role.merge(data)
+  async updateRole(role: Role, data: RolePayload) {
+    const { permissionIds = [], ...rest } = data
+
+    role.merge(rest)
     await role.save()
 
     // sync the roles
-    if (data.permissionIds) await role.related('permissions').sync(data.permissionIds)
+    await role.related('permissions').sync(permissionIds)
 
     return role
   }

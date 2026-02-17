@@ -1,10 +1,16 @@
 import vine from '@vinejs/vine'
 
-import { vine.string().trim() } from './_shared.js'
+const base = {
+  bio: vine.string().trim().maxLength(500).optional(),
+  avatar: vine.file({ extnames: ['jpg', 'jpeg', 'png'], size: '3mb' }).optional(),
+  avatar_id: vine.string().uuid().optional(), // set in backend
+}
 
-// Create user by admin or edit user by admin
-export const updateProfileValidator = vine.compile(
+export const updateProfileValidator = vine.compile(vine.object(base))
+
+export const createProfileValidator = vine.compile(
   vine.object({
-    bio: vine.string().trim().maxLength(500).optional(),
+    ...base,
+    user_id: vine.string().trim().uuid(),
   })
 )

@@ -1,32 +1,12 @@
 'use client'
 
-import User from '#models/user'
+import { AuthUser } from '#types/models'
 
-import {
-  AudioWaveform,
-  BadgeCheck,
-  Bell,
-  BookOpen,
-  Bot,
-  ChevronRight,
-  ChevronsUpDown,
-  Command,
-  CreditCard,
-  Folder,
-  Forward,
-  Frame,
-  GalleryVerticalEnd,
-  LogOut,
-  Map,
-  MoreHorizontal,
-  PieChart,
-  Plus,
-  Settings2,
-  Sparkles,
-  SquareTerminal,
-  Trash2,
-} from 'lucide-react'
+import { SharedProps } from '@adonisjs/inertia/types'
+import { Link, usePage } from '@inertiajs/react'
+import { ChevronRight, ChevronsUpDown, GalleryVerticalEnd, LogOut, User2 } from 'lucide-react'
 import * as React from 'react'
+import { useModals } from '~/components/core/modal/modal-hooks'
 import { Avatar, AvatarFallback, AvatarImage } from '~/components/ui/avatar'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '~/components/ui/collapsible'
 import {
@@ -36,7 +16,6 @@ import {
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
-  DropdownMenuShortcut,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu'
 import {
@@ -47,7 +26,6 @@ import {
   SidebarGroupLabel,
   SidebarHeader,
   SidebarMenu,
-  SidebarMenuAction,
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
@@ -56,286 +34,208 @@ import {
   SidebarRail,
   useSidebar,
 } from '~/components/ui/sidebar'
+import { useAvatar } from '~/hooks/use_avatar'
+import { useLogout } from '~/hooks/use_logout'
+import { DASHBOARD_NAV } from '~/lib/constants'
+import { getInitials } from '~/lib/utils'
 
-// This is sample data.
-const data = {
-  user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
-  teams: [
-    {
-      name: 'Acme Inc',
-      logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
-    },
-    {
-      name: 'Acme Corp.',
-      logo: AudioWaveform,
-      plan: 'Startup',
-    },
-    {
-      name: 'Evil Corp.',
-      logo: Command,
-      plan: 'Free',
-    },
-  ],
-  navMain: [
-    {
-      title: 'Playground',
-      url: '#',
-      icon: SquareTerminal,
-      isActive: true,
-      items: [
-        {
-          title: 'History',
-          url: '#',
-        },
-        {
-          title: 'Starred',
-          url: '#',
-        },
-        {
-          title: 'Settings',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Models',
-      url: '#',
-      icon: Bot,
-      items: [
-        {
-          title: 'Genesis',
-          url: '#',
-        },
-        {
-          title: 'Explorer',
-          url: '#',
-        },
-        {
-          title: 'Quantum',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Documentation',
-      url: '#',
-      icon: BookOpen,
-      items: [
-        {
-          title: 'Introduction',
-          url: '#',
-        },
-        {
-          title: 'Get Started',
-          url: '#',
-        },
-        {
-          title: 'Tutorials',
-          url: '#',
-        },
-        {
-          title: 'Changelog',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Settings',
-      url: '#',
-      icon: Settings2,
-      items: [
-        {
-          title: 'General',
-          url: '#',
-        },
-        {
-          title: 'Team',
-          url: '#',
-        },
-        {
-          title: 'Billing',
-          url: '#',
-        },
-        {
-          title: 'Limits',
-          url: '#',
-        },
-      ],
-    },
-  ],
-  projects: [
-    {
-      name: 'Design Engineering',
-      url: '#',
-      icon: Frame,
-    },
-    {
-      name: 'Sales & Marketing',
-      url: '#',
-      icon: PieChart,
-    },
-    {
-      name: 'Travel',
-      url: '#',
-      icon: Map,
-    },
-  ],
+type MenuItem = {
+  title: string
+  url: string
+  icon?: React.ComponentType<{ className?: string }>
+  flat?: boolean
+  items?: {
+    title: string
+    url: string
+    requiredPermission?: string
+  }[]
+  requiredPermission?: string
 }
 
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar> & { user: User }) {
-  const { isMobile } = useSidebar()
-  const [activeTeam, setActiveTeam] = React.useState(data.teams[0])
+type SidebarMenuEntryProps = {
+  item: MenuItem
+  currentPath: string
+  userPermissions: string[]
+}
 
-  if (!activeTeam) {
+export function SidebarMenuEntry({ item, currentPath, userPermissions }: SidebarMenuEntryProps) {
+  // ─────────────────────────────────────────────
+  // Flat menu item
+  // ─────────────────────────────────────────────
+  if (item.flat) {
+    if (item.requiredPermission && !userPermissions.includes(item.requiredPermission)) {
+      return null
+    }
+
+    return (
+      <SidebarMenuItem>
+        <SidebarMenuButton
+          asChild
+          tooltip={item.title}
+          isActive={currentPath === item.url}
+          className="data-[state=open]:bg-main data-[state=open]:outline-border data-[state=open]:text-main-foreground"
+        >
+          <Link href={item.url}>
+            {item.icon && <item.icon />}
+            <span>{item.title}</span>
+          </Link>
+        </SidebarMenuButton>
+      </SidebarMenuItem>
+    )
+  }
+
+  // ─────────────────────────────────────────────
+  // Collapsible menu item
+  // ─────────────────────────────────────────────
+  const isGroupActive = currentPath.startsWith(item.url)
+
+  if (item.requiredPermission && !userPermissions.includes(item.requiredPermission)) {
     return null
   }
+
+  return (
+    <Collapsible asChild defaultOpen={isGroupActive} className="group/collapsible">
+      <SidebarMenuItem>
+        <CollapsibleTrigger asChild>
+          <SidebarMenuButton
+            tooltip={item.title}
+            isActive={isGroupActive}
+            className="data-[state=open]:bg-main data-[state=open]:outline-border data-[state=open]:text-main-foreground"
+          >
+            {item.icon && <item.icon />}
+            <span className="text-sm">{item.title}</span>
+            <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+          </SidebarMenuButton>
+        </CollapsibleTrigger>
+
+        <CollapsibleContent>
+          <SidebarMenuSub>
+            {item.items?.map((subItem) => {
+              if (
+                subItem.requiredPermission &&
+                !userPermissions.includes(subItem.requiredPermission)
+              ) {
+                return null
+              }
+
+              return (
+                <SidebarMenuSubItem key={subItem.title}>
+                  <SidebarMenuSubButton asChild isActive={currentPath === subItem.url}>
+                    <Link href={subItem.url}>
+                      <span>{subItem.title}</span>
+                    </Link>
+                  </SidebarMenuSubButton>
+                </SidebarMenuSubItem>
+              )
+            })}
+          </SidebarMenuSub>
+        </CollapsibleContent>
+      </SidebarMenuItem>
+    </Collapsible>
+  )
+}
+
+export function AppSidebar({
+  ...props
+}: React.ComponentProps<typeof Sidebar> & { user: AuthUser }) {
+  const { isMobile, state } = useSidebar()
+  const { props: sharedProps } = usePage<SharedProps>()
+  const { ConfirmLogoutModal } = useModals()
+  const { mutate: logout, isPending } = useLogout()
+  const avatar = useAvatar()
+  const initials = getInitials(sharedProps.user?.full_name || '')
+  const avatarComp = (
+    <Avatar className="h-8 w-8">
+      <AvatarImage src={avatar} alt={initials} />
+      <AvatarFallback>{initials}</AvatarFallback>
+    </Avatar>
+  )
+  const userComp = (
+    <div className="grid flex-1 text-left text-sm leading-tight">
+      <span className="truncate font-heading">{sharedProps.user?.full_name}</span>
+      <span className="truncate text-xs">{sharedProps.user?.email}</span>
+    </div>
+  )
+
+  const confirm = ConfirmLogoutModal({
+    onConfirm: () => {
+      logout()
+    },
+  })
+
+  // check from the management menu. one of the requiredPermission is in the user permissions
+  const flatManagementRequiredPermissions = DASHBOARD_NAV.management.flatMap(
+    (item) => item.requiredPermission
+  )
+  const haveAnyManagementAccess = sharedProps.user?.permissions.some((permission) => {
+    return flatManagementRequiredPermissions.includes(permission)
+  })
 
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <DropdownMenu>
-              <DropdownMenuTrigger className="focus-visible:ring-0" asChild>
-                <SidebarMenuButton
-                  size="lg"
-                  className="data-[state=open]:bg-main data-[state=open]:text-main-foreground data-[state=open]:outline-border data-[state=open]:outline-2"
-                >
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-base">
-                    <activeTeam.logo className="size-4" />
-                  </div>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-heading">{activeTeam.name}</span>
-                    <span className="truncate text-xs">{activeTeam.plan}</span>
-                  </div>
-                  <ChevronsUpDown className="ml-auto" />
-                </SidebarMenuButton>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent
-                className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-base"
-                align="start"
-                side={isMobile ? 'bottom' : 'right'}
-                sideOffset={4}
+            <Link href={'/'}>
+              <SidebarMenuButton
+                size="lg"
+                className="data-[state=open]:bg-main data-[state=open]:text-main-foreground data-[state=open]:outline-border data-[state=open]:outline-2 cursor-pointer"
               >
-                <DropdownMenuLabel className="text-sm font-heading">Teams</DropdownMenuLabel>
-                {data.teams.map((team, index) => (
-                  <DropdownMenuItem
-                    key={team.name}
-                    onClick={() => setActiveTeam(team)}
-                    className="gap-2 p-1.5"
-                  >
-                    <div className="flex size-6 items-center justify-center">
-                      <team.logo className="size-4 shrink-0" />
-                    </div>
-                    {team.name}
-                    <DropdownMenuShortcut>⌘{index + 1}</DropdownMenuShortcut>
-                  </DropdownMenuItem>
-                ))}
-                <DropdownMenuSeparator />
-                <DropdownMenuItem className="gap-2 p-1.5">
-                  <div className="flex size-6 items-center justify-center">
-                    <Plus className="size-4" />
-                  </div>
-                  <div className="font-base">Add team</div>
-                </DropdownMenuItem>
-              </DropdownMenuContent>
-            </DropdownMenu>
+                <div className="flex aspect-square size-8 items-center justify-center rounded-base">
+                  <GalleryVerticalEnd className="size-4" />
+                </div>
+                <div className="grid flex-1 text-left text-sm leading-tight">
+                  <span className="truncate font-heading">{'Dadangdut33'}</span>
+                  <span className="truncate text-xs">{'Personal Website'}</span>
+                </div>
+              </SidebarMenuButton>
+            </Link>
           </SidebarMenuItem>
         </SidebarMenu>
       </SidebarHeader>
+
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Platform</SidebarGroupLabel>
           <SidebarMenu>
-            {data.navMain.map((item) => (
-              <Collapsible
+            {DASHBOARD_NAV.flat.map((item) => (
+              <SidebarMenuEntry
                 key={item.title}
-                asChild
-                defaultOpen={item.isActive}
-                className="group/collapsible"
-              >
-                <SidebarMenuItem>
-                  <CollapsibleTrigger asChild>
-                    <SidebarMenuButton
-                      className="data-[state=open]:bg-main data-[state=open]:outline-border data-[state=open]:text-main-foreground"
-                      tooltip={item.title}
-                    >
-                      {item.icon && <item.icon />}
-                      <span>{item.title}</span>
-                      <ChevronRight className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
-                    </SidebarMenuButton>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent>
-                    <SidebarMenuSub>
-                      {item.items?.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
-                            <a href={subItem.url}>
-                              <span>{subItem.title}</span>
-                            </a>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
-                    </SidebarMenuSub>
-                  </CollapsibleContent>
-                </SidebarMenuItem>
-              </Collapsible>
+                item={item}
+                currentPath={sharedProps.currentPath}
+                userPermissions={sharedProps.user?.permissions || []}
+              />
             ))}
           </SidebarMenu>
         </SidebarGroup>
-        <SidebarGroup className="group-data-[collapsible=icon]:hidden">
-          <SidebarGroupLabel>Projects</SidebarGroupLabel>
+        <SidebarGroup>
+          <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarMenu>
-            {data.projects.map((item) => (
-              <SidebarMenuItem key={item.name}>
-                <SidebarMenuButton asChild>
-                  <a href={item.url}>
-                    <item.icon />
-                    <span>{item.name}</span>
-                  </a>
-                </SidebarMenuButton>
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <SidebarMenuAction>
-                      <MoreHorizontal className="group-hover/menu-item:text-main-foreground" />
-                      <span className="sr-only">More</span>
-                    </SidebarMenuAction>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent
-                    className="w-48"
-                    side={isMobile ? 'bottom' : 'right'}
-                    align={isMobile ? 'end' : 'start'}
-                  >
-                    <DropdownMenuItem>
-                      <Folder />
-                      <span>View Project</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Forward />
-                      <span>Share Project</span>
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem>
-                      <Trash2 />
-                      <span>Delete Project</span>
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </SidebarMenuItem>
+            {DASHBOARD_NAV.menu.map((item) => (
+              <SidebarMenuEntry
+                key={item.title}
+                item={item}
+                currentPath={sharedProps.currentPath}
+                userPermissions={sharedProps.user?.permissions || []}
+              />
             ))}
-            <SidebarMenuItem>
-              <SidebarMenuButton>
-                <MoreHorizontal />
-                <span>More</span>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
           </SidebarMenu>
         </SidebarGroup>
+
+        {haveAnyManagementAccess && (
+          <SidebarGroup>
+            <SidebarGroupLabel>Management</SidebarGroupLabel>
+            <SidebarMenu>
+              {DASHBOARD_NAV.management.map((item) => (
+                <SidebarMenuEntry
+                  key={item.title}
+                  item={item}
+                  currentPath={sharedProps.currentPath}
+                  userPermissions={sharedProps.user?.permissions || []}
+                />
+              ))}
+            </SidebarMenu>
+          </SidebarGroup>
+        )}
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
@@ -346,15 +246,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar> & 
                   className="group-data-[state=collapsed]:hover:outline-0 group-data-[state=collapsed]:hover:bg-transparent overflow-visible"
                   size="lg"
                 >
-                  <Avatar className="h-8 w-8">
-                    <AvatarImage src="https://github.com/shadcn.png?size=40" alt="CN" />
-                    <AvatarFallback>CN</AvatarFallback>
-                  </Avatar>
-                  <div className="grid flex-1 text-left text-sm leading-tight">
-                    <span className="truncate font-heading">{data.user.name}</span>
-                    <span className="truncate text-xs">{data.user.email}</span>
-                  </div>
-                  <ChevronsUpDown className="ml-auto size-4" />
+                  {avatarComp}
+                  {userComp}
+                  {state === 'expanded' && <ChevronsUpDown className="ml-auto size-4" />}
                 </SidebarMenuButton>
               </DropdownMenuTrigger>
               <DropdownMenuContent
@@ -365,40 +259,27 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar> & 
               >
                 <DropdownMenuLabel className="p-0 font-base">
                   <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-                    <Avatar className="h-8 w-8">
-                      <AvatarImage src="https://github.com/shadcn.png?size=40" alt="CN" />
-                      <AvatarFallback>CN</AvatarFallback>
-                    </Avatar>
-                    <div className="grid flex-1 text-left text-sm leading-tight">
-                      <span className="truncate font-heading">{data.user.name}</span>
-                      <span className="truncate text-xs">{data.user.email}</span>
-                    </div>
+                    {avatarComp}
+                    {userComp}
                   </div>
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuGroup>
                   <DropdownMenuItem>
-                    <Sparkles />
-                    Upgrade to Pro
+                    <User2 />
+                    Profile
                   </DropdownMenuItem>
-                </DropdownMenuGroup>
-                <DropdownMenuSeparator />
-                <DropdownMenuGroup>
-                  <DropdownMenuItem>
-                    <BadgeCheck />
-                    Account
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
-                    <CreditCard />
-                    Billing
-                  </DropdownMenuItem>
-                  <DropdownMenuItem>
+                  {/* <DropdownMenuItem>
                     <Bell />
                     Notifications
-                  </DropdownMenuItem>
+                  </DropdownMenuItem> */}
                 </DropdownMenuGroup>
                 <DropdownMenuSeparator />
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  className="cursor-pointer"
+                  onClick={() => confirm()}
+                  disabled={isPending}
+                >
                   <LogOut />
                   Log out
                 </DropdownMenuItem>

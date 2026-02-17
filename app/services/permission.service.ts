@@ -10,7 +10,20 @@ export default class PermissionService {
   constructor(protected repo: PermissionRepository) {}
 
   async index(queryParams: QueryBuilderParams<typeof Permission>) {
-    return await this.repo.query(queryParams)
+    const q = this.repo.query(queryParams)
+    return await this.repo.paginate(q, queryParams)
+  }
+
+  async findByIds(ids: any[]) {
+    return this.repo.model.query().whereIn('id', ids)
+  }
+
+  async listIdNames() {
+    return this.repo.getListIdNames()
+  }
+
+  async listGroupedByBaseName() {
+    return this.repo.getListGroupedByBaseName()
   }
 
   async create(data: PermissionPayload) {
@@ -18,7 +31,7 @@ export default class PermissionService {
   }
 
   async update(permission: Permission, data: PermissionPayload) {
-    return this.repo.updateGeneric(permission, data)
+    return this.repo.updatePermission(permission, data)
   }
 
   async findOrFail(value: any) {
@@ -27,5 +40,9 @@ export default class PermissionService {
 
   async deletePermission(id: any) {
     return this.repo.deleteGeneric(id)
+  }
+
+  async deletePermissions(ids: any[]) {
+    return this.repo.deleteBulk(ids)
   }
 }

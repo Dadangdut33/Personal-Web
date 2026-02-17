@@ -1,5 +1,7 @@
 import { SharedProps } from '@adonisjs/inertia/types'
-import { usePage } from '@inertiajs/react'
+import { Link, usePage } from '@inertiajs/react'
+import React from 'react'
+import { ThemeSwitcher } from '~/components/core/theme-switcher'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,44 +10,69 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '~/components/ui/breadcrumb'
-import { SidebarInset, SidebarProvider, SidebarTrigger } from '~/components/ui/sidebar'
+import { Separator } from '~/components/ui/separator'
+import { SidebarInset, SidebarProvider, SidebarTriggerOrResetWidth } from '~/components/ui/sidebar'
+import { cn } from '~/lib/utils'
 
 import { AppSidebar } from './sidebar'
 
-export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const { props } = usePage<SharedProps>()
+export type breadcrumbItem = {
+  title: string
+  href?: string
+}
 
-  console.log(props.user)
+export default function DashboardLayout({
+  children,
+  breadcrumbs,
+  className,
+  withSeparator = true,
+}: {
+  children: React.ReactNode
+  breadcrumbs: breadcrumbItem[]
+  className?: string | undefined
+  withSeparator?: boolean
+}) {
+  const { props } = usePage<SharedProps>()
 
   return (
     <SidebarProvider>
       <AppSidebar user={props.user!} />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-          <div className="flex items-center gap-2 px-4">
-            <SidebarTrigger className="-ml-1" />
-            <Breadcrumb>
-              <BreadcrumbList>
-                <BreadcrumbItem className="hidden md:block">
-                  <BreadcrumbLink href="#">Building Your Application</BreadcrumbLink>
-                </BreadcrumbItem>
-                <BreadcrumbSeparator className="hidden md:block" />
-                <BreadcrumbItem>
-                  <BreadcrumbPage>Data Fetching</BreadcrumbPage>
-                </BreadcrumbItem>
-              </BreadcrumbList>
-            </Breadcrumb>
+          <div className="w-full">
+            <div className="flex items-center gap-2 px-4 ">
+              {/* left side */}
+              <SidebarTriggerOrResetWidth className="-ml-1" />
+              <Breadcrumb>
+                <BreadcrumbList>
+                  {breadcrumbs.map((item, index) => (
+                    <React.Fragment key={index}>
+                      <BreadcrumbItem>
+                        {item.href ? (
+                          <BreadcrumbLink asChild>
+                            <Link href={item.href}>{item.title}</Link>
+                          </BreadcrumbLink>
+                        ) : (
+                          <BreadcrumbPage>{item.title}</BreadcrumbPage>
+                        )}
+                      </BreadcrumbItem>
+                      {index < breadcrumbs.length - 1 && (
+                        <BreadcrumbSeparator className="block" key={`sep-${index}`} />
+                      )}
+                    </React.Fragment>
+                  ))}
+                </BreadcrumbList>
+              </Breadcrumb>
+
+              {/* right side */}
+              <div className="ms-auto">
+                <ThemeSwitcher variant="active" className="bg-secondary-background" />
+              </div>
+            </div>
+            {withSeparator && <Separator className="mt-1 mb-2" />}
           </div>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          <div className="grid auto-rows-min gap-4 md:grid-cols-3">
-            <div className="aspect-video rounded-base bg-background/50 border-2 border-border" />
-            <div className="aspect-video rounded-base bg-background/50 border-2 border-border" />
-            <div className="aspect-video rounded-base bg-background/50 border-2 border-border" />
-          </div>
-          <div className="min-h-[100vh] flex-1 rounded-base bg-background/50 border-2 border-border md:min-h-min" />
-          {children}
-        </div>
+        <div className={cn('flex flex-1 flex-col px-4 pt-0 pb-4', className)}>{children}</div>
       </SidebarInset>
     </SidebarProvider>
   )

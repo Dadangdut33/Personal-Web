@@ -1,7 +1,114 @@
+import { route } from '@izzyjs/route/client'
+import {
+  Bot,
+  Boxes,
+  History,
+  Images,
+  LayoutDashboard,
+  ShieldUser,
+  SquareTerminal,
+  UserPen,
+  UsersRound,
+} from 'lucide-react'
+
 export const NAVIGATION_LINKS = [
-  { text: 'Projects', href: '#projects' },
-  { text: 'Blog', href: '#blog' },
+  { text: 'Projects', href: route('projects').path },
+  { text: 'Blog', href: route('blog').path },
 ]
+
+export const DASHBOARD_NAV = {
+  flat: [
+    {
+      title: 'Dashboard',
+      url: route('dashboard.view').path,
+      icon: LayoutDashboard,
+      flat: true,
+      requiredPermission: 'dashboard.view',
+    },
+  ],
+  menu: [
+    {
+      title: 'need dashboard.view',
+      url: '#',
+      icon: SquareTerminal,
+      items: [
+        {
+          title: 'Submenu 1 (need profile.view)',
+          url: '#',
+          requiredPermission: 'profile.view',
+        },
+        {
+          title: 'Submenu 2 (no perm needed)',
+          url: '#',
+        },
+        {
+          title: 'Submenu 3 (no perm needed)',
+          url: '#',
+        },
+      ],
+      requiredPermission: 'dashboard.view',
+    },
+    {
+      title: 'no perm needed',
+      url: '#',
+      icon: Bot,
+      items: [
+        {
+          title: 'Submenu 1',
+          url: '#',
+        },
+        {
+          title: 'Submenu 2',
+          url: '#',
+        },
+      ],
+    },
+    {
+      title: 'Profile',
+      url: route('profile.view').path,
+      icon: UserPen,
+      flat: true,
+      requiredPermission: 'profile.view',
+    },
+  ],
+  management: [
+    {
+      title: 'Media',
+      url: route('media.index').path,
+      icon: Images,
+      flat: true,
+      requiredPermission: 'media.view',
+    },
+    {
+      title: 'Users',
+      url: route('user.index').path,
+      icon: UsersRound,
+      flat: true,
+      requiredPermission: 'user.view',
+    },
+    {
+      title: 'Roles',
+      url: route('role.index').path,
+      icon: Boxes,
+      flat: true,
+      requiredPermission: 'role.view',
+    },
+    {
+      title: 'Permissions',
+      url: route('permission.index').path,
+      icon: ShieldUser,
+      flat: true,
+      requiredPermission: 'permission.view',
+    },
+    {
+      title: 'Activity Log',
+      url: route('activity_log.index').path,
+      icon: History,
+      flat: true,
+      requiredPermission: 'activity_log.view',
+    },
+  ],
+}
 
 export const TIMEOUT_SHORT = 1000 * 60 * 3 // 3 minute
 export const TIMEOUT_NORMAL = 1000 * 60 * 5 // 5 minutes

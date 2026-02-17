@@ -12,6 +12,14 @@ export default class PermissionPolicy extends CustomBasePolicy {
     return await this.perm.check(user, `${this.base}.view`)
   }
 
+  async viewCreate(user: User) {
+    return await this.perm.check(user, `${this.base}.create`)
+  }
+
+  async viewEdit(user: User) {
+    return await this.perm.check(user, `${this.base}.update`)
+  }
+
   async create(user: User, request: HttpContext['request']) {
     return await this.perm.checkInMethod(user, `${this.base}.create`, request, 'POST')
   }
@@ -23,6 +31,13 @@ export default class PermissionPolicy extends CustomBasePolicy {
 
   async delete(user: User, permission: Permission) {
     if (permission.is_protected) return false // protected permission
+
+    return await this.perm.check(user, `${this.base}.delete`)
+  }
+
+  async deleteBulk(user: User, permissions: Permission[]) {
+    const protectedPermissions = permissions.filter((permission) => permission.is_protected)
+    if (protectedPermissions.length > 0) return false // protected permission
 
     return await this.perm.check(user, `${this.base}.delete`)
   }

@@ -1,10 +1,10 @@
 import PreDefinedRolesId from '#enums/roles'
 import PasswordResetNotification from '#mails/password_reset_notification'
 import VerifyEmailNotification from '#mails/verify_email_notification'
-import Profile from '#models/profile'
 import User from '#models/user'
 import AuthRepository from '#repositories/auth.repository'
 import TokenRepository from '#repositories/token.repository'
+import UserRepository from '#repositories/user.repository'
 import env from '#start/env'
 import { TurnstileResponse } from '#types/api'
 import { LoginPayload, RegisterPayload } from '#types/inferred'
@@ -12,14 +12,17 @@ import { LoginPayload, RegisterPayload } from '#types/inferred'
 import { AccessToken } from '@adonisjs/auth/access_tokens'
 import { inject } from '@adonisjs/core'
 import { Exception } from '@adonisjs/core/exceptions'
+import logger from '@adonisjs/core/services/logger'
 import db from '@adonisjs/lucid/services/db'
 import mail from '@adonisjs/mail/services/main'
+import { randomUUID } from 'node:crypto'
 
 @inject()
 export default class AuthService {
   constructor(
     protected authRepo: AuthRepository,
-    protected tokenRepo: TokenRepository
+    protected tokenRepo: TokenRepository,
+    protected userRepo: UserRepository
   ) {}
 
   /**
@@ -46,18 +49,19 @@ export default class AuthService {
     const trx = await db.transaction()
     let user
     try {
+      // We are forced to generate UUID here before creating user so that we can use it in related profile creation
+      // Its because using db transaction, the id won't be available after user.save() until trx is committed
+      const id = randomUUID()
       user = new User()
       user.useTransaction(trx)
-      user.fill(payload)
-      user = await user.save()
+      user.fill({ ...payload, id })
+      await user.save()
 
+      // attach user role and create empty profile
       await user.related('roles').attach([PreDefinedRolesId.USER])
-
-      const profile = new Profile()
-      profile.fill({
-        user_id: user.id,
+      await user.related('profile').create({
+        user_id: id,
       })
-      console.log('created profile for user')
 
       await trx.commit()
     } catch (error) {
@@ -68,6 +72,7 @@ export default class AuthService {
     // login the user after creating
     const accessToken = await User.accessTokens.create(user)
     const emailVerifyToken = await this.tokenRepo.generateTokenForUser(user, 'VERIFY_EMAIL') // make verify email token
+    logger.info(`Verify email token for user ${user.id}: ${emailVerifyToken}`, 'EMAIL_VERIFY_TOKEN')
     await mail.send(new VerifyEmailNotification(user, emailVerifyToken)) // email verify notification
 
     return { accessToken, user }
@@ -119,7 +124,8 @@ export default class AuthService {
       })
 
     const token = await this.tokenRepo.generateTokenForUser(user, 'VERIFY_EMAIL')
-    await mail.sendLater(new VerifyEmailNotification(user, token))
+    logger.info(`Verify email token for user ${user.id}: ${token}`, 'EMAIL_VERIFY_TOKEN')
+    await mail.send(new VerifyEmailNotification(user, token))
   }
 
   /**
@@ -159,7 +165,7 @@ export default class AuthService {
       })
 
     const token = await this.tokenRepo.generateTokenForUser(user, 'PASSWORD_RESET')
-    await mail.sendLater(new PasswordResetNotification(user, token))
+    await mail.send(new PasswordResetNotification(user, token))
   }
 
   /**
@@ -180,7 +186,8 @@ export default class AuthService {
         status: 401,
       })
 
-    user.fill({ password })
+    user.password = password
+
     await user.save()
     await this.tokenRepo.expireUserTokens(user, 'PASSWORD_RESET') // expire all password reset tokens
   }
@@ -204,5 +211,15 @@ export default class AuthService {
     const res = await this.fetchVerifyCFToken(token)
 
     if (!res) throw new Exception('Invalid captcha.', { status: 401 })
+  }
+
+  async getUserByPasswordResetToken(token: string) {
+    const t = await this.tokenRepo.getToken(token, 'PASSWORD_RESET')
+
+    if (!t) return null
+
+    const user = await this.userRepo.getUserById(t.user_id!)
+
+    return user
   }
 }

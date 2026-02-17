@@ -3,7 +3,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 
 /**
- * Guest middleware is used to deny access to routes that should
+ * Guest middleware is used to deny access to routes that should only
  * be accessed by unauthenticated users.
  *
  * For example, the login page should not be accessible if the user

@@ -19,8 +19,8 @@ interface MetaGenericProps {
 
 const AppMeta: React.FC<MetaGenericProps> = ({
   title = 'Dadangdut33',
-  description = 'My personal website',
-  keywords = 'blog, personal, portfolio, website',
+  description = 'A personal website. I write sometimes.',
+  keywords = 'website',
   canonicalUrl,
   ogTitle,
   ogDescription,

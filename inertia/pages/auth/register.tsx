@@ -14,7 +14,7 @@ import {
   PasswordStrengthDropdown,
   getPasswordStrength,
 } from '~/components/auth/password'
-import { useModals } from '~/components/core/modal-hooks'
+import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyError } from '~/components/core/notify'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
@@ -22,11 +22,20 @@ import { Input } from '~/components/ui/input'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import AuthLayout from '~/layouts/auth'
 import { PASS_REGEX } from '~/lib/constants'
-import { checkForm, cn } from '~/lib/utils'
+import { checkFormWithCaptcha, cn, transformFullName, transformUsername } from '~/lib/utils'
 
+const maxWidth = 'max-w-md'
 export default function Page(props: SharedProps & InferPageProps<AuthController, 'viewRegister'>) {
-  const [_, setEmailTimeoutNewFlag] = useLocalStorage({
-    key: 'timeout_verify_email_new', // key for new email verification timeout
+  const [_, setTimeoutVerifEmailStart] = useLocalStorage<null | number>({
+    key: 'timeout_verify_email_start',
+    defaultValue: null,
+  })
+  const [__, setIsTimedOutVerifEmail] = useLocalStorage<boolean>({
+    key: 'timeout_verify_email',
+    defaultValue: false,
+  })
+  const [___, setIsNewlyRegistered] = useLocalStorage<boolean>({
+    key: 'newly_registered',
     defaultValue: true,
   })
   const { ConfirmModal } = useModals()
@@ -60,12 +69,14 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
       }
     },
     onSuccess() {
-      setEmailTimeoutNewFlag(true)
+      setTimeoutVerifEmailStart(Date.now())
+      setIsTimedOutVerifEmail(true)
+      setIsNewlyRegistered(true)
     },
   })
 
   const doMutate = () => {
-    if (!checkForm(form, { bypass_captcha: props.bypass_captcha })) return
+    if (!checkFormWithCaptcha(form, { bypass_captcha: props.bypass_captcha })) return
     mutation.mutate(form.values)
   }
 
@@ -89,7 +100,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
   const strengthPassConfirm = getPasswordStrength(confirmation, confirmationMatch, true)
 
   return (
-    <AuthLayout>
+    <AuthLayout alertClassName={cn(maxWidth, 'mx-auto px-1')}>
       <Head>
         <title>Register</title>
       </Head>
@@ -105,7 +116,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
         </Button>
       </Box>
 
-      <div className={cn('flex flex-col gap-4 max-w-md mx-auto')}>
+      <div className={cn('flex flex-col gap-4', maxWidth, 'mx-auto')}>
         <Card>
           <CardHeader className="text-center">
             <CardTitle className="text-xl">Register</CardTitle>
@@ -121,7 +132,9 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
                 required
                 value={form.values.full_name}
                 error={form.errors.full_name}
-                onChange={(e) => form.setFieldValue('full_name', e.target.value)}
+                disabled={mutation.isPending}
+                onChange={(e) => form.setFieldValue('full_name', transformFullName(e.target.value))}
+                onBlur={() => form.setFieldValue('full_name', form.values.full_name.trim())}
               />
 
               <Input
@@ -132,7 +145,9 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
                 required
                 value={form.values.username}
                 error={form.errors.username}
-                onChange={(e) => form.setFieldValue('username', e.target.value)}
+                disabled={mutation.isPending}
+                onChange={(e) => form.setFieldValue('username', transformUsername(e.target.value))}
+                onBlur={() => form.setFieldValue('username', form.values.username.trim())}
               />
 
               <Input
@@ -143,6 +158,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
                 required
                 value={form.values.email}
                 error={form.errors.email}
+                disabled={mutation.isPending}
                 onChange={(e) => form.setFieldValue('email', e.target.value)}
               />
 
@@ -156,6 +172,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
                     required
                     value={form.values.password}
                     error={form.errors.password}
+                    disabled={mutation.isPending}
                     onChange={(e) => form.setFieldValue('password', e.target.value)}
                   />
                 }
@@ -180,6 +197,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
                     required
                     value={form.values.password_confirmation}
                     error={form.errors.password_confirmation}
+                    disabled={mutation.isPending}
                     onChange={(e) => form.setFieldValue('password_confirmation', e.target.value)}
                   />
                 }

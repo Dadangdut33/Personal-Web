@@ -4,6 +4,7 @@ import { BaseModel, beforeDelete, column, manyToMany } from '@adonisjs/lucid/orm
 import type { ManyToMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 
+import SnakeCaseNamingStrategy from './_naming_strategy.js'
 import Permission from './permission.js'
 import User from './user.js'
 
@@ -11,16 +12,15 @@ import User from './user.js'
 // It is created as flexible while also making it easy to manage roles
 // If we want to modify the value
 export default class Role extends BaseModel {
-  // The Role id is set as number in the #enums/roles.ts
+  static namingStrategy = new SnakeCaseNamingStrategy()
   @column({ isPrimary: true })
   declare id: number
 
-  // The role name is also set in the #enums/roles.ts
   @column()
   declare name: string
 
-  // * A special role that should always be there. it is protected from deletion
-  // ! must only be inserted from seeder.
+  // * A special role that should always be there. it is protected from deletion and modification
+  // ! flagged from db directly.
   @column()
   declare is_protected: boolean
 

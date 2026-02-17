@@ -1,11 +1,16 @@
 import Tables from '#enums/tables'
 
-import { BaseModel, beforeCreate, column } from '@adonisjs/lucid/orm'
+import router from '@adonisjs/core/services/router'
+import { BaseModel, beforeCreate, column, computed } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 import { randomUUID } from 'node:crypto'
 
+import SnakeCaseNamingStrategy from './_naming_strategy.js'
+
 export default class Media extends BaseModel {
+  static namingStrategy = new SnakeCaseNamingStrategy()
   static table = Tables.MEDIAS
+  static selfAssignPrimaryKey = true
 
   @column({ isPrimary: true })
   declare id: string
@@ -28,6 +33,13 @@ export default class Media extends BaseModel {
   @column()
   declare hash: string
 
+  @column({
+    // prepare so that the string[] that we input get automatically stored as Json.stringify
+    prepare: (value: string[] | null) => JSON.stringify(value),
+    // dont need prepare because its alread read as string[]
+  })
+  declare tags: string[] | null
+
   @column.dateTime({ autoCreate: true })
   declare created_at: DateTime
 
@@ -37,5 +49,13 @@ export default class Media extends BaseModel {
   @beforeCreate()
   static assignUuid(self: Media) {
     self.id = randomUUID()
+  }
+
+  @computed()
+  public get url() {
+    return router
+      .builder()
+      .params({ id: this.id })
+      .makeSigned('api.v1.media.redirect', { expiresIn: '1h' })
   }
 }

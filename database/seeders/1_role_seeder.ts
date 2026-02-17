@@ -1,29 +1,52 @@
-import Roles from '#enums/roles'
 import Role from '#models/role'
 
 import { BaseSeeder } from '@adonisjs/lucid/seeders'
 
 export default class extends BaseSeeder {
   async run() {
-    const data = [
+    // Make sure this run first
+    // the id is important
+    // but we dont define the id here because it will mess with the auto increment
+    const payload = [
       {
-        id: Roles.USER,
+        // id: Roles.USER,
         name: 'User',
         is_protected: true,
       },
       {
-        id: Roles.ADMIN,
+        // id: Roles.ADMIN,
         name: 'Admin',
         is_protected: true,
       },
       {
-        id: Roles.SUPER_ADMIN,
+        // id: Roles.SUPER_ADMIN,
         name: 'Super Admin',
         is_protected: true,
       },
     ]
 
-    await Role.createMany(data)
+    try {
+      await Role.createMany(payload)
+    } catch (error) {
+      if (`${error}`.includes('duplicate key value violates unique constraint')) {
+        console.log('Some roles already exist, skipping bulk insert. Trying one by one...')
+      } else {
+        console.log(error)
+      }
+
+      // if error means dupe. So we just go 1 by 1
+      for (const p of payload) {
+        try {
+          await Role.create(p)
+          console.log(`Created role: ${p.name}`)
+        } catch (e) {
+          if (!`${e}`.includes('duplicate key value violates unique constraint')) {
+            console.log('Error on ', p)
+            console.log(e)
+          }
+        }
+      }
+    }
 
     console.log('Roles created')
   }

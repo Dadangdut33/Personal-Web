@@ -18,7 +18,7 @@ export default function Footer() {
   const { props } = usePage<SharedProps>()
 
   return (
-    <footer className="mt-auto">
+    <footer className="mt-auto font-geistmono">
       <Container className={classes.inner}>
         <Group gap={8} className={classes.links}>
           <Tooltip
