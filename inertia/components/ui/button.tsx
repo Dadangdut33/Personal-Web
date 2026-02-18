@@ -3,7 +3,16 @@ import { type VariantProps, cva } from 'class-variance-authority'
 import * as React from 'react'
 import { cn } from '~/lib/utils'
 
-export type btnVariant = 'default' | 'neutral' | 'reverse' | 'active' | 'disabled'
+export type btnVariant =
+  | 'default'
+  | 'neutral'
+  | 'reverse'
+  | 'active'
+  | 'disabled'
+  | 'destructive'
+  | 'green'
+  | 'noShadow'
+  | 'none'
 
 const buttonVariants = cva(
   'inline-flex items-center justify-center whitespace-nowrap rounded-base text-sm font-base ring-offset-white transition-all gap-2 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 focus-visible:outline-hidden focus-visible:ring-2 focus-visible:ring-black focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50',
@@ -20,6 +29,10 @@ const buttonVariants = cva(
         active: 'text-main-foreground bg-main border-2 border-border',
         disabled:
           'bg-muted text-muted-foreground border-2 border-border opacity-60 !cursor-not-allowed shadow-none',
+        destructive:
+          'bg-destructive text-destructive-foreground border-2 border-border shadow-shadow hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none',
+        green:
+          'bg-green-500 text-white border-2 border-green-600 shadow-shadow hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none',
         none: '',
       },
       size: {
