@@ -1,4 +1,5 @@
 import { RoleDto } from '#dto/role.dto'
+import { TagDto } from '#dto/tag.dto'
 import {
   getMethodActName,
   getRequestFingerprint,
@@ -7,6 +8,7 @@ import {
   throwForbidden,
   throwNotFound,
 } from '#lib/utils'
+import Tag from '#models/tag'
 import ActivityLogService from '#services/activity_log.service'
 import PermissionService from '#services/permission.service'
 import RoleService from '#services/role.service'
@@ -19,6 +21,8 @@ import { route } from '@izzyjs/route/client'
 
 @inject()
 export default class RoleController {
+  private MEDIA_TAG_TYPE = 'media'
+
   constructor(
     protected roleSvc: RoleService,
     protected permSvc: PermissionService,
@@ -28,7 +32,15 @@ export default class RoleController {
   async viewCreate({ bouncer, inertia }: HttpContext) {
     await bouncer.with('RolePolicy').authorize('viewCreate')
     const permissions = await this.permSvc.listGroupedByBaseName()
-    return inertia.render('dashboard/role/createEdit', { data: null, permissions: permissions })
+    const mediaTags = await Tag.query()
+      .where('type', this.MEDIA_TAG_TYPE)
+      .select(['id', 'name'])
+      .orderBy('name', 'asc')
+    return inertia.render('dashboard/role/createEdit', {
+      data: null,
+      permissions: permissions,
+      mediaTags: TagDto.collect(mediaTags),
+    })
   }
 
   async viewEdit({ bouncer, inertia, params }: HttpContext) {
@@ -39,12 +51,18 @@ export default class RoleController {
 
     const data = await this.roleSvc.findOrFail(id)
     await data.load('permissions') // load permissions relation
+    await data.load('media_tags')
 
     const permissions = await this.permSvc.listGroupedByBaseName()
+    const mediaTags = await Tag.query()
+      .where('type', this.MEDIA_TAG_TYPE)
+      .select(['id', 'name'])
+      .orderBy('name', 'asc')
 
     return inertia.render('dashboard/role/createEdit', {
       data: new RoleDto(data),
       permissions: permissions,
+      mediaTags: TagDto.collect(mediaTags),
     })
   }
 

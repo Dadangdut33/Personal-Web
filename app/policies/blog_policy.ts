@@ -11,6 +11,14 @@ export default class BlogPolicy extends CustomBasePolicy {
     return this.perm.check(user, `${this.base}.view`)
   }
 
+  async viewCreate(user: User) {
+    return this.perm.check(user, `${this.base}.create`)
+  }
+
+  async viewEdit(user: User) {
+    return this.perm.check(user, `${this.base}.update`)
+  }
+
   async create(user: User, request: HttpContext['request']) {
     return this.perm.checkInMethod(user, `${this.base}.create`, request, 'POST')
   }

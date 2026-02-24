@@ -22,7 +22,11 @@ router
           .group(() => {
             router
               .get('/redirect/:id', [MediaController, 'redirectMediaAPI'])
-              .as('api.v1.media.redirect')
+              .as('api.v1.media.redirect') // this route need signed URL for access. use router
+
+            router.get('/', [MediaController, 'getMediaListAPI']).as('api.v1.media.list')
+            router.post('/', [MediaController, 'uploadMediaAPI']).as('api.v1.media.upload')
+            router.delete('/', [MediaController, 'deleteMediaAPI']).as('api.v1.media.destroy')
           })
           .prefix('/media')
 

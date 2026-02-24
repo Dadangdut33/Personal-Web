@@ -50,6 +50,7 @@ export function mapRequestToQueryParams<T>(request: HttpContext['request']): Que
 
     sortBy,
     sortDirection,
+    filter: request.input('filter', 'all'),
   }
 }
 

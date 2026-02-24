@@ -7,7 +7,7 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table.increments('id')
+      table.uuid('id').primary()
       table.boolean('is_active').defaultTo(true)
       table.boolean('is_pinned').defaultTo(false)
 

@@ -20,6 +20,7 @@ type SearchFilerProps<T> = {
   onQueryTable: (queryKey: string, queryValue: any) => void
   sortStatus: DataTableSortStatus<T>
   onSortStatus: (e: DataTableSortStatus<T>) => void
+  resetSearch: () => void
 }
 
 export default function useSearchFilter<T>(
@@ -130,6 +131,20 @@ export default function useSearchFilter<T>(
   const onPageChange = (page: number) => onQueryTable('page', page)
   const onRecordsPerPage = (perPage: number) => onQueryTable('per_page', perPage)
 
+  const resetSearch = () => {
+    setSearch('')
+    setSearchBy({})
+    setSortStatus({ columnAccessor: defaultColumnSort as any, direction: 'desc' })
+    router.get(
+      route(endpoint as any).path as any,
+      {},
+      {
+        preserveState: true,
+        replace: true, // Prevents flooding history stack
+      }
+    )
+  }
+
   return {
     isFetching,
     searchParamIsSet,
@@ -144,5 +159,6 @@ export default function useSearchFilter<T>(
     onPageChange,
     onRecordsPerPage,
     onQueryTable,
+    resetSearch,
   }
 }

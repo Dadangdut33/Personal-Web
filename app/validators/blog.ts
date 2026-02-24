@@ -1,9 +1,8 @@
 import vine from '@vinejs/vine'
 
-export const blogValidator = vine.compile(
+export const blogValidator = vine.create(
   vine.object({
-    id: vine.number().optional(),
-    slug_id: vine.string().trim(),
+    id: vine.string().uuid().optional(),
     title: vine.string().trim(),
     thumbnail: vine
       .file({

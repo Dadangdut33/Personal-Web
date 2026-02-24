@@ -1,12 +1,22 @@
 import Tables from '#enums/tables'
 
-import { BaseModel, beforeCreate, belongsTo, column, manyToMany } from '@adonisjs/lucid/orm'
-import type { BelongsTo, ManyToMany } from '@adonisjs/lucid/types/relations'
+import {
+  BaseModel,
+  beforeCreate,
+  belongsTo,
+  column,
+  hasMany,
+  manyToMany,
+} from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany, ManyToMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
+import { nanoid } from 'nanoid'
 import { randomUUID } from 'node:crypto'
 
+import BlogVersion from './blog_version.js'
 import Media from './media.js'
 import Project from './project.js'
+import Tag from './tag.js'
 
 export default class Blog extends BaseModel {
   static table = Tables.BLOGS
@@ -21,7 +31,7 @@ export default class Blog extends BaseModel {
   declare title: string
 
   @column()
-  declare thumbnail_id: number | null
+  declare thumbnail_id: string | null
 
   @column()
   declare description: string | null
@@ -32,21 +42,27 @@ export default class Blog extends BaseModel {
   })
   declare content: Record<string, any>
 
-  @column({
-    prepare: (value) => JSON.stringify(value),
-    consume: (value) => JSON.parse(value),
-  })
-  declare tags: string[] | null
-
   @belongsTo(() => Media, {
     foreignKey: 'thumbnail_id',
   })
   declare thumbnail: BelongsTo<typeof Media>
 
   @manyToMany(() => Project, {
-    pivotTable: Tables.PROJECTS,
+    pivotTable: Tables.BLOGS_PROJECTS,
   })
-  declare permissions: ManyToMany<typeof Project>
+  declare projects: ManyToMany<typeof Project>
+
+  @hasMany(() => BlogVersion, {
+    foreignKey: 'blog_id',
+  })
+  declare versions: HasMany<typeof BlogVersion>
+
+  @manyToMany(() => Tag, {
+    pivotTable: Tables.BLOG_TAGS,
+    pivotForeignKey: 'blog_id',
+    pivotRelatedForeignKey: 'tag_id',
+  })
+  declare tags: ManyToMany<typeof Tag>
 
   @column.dateTime({ autoCreate: true })
   declare created_at: DateTime
@@ -57,5 +73,6 @@ export default class Blog extends BaseModel {
   @beforeCreate()
   static assignUuid(self: Blog) {
     self.id = randomUUID()
+    self.slug_id = nanoid(12)
   }
 }

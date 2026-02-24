@@ -56,9 +56,50 @@ type SidebarMenuEntryProps = {
   item: MenuItem
   currentPath: string
   userPermissions: string[]
+  activePaths: string[]
 }
 
-export function SidebarMenuEntry({ item, currentPath, userPermissions }: SidebarMenuEntryProps) {
+function normalizePath(path: string) {
+  const sanitizedPath = path.split(/[?#]/)[0]
+  if (!sanitizedPath || sanitizedPath === '/') return '/'
+  return sanitizedPath.replace(/\/+$/, '')
+}
+
+function isPathActive(currentPath: string, targetPath: string) {
+  if (!targetPath || targetPath === '#') return false
+
+  const current = normalizePath(currentPath)
+  const target = normalizePath(targetPath)
+
+  return current === target || current.startsWith(`${target}/`)
+}
+
+function getBestMatchingPath(currentPath: string, paths: string[]) {
+  const current = normalizePath(currentPath)
+
+  return paths.reduce<string | null>((best, path) => {
+    if (!path || path === '#') return best
+    const normalizedPath = normalizePath(path)
+    const matches = current === normalizedPath || current.startsWith(`${normalizedPath}/`)
+    if (!matches) return best
+
+    if (!best || normalizedPath.length > best.length) {
+      return normalizedPath
+    }
+
+    return best
+  }, null)
+}
+
+export function SidebarMenuEntry({
+  item,
+  currentPath,
+  userPermissions,
+  activePaths,
+}: SidebarMenuEntryProps) {
+  const normalizedItemPath = normalizePath(item.url)
+  const bestMatchingPath = getBestMatchingPath(currentPath, activePaths)
+
   // ─────────────────────────────────────────────
   // Flat menu item
   // ─────────────────────────────────────────────
@@ -67,13 +108,15 @@ export function SidebarMenuEntry({ item, currentPath, userPermissions }: Sidebar
       return null
     }
 
+    const isFlatActive = bestMatchingPath === normalizedItemPath
+
     return (
       <SidebarMenuItem>
         <SidebarMenuButton
           asChild
           tooltip={item.title}
-          isActive={currentPath === item.url}
-          className="data-[state=open]:bg-main data-[state=open]:outline-border data-[state=open]:text-main-foreground"
+          isActive={isFlatActive}
+          className="relative hover:bg-main/40 hover:text-foreground data-[state=open]:bg-main data-[state=open]:outline-border data-[state=open]:text-main-foreground data-[active=true]:bg-main data-[active=true]:text-main-foreground data-[active=true]:outline-border data-[active=true]:outline-2 data-[active=true]:before:absolute data-[active=true]:before:inset-y-1 data-[active=true]:before:left-0 data-[active=true]:before:w-1 data-[active=true]:before:rounded-r-full data-[active=true]:before:bg-main-foreground"
         >
           <Link href={item.url}>
             {item.icon && <item.icon />}
@@ -87,7 +130,9 @@ export function SidebarMenuEntry({ item, currentPath, userPermissions }: Sidebar
   // ─────────────────────────────────────────────
   // Collapsible menu item
   // ─────────────────────────────────────────────
-  const isGroupActive = currentPath.startsWith(item.url)
+  const isGroupActive =
+    bestMatchingPath === normalizedItemPath ||
+    item.items?.some((subItem) => isPathActive(currentPath, subItem.url))
 
   if (item.requiredPermission && !userPermissions.includes(item.requiredPermission)) {
     return null
@@ -100,7 +145,7 @@ export function SidebarMenuEntry({ item, currentPath, userPermissions }: Sidebar
           <SidebarMenuButton
             tooltip={item.title}
             isActive={isGroupActive}
-            className="data-[state=open]:bg-main data-[state=open]:outline-border data-[state=open]:text-main-foreground"
+            className="relative hover:bg-main/40 hover:text-foreground data-[state=open]:bg-main data-[state=open]:outline-border data-[state=open]:text-main-foreground data-[active=true]:bg-main data-[active=true]:text-main-foreground data-[active=true]:outline-border data-[active=true]:outline-2 data-[active=true]:before:absolute data-[active=true]:before:inset-y-1 data-[active=true]:before:left-0 data-[active=true]:before:w-1 data-[active=true]:before:rounded-r-full data-[active=true]:before:bg-main-foreground"
           >
             {item.icon && <item.icon />}
             <span className="text-sm">{item.title}</span>
@@ -120,7 +165,11 @@ export function SidebarMenuEntry({ item, currentPath, userPermissions }: Sidebar
 
               return (
                 <SidebarMenuSubItem key={subItem.title}>
-                  <SidebarMenuSubButton asChild isActive={currentPath === subItem.url}>
+                  <SidebarMenuSubButton
+                    asChild
+                    isActive={isPathActive(currentPath, subItem.url)}
+                    className="relative hover:bg-main/30 hover:text-foreground data-[active=true]:font-semibold data-[active=true]:before:absolute data-[active=true]:before:inset-y-1 data-[active=true]:before:left-0 data-[active=true]:before:w-0.5 data-[active=true]:before:rounded-r-full data-[active=true]:before:bg-main-foreground"
+                  >
                     <Link href={subItem.url}>
                       <span>{subItem.title}</span>
                     </Link>
@@ -171,6 +220,15 @@ export function AppSidebar({
     return flatManagementRequiredPermissions.includes(permission)
   })
 
+  const activePaths = React.useMemo(() => {
+    return [
+      ...DASHBOARD_NAV.flat.map((item) => item.url),
+      ...DASHBOARD_NAV.menu.map((item) => item.url),
+      ...DASHBOARD_NAV.menu.flatMap((item) => item.items?.map((subItem) => subItem.url) || []),
+      ...DASHBOARD_NAV.management.map((item) => item.url),
+    ].filter((path) => path && path !== '#')
+  }, [])
+
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -203,6 +261,7 @@ export function AppSidebar({
                 item={item}
                 currentPath={sharedProps.currentPath}
                 userPermissions={sharedProps.user?.permissions || []}
+                activePaths={activePaths}
               />
             ))}
           </SidebarMenu>
@@ -216,6 +275,7 @@ export function AppSidebar({
                 item={item}
                 currentPath={sharedProps.currentPath}
                 userPermissions={sharedProps.user?.permissions || []}
+                activePaths={activePaths}
               />
             ))}
           </SidebarMenu>
@@ -231,6 +291,7 @@ export function AppSidebar({
                   item={item}
                   currentPath={sharedProps.currentPath}
                   userPermissions={sharedProps.user?.permissions || []}
+                  activePaths={activePaths}
                 />
               ))}
             </SidebarMenu>

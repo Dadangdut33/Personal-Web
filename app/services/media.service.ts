@@ -1,4 +1,5 @@
 import Media from '#models/media'
+import User from '#models/user'
 import MediaRepository from '#repositories/media.repository'
 import { QueryBuilderParams } from '#types/app'
 
@@ -10,9 +11,56 @@ import { TransactionClientContract } from '@adonisjs/lucid/types/database'
 export default class MediaService {
   constructor(protected repo: MediaRepository) {}
 
+  private async getAllowedTagIdsForUser(user: User) {
+    await user.load('roles', (query) => {
+      query.preload('media_tags')
+    })
+
+    if (user.roles.some((role) => role.can_access_all_media_tags)) {
+      return null
+    }
+
+    const tagIds = new Set<string>()
+    for (const role of user.roles) {
+      for (const tag of role.media_tags || []) {
+        tagIds.add(tag.id)
+      }
+    }
+
+    return [...tagIds]
+  }
+
+  async makeQuery(queryParams: QueryBuilderParams<typeof Media>) {
+    const preload = queryParams.preload ? [...queryParams.preload] : []
+    if (!preload.includes('tags')) preload.push('tags')
+
+    const q = this.repo.query({
+      ...queryParams,
+      preload,
+    })
+
+    this.repo.applyMediaTypeFilter(
+      q as any,
+      (queryParams.filter || 'all') as 'all' | 'images' | 'files' | 'videos' | 'audio'
+    )
+
+    return { q, params: queryParams }
+  }
+
   async index(queryParams: QueryBuilderParams<typeof Media>) {
-    const q = this.repo.query(queryParams)
-    return await this.repo.paginate(q, queryParams)
+    const { q, params } = await this.makeQuery(queryParams)
+    return this.repo.paginate(q, params)
+  }
+
+  async indexByUser(user: User, queryParams: QueryBuilderParams<typeof Media>) {
+    const { q, params } = await this.makeQuery(queryParams)
+
+    const allowedTagIds = await this.getAllowedTagIdsForUser(user)
+    if (allowedTagIds !== null) {
+      this.repo.applyTagAccessFilter(q as any, allowedTagIds)
+    }
+
+    return await this.repo.paginate(q, params)
   }
 
   async replace(
@@ -72,6 +120,12 @@ export default class MediaService {
 
   async delete(id: string) {
     return this.repo.deleteById(id)
+  }
+
+  async canUserAccessMedia(user: User, mediaId: string) {
+    const allowedTagIds = await this.getAllowedTagIdsForUser(user)
+    if (allowedTagIds === null) return true
+    return this.repo.canAccessMediaByTagIds(mediaId, allowedTagIds)
   }
 
   async deleteBulk(ids: string[]) {

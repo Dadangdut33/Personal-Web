@@ -1,0 +1,865 @@
+'use client'
+
+import { AllowedImageTags } from '#validators/media'
+
+import Link from '@tiptap/extension-link'
+import Placeholder from '@tiptap/extension-placeholder'
+import { Table } from '@tiptap/extension-table'
+import TableCell from '@tiptap/extension-table-cell'
+import TableHeader from '@tiptap/extension-table-header'
+import TableRow from '@tiptap/extension-table-row'
+import TextAlign from '@tiptap/extension-text-align'
+import { EditorContent, useEditor } from '@tiptap/react'
+import { BubbleMenu } from '@tiptap/react/menus'
+import StarterKit from '@tiptap/starter-kit'
+import { isString } from 'lodash-es'
+import { AlertCircle, Check, Eye, EyeOff, Loader, X } from 'lucide-react'
+import { NodeSelection, type Selection } from 'prosemirror-state'
+import type React from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { Alert, AlertDescription } from '~/components/ui/alert'
+import { Button } from '~/components/ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '~/components/ui/tooltip'
+import { cn } from '~/lib/utils'
+
+import ImageBubbleMenu from './components/Image/image-bubble-menu'
+import ImageDialogButton from './components/Image/image-dialog-button'
+import ImageResizePopover from './components/Image/image-resize-popover'
+import AudioDialogButton from './components/Audio/audio-dialog-button'
+import FileDialogButton from './components/File/file-dialog-button'
+import LinkDialogButton from './components/Link/link-dialog-button'
+import TableBubbleMenu from './components/Table/tabble-bubble-menu'
+import TableInsertDialogButton from './components/Table/table-insert-dialog-button'
+import TableOperationsDropdown from './components/Table/table-operations-dropdown'
+import TextBubbleMenu from './components/Text/text-bubble-menu'
+import VideoDialogButton from './components/Video/video-dialog-button'
+import YoutubeDialogButton from './components/Youtube/youtube-dialog-button'
+import UtilsBubbleMenu from './components/utils-bubble-menu'
+import { lowlight } from './code-languages'
+import AudioAttachment from './extensions/audio-attachment'
+import CustomCodeBlockLowlight from './extensions/code-block-lowlight'
+import FileAttachment from './extensions/file-attachment'
+import LinkCard from './extensions/link-card'
+import ResizableImage from './extensions/resizeable-image'
+import VideoAttachment from './extensions/video-attachment'
+import YoutubeEmbed from './extensions/youtube-embed'
+import useAudioUpload from './hooks/use_audio_upload'
+import useEmbedActions from './hooks/use_embed_actions'
+import useFileUpload from './hooks/use_file_upload'
+import useImageUpload from './hooks/use_image_upload'
+import useStickyToolbar from './hooks/use_sticky_toolbar'
+import useTableActions from './hooks/use_table_actions'
+import useVideoUpload from './hooks/use_video_upload'
+import MediaLibraryDialog from './media-library-dialog'
+import { SelectedImageType } from './types'
+
+const isTableNodeName = (name: string) =>
+  name === 'table' || name === 'tableRow' || name === 'tableCell' || name === 'tableHeader'
+
+export interface TiptapEditorProps {
+  content?: string | object
+  onSave?: (content: object) => void
+  onError?: (error: string) => void
+  placeholder?: string
+  className?: string
+  toolbarClassName?: string
+  editorClassName?: string
+  readOnly?: boolean
+  stickyToolbar?: boolean
+  imageTags?: AllowedImageTags[] // image tags when upload to media library
+  getMediaURL?: string // URL to fetch media library
+  uploadMediaURL?: string // URL to upload images
+  deleteMediaURL?: string // URL to delete images
+  ssr?: boolean // Server-side rendering support
+}
+
+export default function TiptapEditor({
+  content = '',
+  onSave,
+  onError,
+  placeholder = 'Start writing your blog post...',
+  className,
+  toolbarClassName,
+  editorClassName,
+  readOnly = false,
+  stickyToolbar = true,
+  getMediaURL,
+  uploadMediaURL,
+  deleteMediaURL,
+  ssr: SSR = true, // Server-side rendering support
+  imageTags = [],
+}: TiptapEditorProps) {
+  const [error, setError] = useState<string | null>(null)
+  const [imageUrl, setImageUrl] = useState('')
+  const [isSaving, setIsSaving] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
+  const [isPreviewMode, setIsPreviewMode] = useState(false)
+  const [mediaLibraryOpen, setMediaLibraryOpen] = useState(false)
+  const [mediaLibrarySelectType, setMediaLibrarySelectType] = useState<
+    'image' | 'file' | 'audio' | 'video'
+  >('image')
+  const [selectedImage, setSelectedImage] = useState<SelectedImageType>(null)
+  const [maintainAspectRatio, setMaintainAspectRatio] = useState(true)
+  const [aspectRatio, setAspectRatio] = useState(1)
+  const [isInTableContext, setIsInTableContext] = useState(false)
+
+  const toolbarRef = useRef<HTMLDivElement>(null)
+  const editorContainerRef = useRef<HTMLDivElement>(null)
+  const editorContentRef = useRef<HTMLDivElement>(null)
+  const isResizingRef = useRef(false)
+  const [resizePopoverOpen, setResizePopoverOpen] = useState(false)
+
+  const handleImageSelect = useCallback(
+    (attrs: { pos: number; src: string; width: number; height: number }) => {
+      setSelectedImage(attrs)
+      setAspectRatio(attrs.width / attrs.height)
+      setResizePopoverOpen(true) // Auto-open the resize popover
+    },
+    []
+  )
+
+  const handleImageDeselect = useCallback(() => {
+    // Only deselect if we're not currently resizing and popover is closed
+    if (!isResizingRef.current && !resizePopoverOpen) {
+      setSelectedImage(null)
+    }
+  }, [resizePopoverOpen])
+
+  // Initialize the editor with enhanced extensions
+  const editor = useEditor({
+    immediatelyRender: SSR ? false : true,
+    extensions: [
+      StarterKit.configure({
+        codeBlock: false,
+      }),
+      LinkCard,
+      YoutubeEmbed,
+      AudioAttachment,
+      VideoAttachment,
+      FileAttachment,
+      CustomCodeBlockLowlight.configure({
+        lowlight,
+        defaultLanguage: 'plaintext',
+        enableTabIndentation: true,
+        tabSize: 2,
+      }),
+      Link.configure({
+        openOnClick: false,
+        HTMLAttributes: {
+          class: 'text-primary underline',
+        },
+      }),
+      // Replace standard Image with ResizableImage
+      ResizableImage.configure({
+        HTMLAttributes: {
+          class: 'rounded-md my-4',
+        },
+        onSelect: handleImageSelect,
+        onDeselect: handleImageDeselect,
+      }),
+      Placeholder.configure({
+        placeholder,
+      }),
+      Table.configure({
+        resizable: true,
+        HTMLAttributes: {
+          class: 'border-collapse table-auto w-full my-4',
+        },
+      }),
+      TableRow,
+      TableHeader,
+      TableCell.configure({
+        HTMLAttributes: {
+          class: 'border border-border p-2',
+        },
+      }),
+      TextAlign.configure({
+        types: ['heading', 'paragraph'], // Remove image from types
+        alignments: ['left', 'center', 'right'],
+        defaultAlignment: 'left',
+      }),
+    ],
+    content: content,
+    editable: readOnly ? false : !isPreviewMode,
+    onUpdate: () => {
+      saveContent()
+      // Clear any previous errors when the content changes
+      if (error) setError(null)
+    },
+  })
+
+  const {
+    linkUrl,
+    setLinkUrl,
+    isFetchingLinkMetadata,
+    linkMetadata,
+    linkMetadataError,
+    setLink,
+    fetchLinkMetadata,
+    youtubeUrl,
+    setYoutubeUrl,
+    isFetchingYoutubeMetadata,
+    youtubeMetadata,
+    youtubeMetadataError,
+    fetchYoutubeMetadata,
+    addYoutubeEmbed,
+  } = useEmbedActions(editor)
+
+  useEffect(() => {
+    if (!editor) return
+
+    editor.setEditable(readOnly ? false : !isPreviewMode)
+    // Force a transaction so React node views can re-evaluate `editor.isEditable`.
+    editor.view.dispatch(editor.state.tr.setMeta('rte:editable-changed', Date.now()))
+  }, [editor, readOnly, isPreviewMode])
+
+  const isTableContext = useCallback(() => {
+    if (!editor) return false
+
+    const selection = editor.state.selection
+
+    // CellSelection (selecting one/multiple table cells) should use table actions.
+    const isCellSelection =
+      '$anchorCell' in (selection as Selection) && '$headCell' in (selection as Selection)
+    if (isCellSelection) {
+      return true
+    }
+
+    // If user is selecting text range, prefer text bubble actions.
+    if (!selection.empty && !(selection instanceof NodeSelection)) {
+      return false
+    }
+
+    if (selection instanceof NodeSelection) {
+      const nodeName = selection.node.type.name
+      if (isTableNodeName(nodeName)) {
+        return true
+      }
+    }
+
+    const from = selection.$from
+    for (let depth = from.depth; depth >= 0; depth--) {
+      const nodeName = from.node(depth).type.name
+      if (isTableNodeName(nodeName)) {
+        return true
+      }
+    }
+
+    if (
+      editor.isActive('table') ||
+      editor.isActive('tableCell') ||
+      editor.isActive('tableHeader') ||
+      editor.isActive('tableRow')
+    ) {
+      return true
+    }
+
+    return false
+  }, [editor])
+
+  useEffect(() => {
+    if (!editor) return
+
+    const syncTableContext = () => {
+      setIsInTableContext(isTableContext())
+    }
+
+    syncTableContext()
+    editor.on('selectionUpdate', syncTableContext)
+    editor.on('transaction', syncTableContext)
+
+    return () => {
+      editor.off('selectionUpdate', syncTableContext)
+      editor.off('transaction', syncTableContext)
+    }
+  }, [editor, isTableContext])
+
+  const runOnSelectedImage = useCallback(
+    (fn: () => void) => {
+      if (!editor || !selectedImage) return
+
+      const selected = editor.chain().focus().setNodeSelection(selectedImage.pos).run()
+      if (!selected) return
+      fn()
+    },
+    [editor, selectedImage]
+  )
+
+  const handleSliderMouseDown = useCallback((e: React.MouseEvent) => {
+    // Prevent the editor from losing focus when interacting with sliders
+    e.preventDefault()
+    isResizingRef.current = true
+    setResizePopoverOpen(true) // Keep the popover open during resize
+  }, [])
+
+  const handleSliderMouseUp = useCallback(() => {
+    setTimeout(() => {
+      isResizingRef.current = false
+      // Don't close the popover when releasing the slider
+    }, 100)
+  }, [])
+
+  const {
+    tableDialogOpen,
+    setTableDialogOpen,
+    rows,
+    setRows,
+    cols,
+    setCols,
+    withHeaderRow,
+    setWithHeaderRow,
+    insertTable,
+    addColumnBefore,
+    addColumnAfter,
+    deleteColumn,
+    addRowBefore,
+    addRowAfter,
+    deleteRow,
+    deleteTable,
+    mergeOrSplitCells,
+  } = useTableActions(editor)
+
+  const {
+    isUploading,
+    uploadProgress,
+    fileInputRef,
+    handleFileInputChange,
+    handleDrop,
+    handleDragOver,
+  } = useImageUpload({
+    editor,
+    setError,
+    onError,
+    uploadMediaURL,
+    imageTags,
+    readOnly: !editor?.isEditable,
+  })
+
+  const {
+    isUploadingFile,
+    fileUploadProgress,
+    fileInputRef: fileUploadInputRef,
+    handleFileUpload: handleGenericFileUpload,
+    handleInsertFromUrl: handleInsertFileFromUrl,
+    handleFileInputChange: handleFileUploadInputChange,
+  } = useFileUpload({
+    editor,
+    setError,
+    onError,
+    uploadMediaURL,
+    tags: imageTags,
+  })
+
+  const {
+    isUploadingAudio,
+    audioUploadProgress,
+    audioInputRef,
+    handleAudioUpload,
+    handleAudioInputChange,
+    handleInsertFromUrl: handleInsertAudioFromUrl,
+  } = useAudioUpload({
+    editor,
+    setError,
+    onError,
+    uploadMediaURL,
+    tags: imageTags,
+  })
+
+  const {
+    isUploadingVideo,
+    videoUploadProgress,
+    videoInputRef,
+    handleVideoUpload,
+    handleVideoInputChange,
+    handleInsertFromUrl: handleInsertVideoFromUrl,
+  } = useVideoUpload({
+    editor,
+    setError,
+    onError,
+    uploadMediaURL,
+    tags: imageTags,
+  })
+
+  const { isToolbarSticky } = useStickyToolbar({
+    stickyToolbar,
+    readOnly,
+    toolbarRef,
+    editorContainerRef,
+    editorContentRef,
+  })
+
+  // Load initial content
+  useEffect(() => {
+    if (editor && content) {
+      setIsLoading(true)
+      try {
+        if (isString(content)) {
+          // Try to parse as JSON
+          try {
+            const parsedContent = JSON.parse(content)
+            editor.commands.setContent(parsedContent)
+          } catch (e) {
+            // If not valid JSON, set as HTML
+            editor.commands.setContent(content)
+          }
+        } else {
+          // If object, set directly
+          editor.commands.setContent(content)
+        }
+      } catch (err) {
+        const errorMessage = 'Failed to load content into the editor'
+        setError(errorMessage)
+        if (onError) onError(errorMessage)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+  }, [editor, onError])
+
+  // Handle saving content
+  const saveContent = useCallback(() => {
+    if (!editor) return
+
+    setIsSaving(true)
+    try {
+      const json = editor.getJSON()
+      if (onSave) onSave(json)
+      setError(null)
+    } catch (err) {
+      const errorMessage = 'Failed to save content'
+      setError(errorMessage)
+      if (onError) onError(errorMessage)
+    } finally {
+      setIsSaving(false)
+    }
+  }, [editor, onSave, onError])
+
+  // Handle adding an image from URL
+  const addImage = useCallback(() => {
+    if (!editor) return
+
+    // Cancel if no URL
+    if (!imageUrl) return
+
+    // Add image
+    editor.chain().focus().setImage({ src: imageUrl }).run()
+
+    // Reset field
+    setImageUrl('')
+  }, [editor, imageUrl])
+
+  // Image resizing handlers
+  const handleImageWidthChange = useCallback(
+    (value: number[]) => {
+      if (!editor || !selectedImage) return
+
+      isResizingRef.current = true // Set resizing flag
+      setResizePopoverOpen(true) // Keep the popover open during resize
+
+      const newWidth = value[0]
+      let newHeight = selectedImage.height
+
+      // If maintaining aspect ratio, calculate the new height
+      if (maintainAspectRatio) {
+        newHeight = Math.round(newWidth / aspectRatio)
+      }
+
+      runOnSelectedImage(() => {
+        editor.chain().focus().updateImageSize({ width: newWidth, height: newHeight }).run()
+      })
+
+      // Update the selected image state
+      setSelectedImage({ ...selectedImage, width: newWidth, height: newHeight })
+
+      // Clear the resizing flag after a short delay
+      setTimeout(() => {
+        isResizingRef.current = false
+      }, 100)
+    },
+    [editor, selectedImage, maintainAspectRatio, aspectRatio, runOnSelectedImage]
+  )
+
+  const handleImageHeightChange = useCallback(
+    (value: number[]) => {
+      if (!editor || !selectedImage) return
+
+      isResizingRef.current = true // Set resizing flag
+      setResizePopoverOpen(true) // Keep the popover open during resize
+
+      const newHeight = value[0]
+      let newWidth = selectedImage.width
+
+      // If maintaining aspect ratio, calculate the new width
+      if (maintainAspectRatio) {
+        newWidth = Math.round(newHeight * aspectRatio)
+      }
+
+      runOnSelectedImage(() => {
+        editor.chain().focus().updateImageSize({ width: newWidth, height: newHeight }).run()
+      })
+
+      // Update the selected image state
+      setSelectedImage({ ...selectedImage, width: newWidth, height: newHeight })
+
+      // Clear the resizing flag after a short delay
+      setTimeout(() => {
+        isResizingRef.current = false
+      }, 100)
+    },
+    [editor, selectedImage, maintainAspectRatio, aspectRatio, runOnSelectedImage]
+  )
+
+  const resetImageSize = useCallback(() => {
+    if (!editor || !selectedImage) return
+
+    // Get the original image dimensions
+    const img = new Image()
+    img.src = selectedImage.src
+
+    img.onload = () => {
+      const originalWidth = img.width
+      const originalHeight = img.height
+
+      runOnSelectedImage(() => {
+        editor
+          .chain()
+          .focus()
+          .updateImageSize({ width: originalWidth, height: originalHeight })
+          .run()
+      })
+
+      // Update the selected image state
+      setSelectedImage({ ...selectedImage, width: originalWidth, height: originalHeight })
+      setAspectRatio(originalWidth / originalHeight)
+    }
+  }, [editor, selectedImage, runOnSelectedImage])
+
+  const maximizeImage = useCallback(() => {
+    if (!editor || !selectedImage) return
+
+    // Get the editor container width
+    const editorWidth = editorContainerRef.current?.clientWidth || 800
+    const maxWidth = editorWidth - 40 // Subtract padding
+
+    // Calculate height based on aspect ratio
+    const newHeight = Math.round(maxWidth / aspectRatio)
+
+    runOnSelectedImage(() => {
+      editor.chain().focus().updateImageSize({ width: maxWidth, height: newHeight }).run()
+    })
+
+    // Update the selected image state
+    setSelectedImage({ ...selectedImage, width: maxWidth, height: newHeight })
+  }, [editor, selectedImage, aspectRatio, runOnSelectedImage])
+
+  const toggleAspectRatio = useCallback(() => {
+    setMaintainAspectRatio(!maintainAspectRatio)
+  }, [maintainAspectRatio])
+
+  const renderImagePopover = () => (
+    <ImageResizePopover
+      editor={editor}
+      selectedImage={selectedImage}
+      maintainAspectRatio={maintainAspectRatio}
+      resizePopoverOpen={resizePopoverOpen}
+      setResizePopoverOpen={setResizePopoverOpen}
+      isResizingRef={isResizingRef}
+      onWidthChange={handleImageWidthChange}
+      onHeightChange={handleImageHeightChange}
+      onSliderMouseDown={handleSliderMouseDown}
+      onSliderMouseUp={handleSliderMouseUp}
+      onMaximize={maximizeImage}
+      onReset={resetImageSize}
+      onToggleAspectRatio={toggleAspectRatio}
+    />
+  )
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center p-8 border rounded-md">
+        <div className="animate-pulse">Loading editor...</div>
+      </div>
+    )
+  }
+
+  return (
+    <div
+      className={cn(!readOnly ? 'border rounded-md relative' : '', className)}
+      onDrop={handleDrop}
+      onDragOver={handleDragOver}
+      ref={editorContainerRef}
+    >
+      {error && (
+        <Alert variant="destructive" className="mb-4">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {/*
+        Readonly is set from upper, we dont check editor.isEditable for toolbar menu
+        because when its in readonly it means that its for render data.
+      */}
+      {/* The toolbar menu, same component as bubble mostly */}
+      {!readOnly && (
+        <div
+          ref={toolbarRef}
+          className={cn(
+            'px-3 flex flex-wrap gap-1 p-2 border-b bg-muted/50 z-50 transition-all duration-200',
+            isToolbarSticky && 'fixed top-0  shadow-md border-t border-x rounded-t-none',
+            isToolbarSticky &&
+              editorContainerRef.current && {
+                width: `${editorContainerRef.current.offsetWidth}px`,
+                transform: `translateX(${editorContainerRef.current.getBoundingClientRect().left}px)`,
+              },
+            toolbarClassName
+          )}
+        >
+          <TooltipProvider>
+            <TextBubbleMenu editor={editor} />
+            <ImageBubbleMenu
+              editor={editor}
+              selectedImage={selectedImage}
+              renderImagePopover={renderImagePopover}
+              enableImagePopover={true}
+            />
+
+            <LinkDialogButton
+              editor={editor}
+              linkUrl={linkUrl}
+              setLinkUrl={setLinkUrl}
+              onAddLink={setLink}
+              onFetchMetadata={fetchLinkMetadata}
+              linkMetadata={linkMetadata}
+              isFetchingMetadata={isFetchingLinkMetadata}
+              linkMetadataError={linkMetadataError}
+            />
+
+            <YoutubeDialogButton
+              editor={editor}
+              youtubeUrl={youtubeUrl}
+              setYoutubeUrl={setYoutubeUrl}
+              onAddYoutube={addYoutubeEmbed}
+              onFetchYoutubeMetadata={fetchYoutubeMetadata}
+              youtubeMetadata={youtubeMetadata}
+              isFetchingYoutubeMetadata={isFetchingYoutubeMetadata}
+              youtubeMetadataError={youtubeMetadataError}
+            />
+
+            <ImageDialogButton
+              editor={editor}
+              imageUrl={imageUrl}
+              setImageUrl={setImageUrl}
+              onAddImage={addImage}
+              onOpenLibrary={() => {
+                setMediaLibrarySelectType('image')
+                setMediaLibraryOpen(true)
+              }}
+              isUploading={isUploading}
+              uploadProgress={uploadProgress}
+              fileInputRef={fileInputRef}
+              onFileInputChange={handleFileInputChange}
+            />
+
+            <FileDialogButton
+              editor={editor}
+              isUploadingFile={isUploadingFile}
+              fileUploadProgress={fileUploadProgress}
+              fileInputRef={fileUploadInputRef}
+              onFileInputChange={handleFileUploadInputChange}
+              onFileDrop={handleGenericFileUpload}
+              onInsertFromUrl={handleInsertFileFromUrl}
+              onOpenLibrary={() => {
+                setMediaLibrarySelectType('file')
+                setMediaLibraryOpen(true)
+              }}
+            />
+
+            <AudioDialogButton
+              editor={editor}
+              isUploadingAudio={isUploadingAudio}
+              audioUploadProgress={audioUploadProgress}
+              audioInputRef={audioInputRef}
+              onAudioInputChange={handleAudioInputChange}
+              onAudioDrop={handleAudioUpload}
+              onInsertFromUrl={handleInsertAudioFromUrl}
+              onOpenLibrary={() => {
+                setMediaLibrarySelectType('audio')
+                setMediaLibraryOpen(true)
+              }}
+            />
+
+            <VideoDialogButton
+              editor={editor}
+              isUploadingVideo={isUploadingVideo}
+              videoUploadProgress={videoUploadProgress}
+              videoInputRef={videoInputRef}
+              onVideoInputChange={handleVideoInputChange}
+              onVideoDrop={handleVideoUpload}
+              onInsertFromUrl={handleInsertVideoFromUrl}
+              onOpenLibrary={() => {
+                setMediaLibrarySelectType('video')
+                setMediaLibraryOpen(true)
+              }}
+            />
+
+            <TableInsertDialogButton
+              editor={editor}
+              open={tableDialogOpen}
+              onOpenChange={setTableDialogOpen}
+              rows={rows}
+              cols={cols}
+              withHeaderRow={withHeaderRow}
+              setRows={setRows}
+              setCols={setCols}
+              setWithHeaderRow={setWithHeaderRow}
+              onInsert={insertTable}
+            />
+
+            <TableOperationsDropdown
+              editor={editor}
+              onAddColumnBefore={addColumnBefore}
+              onAddColumnAfter={addColumnAfter}
+              onDeleteColumn={deleteColumn}
+              onAddRowBefore={addRowBefore}
+              onAddRowAfter={addRowAfter}
+              onDeleteRow={deleteRow}
+              onMergeOrSplitCells={mergeOrSplitCells}
+              onDeleteTable={deleteTable}
+            />
+
+            <UtilsBubbleMenu editor={editor} />
+
+            <div className="flex-1"></div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={isPreviewMode ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setIsPreviewMode((prev) => !prev)}
+                  className="ml-auto"
+                >
+                  {isPreviewMode ? (
+                    <>
+                      <EyeOff className="h-4 w-4" />
+                      Edit
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="h-4 w-4" />
+                      Preview
+                    </>
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {isPreviewMode ? 'Switch to Edit Mode' : 'Switch to Preview Mode'}
+              </TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={saveContent}
+                  disabled={isSaving || !editor?.isEditable}
+                >
+                  {isSaving ? (
+                    <Loader className="h-4 w-4 animate-spin" />
+                  ) : error ? (
+                    <>
+                      <X className="h-4 w-4" />
+                    </>
+                  ) : (
+                    <Check className="h-4 w-4" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Local Status</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+      )}
+
+      {/* Bubble Menu for quick formatting */}
+      {editor && !readOnly && !isPreviewMode && (
+        <BubbleMenu
+          editor={editor}
+          shouldShow={({ editor: currentEditor, state }) => {
+            if (!currentEditor.isEditable) return false
+            if (selectedImage) return true
+            const selection = state.selection
+            const isCellSelection =
+              '$anchorCell' in (selection as Selection) && '$headCell' in (selection as Selection)
+            if (isCellSelection) return true
+            if (selection instanceof NodeSelection) {
+              return isTableNodeName(selection.node.type.name)
+            }
+            return !state.selection.empty
+          }}
+          className="bg-background rounded-md shadow-md p-1 flex gap-1 border"
+        >
+          <>
+            {isInTableContext ? (
+              <TableBubbleMenu
+                onAddColumnBefore={addColumnBefore}
+                onAddColumnAfter={addColumnAfter}
+                onDeleteColumn={deleteColumn}
+                onAddRowBefore={addRowBefore}
+                onAddRowAfter={addRowAfter}
+                onDeleteRow={deleteRow}
+                onMergeOrSplitCells={mergeOrSplitCells}
+                onDeleteTable={deleteTable}
+              />
+            ) : (
+              <>
+                {!selectedImage && <TextBubbleMenu editor={editor} />}
+                <ImageBubbleMenu
+                  editor={editor}
+                  selectedImage={selectedImage}
+                  renderImagePopover={renderImagePopover}
+                  enableImagePopover={false}
+                />
+                <UtilsBubbleMenu editor={editor} />
+              </>
+            )}
+          </>
+        </BubbleMenu>
+      )}
+
+      <div ref={editorContentRef}>
+        <EditorContent
+          editor={editor}
+          className={cn(
+            'prose max-w-none focus:outline-none min-h-[200px]',
+            readOnly ? 'p-0' : 'p-4 ',
+            editorClassName
+          )}
+        />
+      </div>
+
+      {/* Media Library Dialog */}
+      <MediaLibraryDialog
+        open={mediaLibraryOpen}
+        onOpenChange={setMediaLibraryOpen}
+        pickerType={mediaLibrarySelectType}
+        onSelectImage={(url) => {
+          if (editor) {
+            if (mediaLibrarySelectType === 'file') {
+              handleInsertFileFromUrl(url)
+            } else if (mediaLibrarySelectType === 'audio') {
+              handleInsertAudioFromUrl(url)
+            } else if (mediaLibrarySelectType === 'video') {
+              handleInsertVideoFromUrl(url)
+            } else {
+              editor.chain().focus().setImage({ src: url }).run()
+            }
+          }
+        }}
+        getURL={getMediaURL!}
+        deleteURL={deleteMediaURL!}
+      />
+    </div>
+  )
+}

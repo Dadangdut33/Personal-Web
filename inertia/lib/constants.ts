@@ -1,5 +1,6 @@
 import { route } from '@izzyjs/route/client'
 import {
+  BookText,
   Bot,
   Boxes,
   History,
@@ -72,6 +73,13 @@ export const DASHBOARD_NAV = {
     },
   ],
   management: [
+    {
+      title: 'Blogs',
+      url: '/dashboard/blogs',
+      icon: BookText,
+      flat: true,
+      requiredPermission: 'blog.view',
+    },
     {
       title: 'Media',
       url: route('media.index').path,

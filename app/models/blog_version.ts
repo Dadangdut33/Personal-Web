@@ -1,0 +1,78 @@
+import Tables from '#enums/tables'
+
+import { BaseModel, beforeCreate, belongsTo, column, manyToMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, ManyToMany } from '@adonisjs/lucid/types/relations'
+import { DateTime } from 'luxon'
+import { randomUUID } from 'node:crypto'
+
+import Blog from './blog.js'
+import Media from './media.js'
+import Tag from './tag.js'
+
+export default class BlogVersion extends BaseModel {
+  static table = Tables.BLOG_VERSIONS
+
+  @column({ isPrimary: true })
+  declare id: string
+
+  @column()
+  declare blog_id: string
+
+  @column()
+  declare version: number
+
+  @column()
+  declare change_type: 'create' | 'update'
+
+  @column()
+  declare slug_id: string
+
+  @column()
+  declare title: string
+
+  @column()
+  declare thumbnail_id: string | null
+
+  @column()
+  declare description: string | null
+
+  @column({
+    prepare: (value) => JSON.stringify(value),
+    consume: (value) => JSON.parse(value),
+  })
+  declare content: Record<string, any>
+
+  @column({
+    prepare: (value) => JSON.stringify(value),
+    consume: (value) => JSON.parse(value),
+  })
+  declare changed_fields: string[] | null
+
+  @belongsTo(() => Blog, {
+    foreignKey: 'blog_id',
+  })
+  declare blog: BelongsTo<typeof Blog>
+
+  @belongsTo(() => Media, {
+    foreignKey: 'thumbnail_id',
+  })
+  declare thumbnail: BelongsTo<typeof Media>
+
+  @manyToMany(() => Tag, {
+    pivotTable: Tables.BLOG_VERSION_TAGS,
+    pivotForeignKey: 'blog_version_id',
+    pivotRelatedForeignKey: 'tag_id',
+  })
+  declare tags: ManyToMany<typeof Tag>
+
+  @column.dateTime({ autoCreate: true })
+  declare created_at: DateTime
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updated_at: DateTime | null
+
+  @beforeCreate()
+  static assignUuid(self: BlogVersion) {
+    self.id = randomUUID()
+  }
+}

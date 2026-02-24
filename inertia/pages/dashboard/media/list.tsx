@@ -9,7 +9,6 @@ import {
   AspectRatio,
   Badge,
   Box,
-  Button,
   Card,
   Center,
   Checkbox,
@@ -17,14 +16,12 @@ import {
   CopyButton,
   Group,
   Image,
-  Loader,
   Tooltip as MantineTooltip,
   Paper,
   SegmentedControl,
   SimpleGrid,
   Table,
   Text,
-  TextInput,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
@@ -38,11 +35,10 @@ import {
   IconMovie,
   IconMusic,
   IconPhoto,
-  IconSearch,
   IconTrash,
 } from '@tabler/icons-react'
 import dayjs from 'dayjs'
-import { ListRestart, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import {
   DataTable,
   DataTableProps,
@@ -50,16 +46,17 @@ import {
   useDataTableColumns,
 } from 'mantine-datatable'
 import { useState } from 'react'
+import { DashboardSearchPanel } from '~/components/core/dashboard/search-panel'
+import { DashboardTableButtons } from '~/components/core/dashboard/table-buttons'
 import { GenericBulkDeleteDescription, GenericDeleteTitle } from '~/components/core/delete-helper'
 import { useModals } from '~/components/core/modal/modal-hooks'
 import { FilterDate } from '~/components/core/table-filter/date-filter'
 import { FilterText } from '~/components/core/table-filter/text-filter'
 import { TooltipIfTrue } from '~/components/core/tooltipper'
-import classes from '~/css/TableUtils.module.css'
 import { useDeleteGeneric } from '~/hooks/use_generic_delete'
 import useSearchFilter from '~/hooks/use_search_filter'
 import DashboardLayout from '~/layouts/dashboard'
-import { cn, formatBytes } from '~/lib/utils'
+import { formatBytes } from '~/lib/utils'
 
 const baseRoute = 'media'
 const basePerm = 'media'
@@ -232,8 +229,8 @@ export default function page(props: PageProps) {
               <Table.Td className="break-all">
                 <div className="flex flex-wrap gap-2">
                   {record.tags?.map((tag) => (
-                    <Badge key={tag} variant="light">
-                      {tag}
+                    <Badge key={tag.id} variant="light">
+                      {tag.name}
                     </Badge>
                   ))}
                 </div>
@@ -324,14 +321,14 @@ export default function page(props: PageProps) {
       filtering: searchFilter.searchBy.mime_type ? true : false,
     },
     {
-      accessor: 'tags',
+      accessor: 'tags.name',
       title: 'Tags',
       toggleable: true,
       sortable: true,
       width: 160,
       filter: () => (
         <FilterText
-          column={'tags'}
+          column={'tags.name'}
           searchFilter={searchFilter}
           label="Tags"
           description="Filter by tags"
@@ -340,13 +337,13 @@ export default function page(props: PageProps) {
       render: (record) => (
         <div className="flex flex-wrap gap-2">
           {record.tags?.map((tag) => (
-            <Badge key={tag} variant="light">
-              {tag}
+            <Badge key={tag.id} variant="light">
+              {tag.name}
             </Badge>
           ))}
         </div>
       ),
-      filtering: searchFilter.searchBy.tags ? true : false,
+      filtering: searchFilter.searchBy['tags.name'] ? true : false,
     },
     {
       accessor: 'size',
@@ -454,7 +451,6 @@ export default function page(props: PageProps) {
       columns,
       key,
     })
-  const thereIsHiddenColumn = effectiveColumns.some((col) => col.hidden)
   const resetColumnState = () => {
     resetColumnsToggle()
     resetColumnsWidth()
@@ -465,88 +461,58 @@ export default function page(props: PageProps) {
     <DashboardLayout breadcrumbs={breadcrumbs}>
       <Head title={pageTitle} />
       <div className="space-y-4">
-        <Paper p="md" shadow="md" radius="md" withBorder mb={'md'}>
-          <Group justify="space-between" mb="md">
-            <Group>
-              <Button
-                color="red"
-                leftSection={<IconTrash size={18} />}
-                onClick={confirmBulkDel}
-                disabled={selectedRecords.length === 0 || !canDelete}
-              >
-                {selectedRecords.length
-                  ? `Delete Selected (${selectedRecords.length})`
-                  : 'Batch Delete'}
-              </Button>
-            </Group>
-            <Group ms={'auto'} gap={'xs'} justify="flex-end">
-              <SegmentedControl
-                value={viewMode}
-                onChange={(value) => setViewMode(value as 'list' | 'grid')}
-                data={[
-                  {
-                    label: (
-                      <Center>
-                        <IconList size={16} />
-                        <Box ml={5}>List</Box>
-                      </Center>
-                    ),
-                    value: 'list',
-                  },
-                  {
-                    label: (
-                      <Center>
-                        <IconLayoutGrid size={16} />
-                        <Box ml={5}>Gallery</Box>
-                      </Center>
-                    ),
-                    value: 'grid',
-                  },
-                ]}
-              />
+        <DashboardTableButtons
+          searching={searching}
+          canResetSearch={searchFilter.searchParamIsSet}
+          selectedRecords={selectedRecords}
+          canDelete={canDelete}
+          showAddButton={false}
+          addHref={route(`${baseRoute}.create`).path}
+          onToggleSearch={handleSearchingButton}
+          onBulkDelete={confirmBulkDel}
+          onResetFilter={() => {
+            searchFilter.resetSearch()
+          }}
+          onResetColumns={resetColumnState}
+          labels={{
+            noDeletePermission: "You don't have permission to delete media",
+            bulkDeleteMin: 'Select at least 1 record to delete',
+          }}
+        />
 
-              <Group gap={'xs'} justify="flex-end">
-                <TextInput
-                  placeholder="Search..."
-                  leftSection={
-                    searchFilter.isFetching ? <Loader size={16} /> : <IconSearch size={16} />
-                  }
-                  value={searchFilter.search}
-                  onChange={(e) => {
-                    searchFilter.onSearch(e.currentTarget.value)
-                  }}
-                  className={cn(classes.searchInput, {
-                    [classes.appearAnimation]: searching,
-                    [classes.disappearAnimation]: !searching,
-                  })}
-                />
+        <DashboardSearchPanel
+          opened={searching}
+          value={searchFilter.search}
+          onChange={(value) => searchFilter.onSearch(value)}
+          placeholder={`Search ${pageTitle.toLowerCase()}...`}
+        />
 
-                <MantineTooltip label="Search" withArrow>
-                  <ActionIcon
-                    variant="outline"
-                    size={'lg'}
-                    onClick={handleSearchingButton}
-                    loading={searchFilter.isFetching}
-                  >
-                    <IconSearch />
-                  </ActionIcon>
-                </MantineTooltip>
-              </Group>
-
-              {viewMode === 'list' && (
-                <MantineTooltip label="Reset columns state" withArrow>
-                  <ActionIcon
-                    variant="outline"
-                    color="gray"
-                    size={'lg'}
-                    onClick={resetColumnState}
-                    disabled={!thereIsHiddenColumn}
-                  >
-                    <ListRestart />
-                  </ActionIcon>
-                </MantineTooltip>
-              )}
-            </Group>
+        <Paper p="xs" shadow="md" radius="md" withBorder>
+          <Group mb={'md'}>
+            <SegmentedControl
+              value={viewMode}
+              onChange={(value) => setViewMode(value as 'list' | 'grid')}
+              data={[
+                {
+                  label: (
+                    <Center>
+                      <IconList size={16} />
+                      <Box ml={5}>List</Box>
+                    </Center>
+                  ),
+                  value: 'list',
+                },
+                {
+                  label: (
+                    <Center>
+                      <IconLayoutGrid size={16} />
+                      <Box ml={5}>Gallery</Box>
+                    </Center>
+                  ),
+                  value: 'grid',
+                },
+              ]}
+            />
           </Group>
 
           {viewMode === 'list' ? (

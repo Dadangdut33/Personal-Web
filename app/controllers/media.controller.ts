@@ -4,6 +4,7 @@ import ActivityLogService from '#services/activity_log.service'
 import MediaService from '#services/media.service'
 import PermissionCheckService from '#services/permission_check.service'
 import { PaginationMeta } from '#types/app'
+import { mediaUploadAPIValidator } from '#validators/media'
 
 import cache from '@adonisjs/cache/services/main'
 import { inject } from '@adonisjs/core'
@@ -18,11 +19,11 @@ export default class MediaController {
     protected activityLogSvc: ActivityLogService
   ) {}
 
-  async viewList({ request, bouncer, inertia }: HttpContext) {
+  async viewList({ request, bouncer, inertia, auth }: HttpContext) {
     await bouncer.with('MediaPolicy').authorize('view')
 
     const q = mapRequestToQueryParams(request)
-    const dataQ = await this.mediaSvc.index(q)
+    const dataQ = await this.mediaSvc.indexByUser(auth.user!, q)
 
     return inertia.render('dashboard/media/list', {
       data: MediaDto.collect(dataQ.all()),
@@ -35,6 +36,8 @@ export default class MediaController {
       await bouncer.with('MediaPolicy').authorize('delete')
 
       const id = params.id
+      await bouncer.with('MediaPolicy').authorize('accessByTag', id)
+
       await this.mediaSvc.delete(id)
       await this.activityLogSvc.log(
         auth.user!.id,
@@ -58,6 +61,8 @@ export default class MediaController {
 
       const { ids } = request.only(['ids'])
       if (!ids || !Array.isArray(ids)) return response.badRequest('Invalid ids provided')
+
+      await bouncer.with('MediaPolicy').authorize('accessBulkByTag', ids)
 
       await this.mediaSvc.deleteBulk(ids)
       await this.activityLogSvc.log(
@@ -103,6 +108,80 @@ export default class MediaController {
       return response.redirect(url)
     } catch (error) {
       return returnError(response, error, `MEDIA_PROXY`, { logErrors: true })
+    }
+  }
+
+  async getMediaListAPI({ request, response, bouncer, auth }: HttpContext) {
+    try {
+      await bouncer.with('MediaPolicy').authorize('view')
+
+      const q = mapRequestToQueryParams(request)
+      const dataQ = await this.mediaSvc.indexByUser(auth.user!, q)
+
+      return response.status(200).json({
+        status: 'success',
+        data: MediaDto.collect(dataQ.all()),
+        meta: dataQ.getMeta(),
+      })
+    } catch (error) {
+      return returnError(response, error, 'MEDIA_LIST', {})
+    }
+  }
+
+  async uploadMediaAPI({ request, response, bouncer, auth }: HttpContext) {
+    try {
+      await bouncer.with('MediaPolicy').authorize('create', request)
+
+      const userId = auth.user!.id
+      const payload = await request.validateUsing(mediaUploadAPIValidator)
+      const onDupe = payload.tags?.includes('blog-content') ? 'use_old' : 'add'
+
+      const media = await this.mediaSvc.upload(payload.file, {
+        keyPrefix: `${userId}/uploads`,
+        tags: payload.tags,
+        onDupe,
+      })
+
+      await this.activityLogSvc.log(
+        userId,
+        'upload_media',
+        `Uploaded media with id:\n\`\`\`\n${media.id}\n\`\`\``,
+        getRequestFingerprint(request)
+      )
+
+      return response.status(201).json({
+        status: 'success',
+        message: 'File uploaded successfully.',
+        data: new MediaDto(media),
+      })
+    } catch (error) {
+      return returnError(response, error, 'MEDIA_UPLOAD', { logValidation: true })
+    }
+  }
+
+  async deleteMediaAPI({ request, response, bouncer, auth }: HttpContext) {
+    try {
+      await bouncer.with('MediaPolicy').authorize('delete')
+
+      const { id } = request.only(['id'])
+      if (!id) return response.badRequest('Media id is required')
+
+      await bouncer.with('MediaPolicy').authorize('accessByTag', id)
+
+      await this.mediaSvc.delete(id)
+      await this.activityLogSvc.log(
+        auth.user!.id,
+        'delete_media',
+        `Deleted media with id:\n\`\`\`\n${id}\n\`\`\``,
+        getRequestFingerprint(request)
+      )
+
+      return response.status(200).json({
+        status: 'success',
+        message: 'Successfully deleted media.',
+      })
+    } catch (error) {
+      return returnError(response, error, 'MEDIA_DELETE', {})
     }
   }
 }

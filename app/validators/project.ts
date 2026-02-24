@@ -1,6 +1,6 @@
 import vine from '@vinejs/vine'
 
-export const projectValidator = vine.compile(
+export const projectValidator = vine.create(
   vine.object({
     id: vine.number().optional(),
     is_active: vine.boolean().optional(),

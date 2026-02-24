@@ -6,6 +6,7 @@ enum Tables {
   ROLES = 'roles',
   PERMISSIONS = 'permissions',
   ROLE_PERMISSIONS = 'role_permissions',
+  ROLE_MEDIA_TAGS = 'role_media_tags',
 
   // system
   TOKENS = 'tokens',
@@ -18,6 +19,11 @@ enum Tables {
   PROJECTS = 'projects',
   BLOGS = 'blogs',
   BLOGS_PROJECTS = 'blogs_projects',
+  TAGS = 'tags',
+  BLOG_VERSIONS = 'blog_versions',
+  BLOG_TAGS = 'blog_tags',
+  BLOG_VERSION_TAGS = 'blog_version_tags',
+  MEDIA_TAGS = 'media_tags',
 }
 
 export default Tables

@@ -4,31 +4,18 @@ import { RouteNameType } from '#types/app'
 import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import { Head, Link } from '@inertiajs/react'
 import { route } from '@izzyjs/route/client'
-import {
-  ActionIcon,
-  Alert,
-  Button,
-  Group,
-  Loader,
-  Tooltip as MantineTooltip,
-  Menu,
-  Paper,
-  Text,
-  TextInput,
-} from '@mantine/core'
+import { ActionIcon, Alert, Tooltip as MantineTooltip, Menu, Paper, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
   IconAlertCircle,
   IconCheck,
   IconDotsVertical,
   IconEdit,
-  IconPlus,
-  IconSearch,
   IconTrash,
   IconX,
 } from '@tabler/icons-react'
 import dayjs from 'dayjs'
-import { ListRestart, Trash2 } from 'lucide-react'
+import { Trash2 } from 'lucide-react'
 import {
   DataTable,
   DataTableProps,
@@ -36,16 +23,16 @@ import {
   useDataTableColumns,
 } from 'mantine-datatable'
 import { useState } from 'react'
+import { DashboardSearchPanel } from '~/components/core/dashboard/search-panel'
+import { DashboardTableButtons } from '~/components/core/dashboard/table-buttons'
 import { GenericBulkDeleteDescription, GenericDeleteTitle } from '~/components/core/delete-helper'
 import { FilterDate } from '~/components/core/table-filter/date-filter'
 import { FilterRadio } from '~/components/core/table-filter/radio-filter'
 import { FilterText } from '~/components/core/table-filter/text-filter'
 import { TooltipIfTrue } from '~/components/core/tooltipper'
-import classes from '~/css/TableUtils.module.css'
 import { useDeleteGeneric } from '~/hooks/use_generic_delete'
 import useSearchFilter from '~/hooks/use_search_filter'
 import DashboardLayout from '~/layouts/dashboard'
-import { cn } from '~/lib/utils'
 
 const baseRoute = 'permission'
 const basePerm = 'permission'
@@ -290,7 +277,6 @@ export default function page(props: PageProps) {
       columns,
       key,
     })
-  const thereIsHiddenColumn = effectiveColumns.some((col) => col.hidden)
   const resetColumnState = () => {
     resetColumnsToggle()
     resetColumnsWidth()
@@ -301,19 +287,6 @@ export default function page(props: PageProps) {
     <DashboardLayout breadcrumbs={breadcrumbs}>
       <Head title={pageTitle} />
       <div className="space-y-4">
-        <Group>
-          <TooltipIfTrue isTrue={!canAdd} label="You don't have permission to create a new role">
-            <Button
-              leftSection={<IconPlus size={18} />}
-              href={route(`${baseRoute}.create`).path}
-              component={canAdd ? Link : undefined}
-              disabled={!canAdd}
-            >
-              Add
-            </Button>
-          </TooltipIfTrue>
-        </Group>
-
         <Alert
           title="About Protected Permissions"
           color="red"
@@ -330,63 +303,35 @@ export default function page(props: PageProps) {
           coresponding permissions.
         </Alert>
 
+        <DashboardTableButtons
+          searching={searching}
+          canResetSearch={searchFilter.searchParamIsSet}
+          selectedRecords={selectedRecords}
+          canDelete={canDelete}
+          canAdd={canAdd}
+          showAddButton={true}
+          addHref={route(`${baseRoute}.create`).path}
+          onToggleSearch={handleSearchingButton}
+          onBulkDelete={confirmBulkDel}
+          onResetFilter={() => {
+            searchFilter.resetSearch()
+          }}
+          onResetColumns={resetColumnState}
+          labels={{
+            noDeletePermission: "You don't have permission to delete role",
+            noAddPermission: "You don't have permission to add role",
+            bulkDeleteMin: 'Select at least 1 record to delete',
+          }}
+        />
+
+        <DashboardSearchPanel
+          opened={searching}
+          value={searchFilter.search}
+          onChange={(value) => searchFilter.onSearch(value)}
+          placeholder={`Search ${pageTitle.toLowerCase()}...`}
+        />
+
         <Paper p="md" shadow="md" radius="md" withBorder mb={'md'}>
-          <Group justify="space-between" mb="md">
-            <Group>
-              <Button
-                color="red"
-                leftSection={<IconTrash size={18} />}
-                onClick={confirmBulkDel}
-                disabled={selectedRecords.length === 0 || !canDelete}
-              >
-                {selectedRecords.length
-                  ? `Delete Selected (${selectedRecords.length})`
-                  : 'Batch Delete'}
-              </Button>
-            </Group>
-            <Group ms={'auto'} gap={'xs'} justify="flex-end">
-              <Group gap={'xs'} justify="flex-end">
-                <TextInput
-                  placeholder="Cari..."
-                  leftSection={
-                    searchFilter.isFetching ? <Loader size={16} /> : <IconSearch size={16} />
-                  }
-                  value={searchFilter.search}
-                  onChange={(e) => {
-                    searchFilter.onSearch(e.currentTarget.value)
-                  }}
-                  className={cn(classes.searchInput, {
-                    [classes.appearAnimation]: searching,
-                    [classes.disappearAnimation]: !searching,
-                  })}
-                />
-
-                <MantineTooltip label="Cari" withArrow>
-                  <ActionIcon
-                    variant="outline"
-                    size={'lg'}
-                    onClick={handleSearchingButton}
-                    loading={searchFilter.isFetching}
-                  >
-                    <IconSearch />
-                  </ActionIcon>
-                </MantineTooltip>
-              </Group>
-
-              <MantineTooltip label="Reset columns toggle state" withArrow>
-                <ActionIcon
-                  variant="outline"
-                  color="gray"
-                  size={'lg'}
-                  onClick={resetColumnState}
-                  disabled={!thereIsHiddenColumn}
-                >
-                  <ListRestart />
-                </ActionIcon>
-              </MantineTooltip>
-            </Group>
-          </Group>
-
           <DataTable
             minHeight={
               searchFilter.searchParamIsSet || searchFilter.isFetching || data.length === 0

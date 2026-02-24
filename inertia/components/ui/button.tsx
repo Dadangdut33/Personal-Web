@@ -12,6 +12,8 @@ export type btnVariant =
   | 'destructive'
   | 'green'
   | 'noShadow'
+  | 'ghost'
+  | 'outline'
   | 'none'
 
 const buttonVariants = cva(
@@ -33,6 +35,10 @@ const buttonVariants = cva(
           'bg-destructive text-destructive-foreground border-2 border-border shadow-shadow hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none',
         green:
           'bg-green-500 text-white border-2 border-green-600 shadow-shadow hover:translate-x-boxShadowX hover:translate-y-boxShadowY hover:shadow-none',
+        ghost:
+          'bg-transparent text-foreground border-2 border-transparent shadow-none hover:bg-secondary-background hover:border-border active:bg-secondary-background/80',
+        outline:
+          'bg-transparent text-foreground border-2 border-border shadow-none hover:bg-secondary-background active:bg-secondary-background/80',
         none: '',
       },
       size: {

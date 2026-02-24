@@ -7,13 +7,8 @@ export default class extends BaseSchema {
 
   async up() {
     this.schema.createTable(this.tableName, (table) => {
-      table
-        .integer('project_id')
-        .unsigned()
-        .references('id')
-        .inTable(Tables.PROJECTS)
-        .onDelete('CASCADE')
-      table.integer('blog_id').unsigned().references('id').inTable(Tables.BLOGS).onDelete('CASCADE')
+      table.uuid('project_id').references('id').inTable(Tables.PROJECTS).onDelete('CASCADE')
+      table.uuid('blog_id').references('id').inTable(Tables.BLOGS).onDelete('CASCADE')
       table.primary(['project_id', 'blog_id'])
 
       table.timestamp('created_at')

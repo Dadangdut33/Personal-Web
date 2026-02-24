@@ -1,4 +1,5 @@
 import { loginValidator, registerValidator, resetPasswordValidator } from '#validators/auth/auth'
+import { createEditBlogValidator } from '#validators/auth/blog'
 import { createEditPermissionValidator } from '#validators/auth/permission'
 import { createEditRoleValidator } from '#validators/auth/role'
 import { createProfileValidator, updateProfileValidator } from '#validators/profile'
@@ -13,6 +14,7 @@ export type ResetPasswordPayload = Infer<typeof resetPasswordValidator>
 export type UserPayload = Infer<typeof createEditUserValidator>
 export type RolePayload = Infer<typeof createEditRoleValidator>
 export type PermissionPayload = Infer<typeof createEditPermissionValidator>
+export type BlogPayload = Infer<typeof createEditBlogValidator>
 
 export type UpdateProfilePayload = Infer<typeof updateProfileValidator>
 export type CreateProfilePayload = Infer<typeof createProfileValidator>

@@ -12,6 +12,7 @@ export interface QueryBuilderParams<T extends LucidModel> {
 
   sortBy?: string
   sortDirection?: 'asc' | 'desc'
+  filter?: 'all' | 'images' | 'files' | 'videos' | 'audio'
   preload?: ExtractModelRelations<InstanceType<T>>[]
   filters?: Partial<ModelAttributes<InstanceType<T>>>
 

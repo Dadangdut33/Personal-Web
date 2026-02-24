@@ -1,5 +1,7 @@
 import type { FormErrors } from '@mantine/form'
 
+import { PaginationMeta } from './app.js'
+
 export interface TurnstileResponse {
   'success': boolean
   'challenge_ts': string
@@ -16,6 +18,7 @@ export interface BaseAPIResponse<T = any> {
   status: 'success' | 'error'
   message: string
   data?: T
+  meta?: PaginationMeta
   redirect_to?: string
   form_errors?: FormErrors
   unique_error_uuid?: string

@@ -37,9 +37,9 @@ export default function DashboardLayout({
   return (
     <SidebarProvider>
       <AppSidebar user={props.user!} />
-      <SidebarInset>
+      <SidebarInset className="min-w-0 overflow-hidden">
         <header className="flex h-16 shrink-0 items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12">
-          <div className="w-full">
+          <div className="w-full min-w-0">
             <div className="flex items-center gap-2 px-4 ">
               {/* left side */}
               <SidebarTriggerOrResetWidth className="-ml-1" />
@@ -72,7 +72,9 @@ export default function DashboardLayout({
             {withSeparator && <Separator className="mt-1 mb-2" />}
           </div>
         </header>
-        <div className={cn('flex flex-1 flex-col px-4 pt-0 pb-4', className)}>{children}</div>
+        <div className={cn('flex min-h-0 min-w-0 flex-1 flex-col px-4 pt-0 pb-4', className)}>
+          {children}
+        </div>
       </SidebarInset>
     </SidebarProvider>
   )
