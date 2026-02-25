@@ -4,11 +4,34 @@ import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
 import { route } from '@izzyjs/route/client'
-import { Button, Group, MultiSelect, Paper, Stack, Text, TextInput, Textarea } from '@mantine/core'
+import {
+  Alert,
+  Button,
+  Group,
+  Image,
+  MultiSelect,
+  Paper,
+  Stack,
+  TagsInput,
+  Text,
+  TextInput,
+  Textarea,
+} from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { IconArrowLeft, IconCancel, IconDeviceFloppy } from '@tabler/icons-react'
-import { useState } from 'react'
+import {
+  IconArrowLeft,
+  IconCancel,
+  IconDeviceFloppy,
+  IconPhoto,
+  IconPhotoPlus,
+  IconTrash,
+  IconUpload,
+} from '@tabler/icons-react'
+import type React from 'react'
+import { useRef, useState } from 'react'
 import TiptapEditor from '~/components/RTE'
+import MediaLibraryDialog from '~/components/RTE/media-library-dialog'
+import { uploadImage } from '~/components/RTE/upload-service'
 import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyInfo } from '~/components/core/notify'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
@@ -27,13 +50,31 @@ function formSafeTitle(value: string) {
     .replace(/^-+|-+$/g, '')
 }
 
+function extractMediaIdFromRedirectUrl(value: string): string | null {
+  if (!value) return null
+
+  try {
+    const parsed = new URL(value, window.location.origin)
+    const match = parsed.pathname.match(/^\/api\/v1\/media\/redirect\/([^/?#]+)$/)
+    return match?.[1] ? decodeURIComponent(match[1]) : null
+  } catch {
+    return null
+  }
+}
+
 export default function Page(
   props: SharedProps &
     (InferPageProps<BlogController, 'viewEdit'> | InferPageProps<BlogController, 'viewCreate'>)
 ) {
-  const { data, projects } = props
+  const { data, projects, availableTags } = props
   const defaultContent = { type: 'doc', content: [] }
   const [content, setContent] = useState<Record<string, any>>(data?.content || defaultContent)
+  const [thumbnailPreviewUrl, setThumbnailPreviewUrl] = useState<string>(data?.thumbnail?.url || '')
+  const [thumbnailUploadError, setThumbnailUploadError] = useState<string | null>(null)
+  const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false)
+  const [mediaLibraryOpen, setMediaLibraryOpen] = useState(false)
+  const thumbnailInputRef = useRef<HTMLInputElement>(null)
+  const tagSuggestions = (availableTags || []).map((tag) => tag.name)
 
   const breadcrumbs = [
     {
@@ -58,7 +99,7 @@ export default function Page(
       title: data ? data.title : '',
       thumbnail_id: data?.thumbnail_id || '',
       description: data?.description || '',
-      tags_input: data?.tags?.map((tag) => tag.name).join(', ') || '',
+      tags: data?.tags?.map((tag) => tag.name) || ([] as string[]),
       projectIds: data?.projects?.map((project) => project.id) || ([] as string[]),
     },
     validate: {
@@ -86,10 +127,9 @@ export default function Page(
         thumbnail_id: form.values.thumbnail_id ? form.values.thumbnail_id : null,
         description: form.values.description ? form.values.description : null,
         content,
-        tags: form.values.tags_input
-          .split(',')
-          .map((tag) => tag.trim())
-          .filter((tag) => tag.length > 0),
+        tags: Array.from(
+          new Set(form.values.tags.map((tag) => tag.trim()).filter((tag) => tag.length > 0))
+        ),
         projectIds: form.values.projectIds,
       })
     },
@@ -99,6 +139,8 @@ export default function Page(
     onConfirm: () => {
       form.reset()
       setContent(data?.content || defaultContent)
+      setThumbnailPreviewUrl(data?.thumbnail?.url || '')
+      setThumbnailUploadError(null)
       NotifyInfo('Form Reseted', 'Form has been reseted successfully')
     },
     name: 'Form',
@@ -112,6 +154,44 @@ export default function Page(
     confirmText: 'Go Back',
     confirmVariant: 'destructive',
   })
+
+  const setThumbnailFromUrl = (url: string) => {
+    const mediaId = extractMediaIdFromRedirectUrl(url)
+    if (!mediaId) {
+      setThumbnailUploadError('Selected media URL is invalid.')
+      return
+    }
+
+    form.setFieldValue('thumbnail_id', mediaId)
+    setThumbnailPreviewUrl(url)
+    setThumbnailUploadError(null)
+  }
+
+  const clearThumbnail = () => {
+    form.setFieldValue('thumbnail_id', '')
+    setThumbnailPreviewUrl('')
+    setThumbnailUploadError(null)
+  }
+
+  const handleThumbnailFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    setThumbnailUploadError(null)
+    setIsUploadingThumbnail(true)
+    try {
+      const uploadedMedia = await uploadImage(file, route('api.v1.media.upload').path, ['blog-content'])
+      form.setFieldValue('thumbnail_id', uploadedMedia.id)
+      setThumbnailPreviewUrl(uploadedMedia.url)
+    } catch (error) {
+      setThumbnailUploadError(error instanceof Error ? error.message : 'Failed to upload thumbnail')
+    } finally {
+      setIsUploadingThumbnail(false)
+      if (thumbnailInputRef.current) {
+        thumbnailInputRef.current.value = ''
+      }
+    }
+  }
 
   return (
     <DashboardLayout breadcrumbs={breadcrumbs}>
@@ -176,13 +256,82 @@ export default function Page(
               disabled
             />
 
-            <TextInput
-              label="Thumbnail Media ID"
-              placeholder="UUID media id"
-              value={form.values.thumbnail_id}
-              disabled={mutation.isPending}
-              onChange={(e) => form.setFieldValue('thumbnail_id', e.target.value)}
-            />
+            <Stack gap={8}>
+              <Text size="sm" fw={500}>
+                Thumbnail
+              </Text>
+
+              {thumbnailPreviewUrl ? (
+                <Image
+                  src={thumbnailPreviewUrl}
+                  alt="Blog thumbnail preview"
+                  radius="md"
+                  h={220}
+                  fit="cover"
+                  fallbackSrc="https://placehold.co/800x400?text=Thumbnail"
+                />
+              ) : (
+                <Paper withBorder radius="md" p="md">
+                  <Group>
+                    <IconPhoto size={18} />
+                    <Text size="sm" c="dimmed">
+                      No thumbnail selected
+                    </Text>
+                  </Group>
+                </Paper>
+              )}
+
+              <Group>
+                <Button
+                  variant="outline"
+                  leftSection={<IconPhotoPlus size={16} />}
+                  disabled={mutation.isPending || isUploadingThumbnail}
+                  onClick={() => setMediaLibraryOpen(true)}
+                >
+                  Select From Library
+                </Button>
+                <Button
+                  variant="outline"
+                  leftSection={<IconUpload size={16} />}
+                  loading={isUploadingThumbnail}
+                  disabled={mutation.isPending}
+                  onClick={() => thumbnailInputRef.current?.click()}
+                >
+                  Upload Image
+                </Button>
+                <Button
+                  variant="light"
+                  color="red"
+                  leftSection={<IconTrash size={16} />}
+                  disabled={mutation.isPending || (!form.values.thumbnail_id && !thumbnailPreviewUrl)}
+                  onClick={clearThumbnail}
+                >
+                  Remove
+                </Button>
+              </Group>
+
+              <input
+                ref={thumbnailInputRef}
+                type="file"
+                accept="image/*"
+                className="hidden"
+                onChange={handleThumbnailFileChange}
+              />
+
+              <TextInput
+                label="Selected Thumbnail ID"
+                placeholder="No thumbnail selected"
+                value={form.values.thumbnail_id}
+                readOnly
+                disabled
+              />
+
+              {thumbnailUploadError ? (
+                <Alert color="red" title="Thumbnail Error">
+                  {thumbnailUploadError}
+                </Alert>
+              ) : null}
+            </Stack>
 
             <Textarea
               label="Description"
@@ -192,15 +341,19 @@ export default function Page(
               onChange={(e) => form.setFieldValue('description', e.target.value)}
               autosize
               minRows={3}
+              maxRows={6}
             />
 
-            <TextInput
+            <TagsInput
               label="Tags"
-              description="Use comma separated tags. Example: tech, adonis, tutorial"
-              placeholder="tech, adonis, tutorial"
-              value={form.values.tags_input}
+              description="Type and press Enter/comma to add tags. "
+              placeholder="Type tags..."
+              data={tagSuggestions}
+              value={form.values.tags}
+              splitChars={[',']}
+              clearable
               disabled={mutation.isPending}
-              onChange={(e) => form.setFieldValue('tags_input', e.target.value)}
+              onChange={(value) => form.setFieldValue('tags', value)}
             />
 
             <MultiSelect
@@ -234,6 +387,15 @@ export default function Page(
           </Stack>
         </Paper>
       </div>
+
+      <MediaLibraryDialog
+        open={mediaLibraryOpen}
+        onOpenChange={setMediaLibraryOpen}
+        pickerType="image"
+        onSelectImage={setThumbnailFromUrl}
+        getURL={route('api.v1.media.list').path}
+        deleteURL={route('api.v1.media.destroy').path}
+      />
     </DashboardLayout>
   )
 }

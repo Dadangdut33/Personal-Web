@@ -1,3 +1,4 @@
+import { normalizeRteMediaUrlsForSave } from '#lib/rte_media_url'
 import Blog from '#models/blog'
 import BlogRepository, {
   BlogUpsertPayload,
@@ -16,17 +17,22 @@ export default class BlogService {
     if (!preload.includes('tags')) preload.push('tags')
     if (!preload.includes('projects')) preload.push('projects')
     if (!preload.includes('thumbnail')) preload.push('thumbnail')
+    const exclude = Array.from(new Set([...(queryParams.exclude || []), 'content'])) as any
 
     const q = this.repo.query({
       ...queryParams,
       preload,
+      exclude,
     })
 
     return await this.repo.paginate(q, queryParams)
   }
 
   async createUpdate(data: BlogUpsertPayload) {
-    return this.repo.updateOrCreateBlog(data)
+    return this.repo.updateOrCreateBlog({
+      ...data,
+      content: data.content ? normalizeRteMediaUrlsForSave(data.content) : data.content,
+    })
   }
 
   async findOrFail(id: string) {

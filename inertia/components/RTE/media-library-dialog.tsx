@@ -12,7 +12,6 @@ import {
   ChevronsRight,
   ExternalLink,
   FileText,
-  FileImage,
   Grid3X3,
   ImageIcon,
   List,
@@ -73,19 +72,27 @@ export default function MediaLibraryDialog({
   const [search, setSearch] = useState('')
   const [currentPage, setCurrentPage] = useState(1)
   const [perPage, setPerPage] = useState(12)
-  const [sortBy, setSortBy] = useState('updated_at')
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc')
+  const [sortBy, _setSortBy] = useState('updated_at')
+  const [sortDirection, _setSortDirection] = useState<'asc' | 'desc'>('desc')
 
   useEffect(() => {
-    const filter =
-      pickerType === 'image'
-        ? 'images'
-        : pickerType === 'audio'
-          ? 'audio'
-          : pickerType === 'video'
-            ? 'videos'
-            : 'files'
-    setFilterType(filter)
+    switch (pickerType) {
+      case 'image':
+        setFilterType('images')
+        break
+      case 'audio':
+        setFilterType('audio')
+        break
+      case 'video':
+        setFilterType('videos')
+        break
+      case 'file':
+        setFilterType('files')
+        break
+      default:
+        setFilterType('all')
+    }
+
     setCurrentPage(1)
   }, [pickerType])
 
@@ -283,18 +290,27 @@ export default function MediaLibraryDialog({
             >
               <div className="aspect-square overflow-hidden bg-muted">
                 {isImageMime(media.mime_type) ? (
-                  <button type="button" className="h-full w-full" onClick={() => handleSelectMedia(media)}>
+                  <button
+                    type="button"
+                    className="h-full w-full"
+                    onClick={() => handleSelectMedia(media)}
+                  >
                     <img
                       src={media.url}
                       alt={media.name}
                       className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
                       onError={(e) => {
-                        ;(e.target as HTMLImageElement).src = '/placeholder.svg?height=200&width=200'
+                        ;(e.target as HTMLImageElement).src =
+                          '/placeholder.svg?height=200&width=200'
                       }}
                     />
                   </button>
                 ) : isVideoMime(media.mime_type) ? (
-                  <button type="button" className="h-full w-full" onClick={() => handleSelectMedia(media)}>
+                  <button
+                    type="button"
+                    className="h-full w-full"
+                    onClick={() => handleSelectMedia(media)}
+                  >
                     <video
                       src={media.url}
                       muted

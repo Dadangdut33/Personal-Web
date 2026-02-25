@@ -1,5 +1,6 @@
 import { BlogDto } from '#dto/blog.dto'
 import { ProjectDto } from '#dto/project.dto'
+import { TagDto } from '#dto/tag.dto'
 import {
   getMethodActName,
   getRequestFingerprint,
@@ -10,6 +11,7 @@ import {
 } from '#lib/utils'
 import Blog from '#models/blog'
 import Project from '#models/project'
+import Tag from '#models/tag'
 import ActivityLogService from '#services/activity_log.service'
 import BlogService from '#services/blog.service'
 import { PaginationMeta } from '#types/app'
@@ -30,10 +32,12 @@ export default class BlogController {
     await bouncer.with('BlogPolicy').authorize('viewCreate')
 
     const projects = await Project.query().select(['id', 'title']).orderBy('title', 'asc')
+    const availableTags = await Tag.query().where('type', 'blog').orderBy('name', 'asc')
 
     return inertia.render('dashboard/blog/createEdit', {
       data: null,
       projects: ProjectDto.collect(projects),
+      availableTags: TagDto.collect(availableTags),
     })
   }
 
@@ -49,10 +53,12 @@ export default class BlogController {
     await data.load('thumbnail')
 
     const projects = await Project.query().select(['id', 'title']).orderBy('title', 'asc')
+    const availableTags = await Tag.query().where('type', 'blog').orderBy('name', 'asc')
 
     return inertia.render('dashboard/blog/createEdit', {
       data: new BlogDto(data),
       projects: ProjectDto.collect(projects),
+      availableTags: TagDto.collect(availableTags),
     })
   }
 

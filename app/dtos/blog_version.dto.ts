@@ -1,3 +1,4 @@
+import { signRteMediaUrlsForOutput } from '#lib/rte_media_url'
 import BlogVersion from '#models/blog_version'
 
 import { MediaDto } from './media.dto.js'
@@ -28,7 +29,7 @@ export class BlogVersionDto {
     this.title = version.title
     this.thumbnail_id = version.thumbnail_id
     this.description = version.description
-    this.content = version.content
+    this.content = signRteMediaUrlsForOutput(version.content)
     this.tags = version.tags ? TagDto.collect(version.tags) : undefined
     this.changed_fields = version.changed_fields
     this.created_at = version.created_at ? version.created_at.toString() : ''

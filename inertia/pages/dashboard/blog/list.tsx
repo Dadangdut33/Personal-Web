@@ -9,6 +9,7 @@ import {
   Alert,
   Badge,
   Group,
+  Image,
   Tooltip as MantineTooltip,
   Menu,
   Paper,
@@ -113,8 +114,31 @@ export default function Page(props: PageProps) {
   const key = 'blog-table'
   const columns: DataTableProps<DataType>['columns'] = [
     {
+      accessor: 'thumbnail',
+      title: 'Thumbnail',
+      sortable: false,
+      width: 200,
+      render: (record) =>
+        record.thumbnail?.url ? (
+          <Image
+            src={record.thumbnail.url}
+            alt={record.title}
+            w={200}
+            h={120}
+            radius="sm"
+            fit="cover"
+            fallbackSrc="https://placehold.co/200x200?text=No+Image"
+          />
+        ) : (
+          <Text fz="xs" c="dimmed">
+            No image
+          </Text>
+        ),
+    },
+    {
       accessor: 'title',
       title: 'Title',
+      width: 150,
       sortable: true,
       filter: () => (
         <FilterText
@@ -125,6 +149,16 @@ export default function Page(props: PageProps) {
         />
       ),
       filtering: searchFilter.searchBy.title ? true : false,
+    },
+    {
+      accessor: 'url_path',
+      title: 'URL Preview',
+      sortable: false,
+      render: (record) => (
+        <Text fz="sm" c="dimmed">
+          {record.url_path}
+        </Text>
+      ),
     },
     {
       accessor: 'slug_id',
@@ -141,8 +175,49 @@ export default function Page(props: PageProps) {
       filtering: searchFilter.searchBy.slug_id ? true : false,
     },
     {
+      accessor: 'description',
+      title: 'Description',
+      sortable: false,
+      width: 280,
+      render: (record) => (
+        <Text fz="sm" c="dimmed" lineClamp={2}>
+          {record.description || '-'}
+        </Text>
+      ),
+      filter: () => (
+        <FilterText
+          column={'description'}
+          searchFilter={searchFilter}
+          label="Description"
+          description="Filter by description"
+        />
+      ),
+      filtering: searchFilter.searchBy.description ? true : false,
+    },
+    {
+      accessor: 'projects',
+      title: 'Projects',
+      sortable: false,
+      render: (record) => (
+        <Group gap={6}>
+          {record.projects?.length ? (
+            record.projects.map((project) => (
+              <Badge key={project.id} variant="outline">
+                {project.title}
+              </Badge>
+            ))
+          ) : (
+            <Text fz="xs" c="dimmed">
+              -
+            </Text>
+          )}
+        </Group>
+      ),
+    },
+    {
       accessor: 'tags',
       title: 'Tags',
+      width: 150,
       sortable: false,
       render: (record) => (
         <Group gap={6}>

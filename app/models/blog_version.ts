@@ -37,14 +37,24 @@ export default class BlogVersion extends BaseModel {
   declare description: string | null
 
   @column({
-    prepare: (value) => JSON.stringify(value),
-    consume: (value) => JSON.parse(value),
+    prepare: (value) => (typeof value === 'string' ? value : JSON.stringify(value)),
+    consume: (value) => {
+      if (value === null || value === undefined) return {}
+      if (typeof value === 'string') return JSON.parse(value)
+      if (typeof value === 'object') return value
+      return {}
+    },
   })
   declare content: Record<string, any>
 
   @column({
-    prepare: (value) => JSON.stringify(value),
-    consume: (value) => JSON.parse(value),
+    prepare: (value) => (typeof value === 'string' ? value : JSON.stringify(value)),
+    consume: (value) => {
+      if (value === null || value === undefined) return null
+      if (typeof value === 'string') return JSON.parse(value)
+      if (Array.isArray(value)) return value
+      return null
+    },
   })
   declare changed_fields: string[] | null
 
