@@ -4,36 +4,17 @@ import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
 import { route } from '@izzyjs/route/client'
-import {
-  Alert,
-  Button,
-  Group,
-  Image,
-  MultiSelect,
-  Paper,
-  Stack,
-  TagsInput,
-  Text,
-  TextInput,
-  Textarea,
-} from '@mantine/core'
+import { Button, Group, Paper, Tabs } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import {
-  IconArrowLeft,
-  IconCancel,
-  IconDeviceFloppy,
-  IconPhoto,
-  IconPhotoPlus,
-  IconTrash,
-  IconUpload,
-} from '@tabler/icons-react'
+import { IconArrowLeft, IconCancel, IconDeviceFloppy } from '@tabler/icons-react'
 import type React from 'react'
-import { useRef, useState } from 'react'
-import TiptapEditor from '~/components/RTE'
+import { useEffect, useRef, useState } from 'react'
 import MediaLibraryDialog from '~/components/RTE/media-library-dialog'
 import { uploadImage } from '~/components/RTE/upload-service'
 import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyInfo } from '~/components/core/notify'
+import BlogEditorTab from '~/components/page-components/blog/editor-tab'
+import BlogRollbackTab from '~/components/page-components/blog/rollback-tab'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import DashboardLayout from '~/layouts/dashboard'
 import { checkForm } from '~/lib/utils'
@@ -41,6 +22,15 @@ import { checkForm } from '~/lib/utils'
 const baseRoute = 'blog'
 const basePerm = 'blog'
 const title = 'Blog'
+
+type BlogFormValues = {
+  id: string
+  title: string
+  thumbnail_id: string
+  description: string
+  tags: string[]
+  projectIds: string[]
+}
 
 function formSafeTitle(value: string) {
   return value
@@ -73,6 +63,14 @@ export default function Page(
   const [thumbnailUploadError, setThumbnailUploadError] = useState<string | null>(null)
   const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false)
   const [mediaLibraryOpen, setMediaLibraryOpen] = useState(false)
+  const [activeTab, setActiveTab] = useState<'editor' | 'rollback'>(() => {
+    if (typeof window === 'undefined') return 'editor'
+    return window.location.search.includes('tab=rollback') && !!data ? 'rollback' : 'editor'
+  })
+  const [selectedRevisionId, setSelectedRevisionId] = useState<string | null>(
+    data?.versions?.[0]?.id || null
+  )
+  const [selectedRollbackFields, setSelectedRollbackFields] = useState<string[]>([])
   const thumbnailInputRef = useRef<HTMLInputElement>(null)
   const tagSuggestions = (availableTags || []).map((tag) => tag.name)
 
@@ -93,14 +91,14 @@ export default function Page(
 
   const { ConfirmAddModal, ConfirmModal, ConfirmResetModal } = useModals()
 
-  const form = useForm({
+  const form = useForm<BlogFormValues>({
     initialValues: {
       id: data ? data.id : '',
       title: data ? data.title : '',
       thumbnail_id: data?.thumbnail_id || '',
       description: data?.description || '',
-      tags: data?.tags?.map((tag) => tag.name) || ([] as string[]),
-      projectIds: data?.projects?.map((project) => project.id) || ([] as string[]),
+      tags: data?.tags?.map((tag) => tag.name) || [],
+      projectIds: data?.projects?.map((project) => project.id) || [],
     },
     validate: {
       title: (value) => (value.trim().length > 0 ? null : 'Title is required'),
@@ -114,6 +112,33 @@ export default function Page(
       onSuccess: () => {
         form.reset()
       },
+    }
+  )
+
+  const refreshEditData = () => {
+    if (!data?.id) return
+
+    router.visit(
+      `${route(`${baseRoute}.edit`, { params: { id: data.id } }).path}?tab=${activeTab}`,
+      {
+        replace: true,
+        preserveState: false,
+        preserveScroll: true,
+      }
+    )
+  }
+
+  const rollbackMutation = useGenericMutation('POST', route('blog.rollback' as any).path, {
+    doRedirect: false,
+    onSuccess: refreshEditData,
+  })
+
+  const rollbackFieldsMutation = useGenericMutation(
+    'POST',
+    route('blog.rollbackFields' as any).path,
+    {
+      doRedirect: false,
+      onSuccess: refreshEditData,
     }
   )
 
@@ -180,7 +205,9 @@ export default function Page(
     setThumbnailUploadError(null)
     setIsUploadingThumbnail(true)
     try {
-      const uploadedMedia = await uploadImage(file, route('api.v1.media.upload').path, ['blog-content'])
+      const uploadedMedia = await uploadImage(file, route('api.v1.media.upload').path, [
+        'blog-content',
+      ])
       form.setFieldValue('thumbnail_id', uploadedMedia.id)
       setThumbnailPreviewUrl(uploadedMedia.url)
     } catch (error) {
@@ -193,6 +220,53 @@ export default function Page(
     }
   }
 
+  const selectedRevision = data?.versions?.find((version) => version.id === selectedRevisionId)
+  const currentTagsText = form.values.tags.join(', ')
+  const contentCurrentText = JSON.stringify(content, null, 2)
+  const contentRevisionText = JSON.stringify(selectedRevision?.content || {}, null, 2)
+  const revisionSelectData =
+    data?.versions?.map((version) => ({
+      value: version.id,
+      label: `v${version.version} • ${new Date(version.created_at).toLocaleString()} • ${version.change_type}`,
+    })) || []
+
+  const onRollbackFull = () => {
+    if (!data?.id || !selectedRevisionId) return
+
+    rollbackMutation.mutate({
+      id: data.id,
+      revisionId: selectedRevisionId,
+    })
+  }
+
+  const onRollbackFields = () => {
+    if (!data?.id || !selectedRevisionId || selectedRollbackFields.length === 0) return
+
+    rollbackFieldsMutation.mutate({
+      id: data.id,
+      revisionId: selectedRevisionId,
+      fields: selectedRollbackFields,
+    })
+  }
+
+  useEffect(() => {
+    if (!data) return
+
+    form.setValues({
+      id: data.id,
+      title: data.title,
+      thumbnail_id: data.thumbnail_id || '',
+      description: data.description || '',
+      tags: data.tags?.map((tag) => tag.name) || [],
+      projectIds: data.projects?.map((project) => project.id) || [],
+    })
+    setContent(data.content || defaultContent)
+    setThumbnailPreviewUrl(data.thumbnail?.url || '')
+    setThumbnailUploadError(null)
+    setSelectedRevisionId(data.versions?.[0]?.id || null)
+    setSelectedRollbackFields([])
+  }, [data?.updated_at])
+
   return (
     <DashboardLayout breadcrumbs={breadcrumbs}>
       <Head title={`${title} ` + (data ? 'Edit' : 'Create')} />
@@ -201,7 +275,9 @@ export default function Page(
           <Button
             variant="outline"
             style={{ width: 'fit-content' }}
-            loading={mutation.isPending}
+            loading={
+              mutation.isPending || rollbackMutation.isPending || rollbackFieldsMutation.isPending
+            }
             leftSection={<IconArrowLeft size={16} />}
             color="gray"
             onClick={onBack}
@@ -209,182 +285,104 @@ export default function Page(
             Back
           </Button>
           <Group ms={'auto'} justify="flex-end">
-            <Button
-              variant="outline"
-              style={{ width: 'fit-content' }}
-              loading={mutation.isPending}
-              leftSection={<IconCancel size={16} />}
-              color="red"
-              onClick={onReset}
-            >
-              {data ? 'Cancel Changes' : 'Reset'}
-            </Button>
-            <Button
-              style={{ width: 'fit-content' }}
-              loading={mutation.isPending}
-              leftSection={<IconDeviceFloppy size={16} />}
-              onClick={onSave}
-            >
-              {data ? 'Save Changes' : 'Create'}
-            </Button>
+            {activeTab === 'editor' ? (
+              <>
+                <Button
+                  variant="outline"
+                  style={{ width: 'fit-content' }}
+                  loading={mutation.isPending}
+                  leftSection={<IconCancel size={16} />}
+                  color="red"
+                  onClick={onReset}
+                >
+                  {data ? 'Cancel Changes' : 'Reset'}
+                </Button>
+                <Button
+                  style={{ width: 'fit-content' }}
+                  loading={mutation.isPending}
+                  leftSection={<IconDeviceFloppy size={16} />}
+                  onClick={onSave}
+                >
+                  {data ? 'Save Changes' : 'Create'}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button
+                  color="yellow"
+                  variant="outline"
+                  loading={rollbackMutation.isPending}
+                  disabled={!selectedRevisionId || rollbackFieldsMutation.isPending}
+                  onClick={onRollbackFull}
+                >
+                  Rollback Full Revision
+                </Button>
+                <Button
+                  color="orange"
+                  loading={rollbackFieldsMutation.isPending}
+                  disabled={
+                    !selectedRevisionId ||
+                    selectedRollbackFields.length === 0 ||
+                    rollbackMutation.isPending
+                  }
+                  onClick={onRollbackFields}
+                >
+                  Rollback Selected Fields
+                </Button>
+              </>
+            )}
           </Group>
         </Group>
 
         <Paper p="md" shadow="md" radius="md" withBorder>
-          <Stack>
-            {data && <TextInput label="ID" value={form.values.id} readOnly disabled />}
+          <Tabs value={activeTab} onChange={(value) => setActiveTab((value as any) || 'editor')}>
+            <Tabs.List>
+              <Tabs.Tab value="editor">Editor</Tabs.Tab>
+              {data ? <Tabs.Tab value="rollback">Version Rollback</Tabs.Tab> : null}
+            </Tabs.List>
 
-            <TextInput
-              withAsterisk
-              label="Title"
-              placeholder="Blog title"
-              value={form.values.title}
-              error={form.errors.title}
-              disabled={mutation.isPending}
-              onChange={(e) => form.setFieldValue('title', e.target.value)}
-            />
-
-            <TextInput
-              label="URL Preview"
-              value={
-                form.values.title
-                  ? `${formSafeTitle(form.values.title)}-${data?.slug_id || '{slug_id}'}`
-                  : '{title}-{slug_id}'
-              }
-              description="Format: {title}-{slug_id}. slug_id is generated by server."
-              readOnly
-              disabled
-            />
-
-            <Stack gap={8}>
-              <Text size="sm" fw={500}>
-                Thumbnail
-              </Text>
-
-              {thumbnailPreviewUrl ? (
-                <Image
-                  src={thumbnailPreviewUrl}
-                  alt="Blog thumbnail preview"
-                  radius="md"
-                  h={220}
-                  fit="cover"
-                  fallbackSrc="https://placehold.co/800x400?text=Thumbnail"
-                />
-              ) : (
-                <Paper withBorder radius="md" p="md">
-                  <Group>
-                    <IconPhoto size={18} />
-                    <Text size="sm" c="dimmed">
-                      No thumbnail selected
-                    </Text>
-                  </Group>
-                </Paper>
-              )}
-
-              <Group>
-                <Button
-                  variant="outline"
-                  leftSection={<IconPhotoPlus size={16} />}
-                  disabled={mutation.isPending || isUploadingThumbnail}
-                  onClick={() => setMediaLibraryOpen(true)}
-                >
-                  Select From Library
-                </Button>
-                <Button
-                  variant="outline"
-                  leftSection={<IconUpload size={16} />}
-                  loading={isUploadingThumbnail}
-                  disabled={mutation.isPending}
-                  onClick={() => thumbnailInputRef.current?.click()}
-                >
-                  Upload Image
-                </Button>
-                <Button
-                  variant="light"
-                  color="red"
-                  leftSection={<IconTrash size={16} />}
-                  disabled={mutation.isPending || (!form.values.thumbnail_id && !thumbnailPreviewUrl)}
-                  onClick={clearThumbnail}
-                >
-                  Remove
-                </Button>
-              </Group>
-
-              <input
-                ref={thumbnailInputRef}
-                type="file"
-                accept="image/*"
-                className="hidden"
-                onChange={handleThumbnailFileChange}
-              />
-
-              <TextInput
-                label="Selected Thumbnail ID"
-                placeholder="No thumbnail selected"
-                value={form.values.thumbnail_id}
-                readOnly
-                disabled
-              />
-
-              {thumbnailUploadError ? (
-                <Alert color="red" title="Thumbnail Error">
-                  {thumbnailUploadError}
-                </Alert>
-              ) : null}
-            </Stack>
-
-            <Textarea
-              label="Description"
-              placeholder="Short blog description"
-              value={form.values.description}
-              disabled={mutation.isPending}
-              onChange={(e) => form.setFieldValue('description', e.target.value)}
-              autosize
-              minRows={3}
-              maxRows={6}
-            />
-
-            <TagsInput
-              label="Tags"
-              description="Type and press Enter/comma to add tags. "
-              placeholder="Type tags..."
-              data={tagSuggestions}
-              value={form.values.tags}
-              splitChars={[',']}
-              clearable
-              disabled={mutation.isPending}
-              onChange={(value) => form.setFieldValue('tags', value)}
-            />
-
-            <MultiSelect
-              label="Projects"
-              placeholder="Select related projects"
-              data={projects.map((project) => ({
-                value: project.id,
-                label: project.title,
-              }))}
-              searchable
-              value={form.values.projectIds}
-              disabled={mutation.isPending}
-              onChange={(value) => form.setFieldValue('projectIds', value)}
-            />
-
-            <div>
-              <Text size="sm" fw={500} mb={8}>
-                Content
-              </Text>
-              <TiptapEditor
+            <Tabs.Panel value="editor" pt="md">
+              <BlogEditorTab
+                data={data ? { id: data.id, slug_id: data.slug_id } : null}
+                form={form}
+                mutationPending={mutation.isPending}
+                isUploadingThumbnail={isUploadingThumbnail}
+                thumbnailPreviewUrl={thumbnailPreviewUrl}
+                thumbnailUploadError={thumbnailUploadError}
+                thumbnailInputRef={thumbnailInputRef}
+                tagSuggestions={tagSuggestions}
+                projects={projects}
                 content={content}
-                onSave={(value) => setContent(value)}
-                getMediaURL={route('api.v1.media.list').path}
-                uploadMediaURL={route('api.v1.media.upload').path}
-                deleteMediaURL={route('api.v1.media.destroy').path}
-                className="min-h-[500px]"
-                stickyToolbar={true}
-                imageTags={['blog-content']}
+                onContentChange={setContent}
+                onOpenMediaLibrary={() => setMediaLibraryOpen(true)}
+                onThumbnailFileChange={handleThumbnailFileChange}
+                onClearThumbnail={clearThumbnail}
+                formSafeTitle={formSafeTitle}
               />
-            </div>
-          </Stack>
+            </Tabs.Panel>
+
+            {data ? (
+              <Tabs.Panel value="rollback" pt="md">
+                <BlogRollbackTab
+                  selectedRevisionId={selectedRevisionId}
+                  selectedRevision={selectedRevision}
+                  selectedRollbackFields={selectedRollbackFields}
+                  currentTitle={form.values.title}
+                  currentDescription={form.values.description || ''}
+                  currentTagsText={currentTagsText}
+                  contentCurrentText={contentCurrentText}
+                  contentRevisionText={contentRevisionText}
+                  revisionSelectData={revisionSelectData}
+                  rollbackPending={rollbackMutation.isPending}
+                  rollbackFieldsPending={rollbackFieldsMutation.isPending}
+                  onSelectRevision={setSelectedRevisionId}
+                  onChangeRollbackFields={setSelectedRollbackFields}
+                  onRollbackFull={onRollbackFull}
+                  onRollbackFields={onRollbackFields}
+                />
+              </Tabs.Panel>
+            ) : null}
+          </Tabs>
         </Paper>
       </div>
 

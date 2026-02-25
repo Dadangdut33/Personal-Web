@@ -23,13 +23,7 @@ export type BlogUpsertPayload = {
   projectIds?: string[] | null
 }
 
-export type RevertableBlogField =
-  | 'slug_id'
-  | 'title'
-  | 'thumbnail_id'
-  | 'description'
-  | 'content'
-  | 'tags'
+export type RevertableBlogField = 'title' | 'thumbnail_id' | 'description' | 'content' | 'tags'
 
 export default class BlogRepository extends BaseRepository<typeof Blog> {
   protected versionRepo: BlogVersionRepository
@@ -315,7 +309,6 @@ export default class BlogRepository extends BaseRepository<typeof Blog> {
 
     const partialPayload: BlogUpsertPayload = { id: blogId }
     for (const field of fields) {
-      if (field === 'slug_id') partialPayload.slug_id = snapshot.slug_id
       if (field === 'title') partialPayload.title = snapshot.title
       if (field === 'thumbnail_id') partialPayload.thumbnail_id = snapshot.thumbnail_id
       if (field === 'description') partialPayload.description = snapshot.description

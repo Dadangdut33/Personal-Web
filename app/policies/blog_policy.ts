@@ -27,6 +27,14 @@ export default class BlogPolicy extends CustomBasePolicy {
     return this.perm.checkInMethod(user, `${this.base}.update`, request, 'PATCH')
   }
 
+  async rollback(user: User, request: HttpContext['request']) {
+    return this.perm.checkInMethod(user, `${this.base}.update`, request, 'POST')
+  }
+
+  async rollbackFields(user: User, request: HttpContext['request']) {
+    return this.perm.checkInMethod(user, `${this.base}.update`, request, 'POST')
+  }
+
   async delete(user: User, request: HttpContext['request']) {
     return this.perm.checkInMethod(user, `${this.base}.delete`, request, 'DELETE')
   }

@@ -51,6 +51,10 @@ router
     mapGenericRoutes('/roles', RoleController, 'role', true)
     mapGenericRoutes('/media', MediaController, 'media', true)
     mapGenericRoutes('/blogs', BlogController, 'blog', true)
+    router.post('/blogs/rollback', [BlogController, 'rollbackRevision']).as('blog.rollback')
+    router
+      .post('/blogs/rollback-fields', [BlogController, 'rollbackRevisionFields'])
+      .as('blog.rollbackFields')
 
     router.get('/activity-log', [ActivityLogController, 'viewList']).as('activity_log.index')
   })

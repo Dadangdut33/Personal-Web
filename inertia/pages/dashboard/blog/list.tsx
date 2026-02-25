@@ -16,7 +16,13 @@ import {
   Text,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconAlertCircle, IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react'
+import {
+  IconAlertCircle,
+  IconDotsVertical,
+  IconEdit,
+  IconHistory,
+  IconTrash,
+} from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import { Trash2 } from 'lucide-react'
 import {
@@ -279,7 +285,7 @@ export default function Page(props: PageProps) {
       width: 75,
       render: (record) => {
         return (
-          <Menu withArrow width={150} shadow="md">
+          <Menu withArrow width={180} shadow="md">
             <Menu.Target>
               <div className="flex">
                 <ActionIcon className="mx-auto" variant="light">
@@ -300,6 +306,20 @@ export default function Page(props: PageProps) {
                   disabled={!canEdit}
                 >
                   Edit
+                </Menu.Item>
+              </TooltipIfTrue>
+              <TooltipIfTrue isTrue={!canEdit} label="You don't have permission to rollback blog">
+                <Menu.Item
+                  fw={600}
+                  fz="sm"
+                  color="orange"
+                  variant="filled"
+                  component={!canEdit ? undefined : Link}
+                  leftSection={<IconHistory size={16} />}
+                  href={`${route(`${baseRoute}.edit`, { params: { id: record.id } }).path}?tab=rollback`}
+                  disabled={!canEdit}
+                >
+                  Rollback
                 </Menu.Item>
               </TooltipIfTrue>
 

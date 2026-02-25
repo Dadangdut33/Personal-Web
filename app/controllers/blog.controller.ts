@@ -51,6 +51,8 @@ export default class BlogController {
     await data.load('tags')
     await data.load('projects')
     await data.load('thumbnail')
+    const versions = await this.blogSvc.versions(id)
+    data.$setRelated('versions', versions as any)
 
     const projects = await Project.query().select(['id', 'title']).orderBy('title', 'asc')
     const availableTags = await Tag.query().where('type', 'blog').orderBy('name', 'asc')
@@ -160,6 +162,71 @@ export default class BlogController {
       })
     } catch (error) {
       return returnError(response, error, 'BLOG_BULK_DELETE', { logErrors: true })
+    }
+  }
+
+  async rollbackRevision({ request, response, bouncer, auth }: HttpContext) {
+    try {
+      await bouncer.with('BlogPolicy').authorize('rollback', request)
+
+      const { id, revisionId } = request.only(['id', 'revisionId'])
+      if (!id || !revisionId) {
+        return response.badRequest('Blog id and revision id are required')
+      }
+
+      const updated = await this.blogSvc.revertToRevision(String(id), String(revisionId))
+      await this.activityLogSvc.log(
+        auth.user!.id,
+        'rollback_blog_revision',
+        `Rollback blog to revision:\n\`\`\`\n${updated.title} [${updated.id}] <- ${revisionId}\n\`\`\``,
+        getRequestFingerprint(request)
+      )
+
+      return response.status(200).json({
+        status: 'success',
+        message: 'Successfully rolled back to selected revision.',
+      })
+    } catch (error) {
+      return returnError(response, error, 'BLOG_ROLLBACK', { logErrors: true })
+    }
+  }
+
+  async rollbackRevisionFields({ request, response, bouncer, auth }: HttpContext) {
+    try {
+      await bouncer.with('BlogPolicy').authorize('rollbackFields', request)
+
+      const { id, revisionId, fields } = request.only(['id', 'revisionId', 'fields'])
+      if (!id || !revisionId) {
+        return response.badRequest('Blog id and revision id are required')
+      }
+      if (!Array.isArray(fields) || fields.length === 0) {
+        return response.badRequest('Fields must be a non-empty array')
+      }
+
+      const allowedFields = ['title', 'thumbnail_id', 'description', 'content', 'tags']
+      const invalid = fields.filter((field: string) => !allowedFields.includes(String(field)))
+      if (invalid.length > 0) {
+        return response.badRequest(`Invalid fields: ${invalid.join(', ')}`)
+      }
+
+      const updated = await this.blogSvc.revertFieldsToRevision(
+        String(id),
+        String(revisionId),
+        fields as any
+      )
+      await this.activityLogSvc.log(
+        auth.user!.id,
+        'rollback_blog_revision_fields',
+        `Rollback selected fields to revision:\n\`\`\`\n${updated.title} [${updated.id}] <- ${revisionId}\nFields: ${fields.join(', ')}\n\`\`\``,
+        getRequestFingerprint(request)
+      )
+
+      return response.status(200).json({
+        status: 'success',
+        message: 'Successfully rolled back selected fields.',
+      })
+    } catch (error) {
+      return returnError(response, error, 'BLOG_ROLLBACK_FIELDS', { logErrors: true })
     }
   }
 }
