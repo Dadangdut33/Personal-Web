@@ -1,5 +1,18 @@
 import { route } from '@izzyjs/route/client'
-import { Alert, Button, Group, Image, MultiSelect, Paper, Stack, TagsInput, Text, TextInput, Textarea } from '@mantine/core'
+import {
+  Alert,
+  Button,
+  Checkbox,
+  Group,
+  Image,
+  MultiSelect,
+  Paper,
+  Stack,
+  TagsInput,
+  Text,
+  TextInput,
+  Textarea,
+} from '@mantine/core'
 import { UseFormReturnType } from '@mantine/form'
 import { IconPhoto, IconPhotoPlus, IconTrash, IconUpload } from '@tabler/icons-react'
 import type { ChangeEvent, RefObject } from 'react'
@@ -8,6 +21,8 @@ import TiptapEditor from '~/components/RTE'
 type BlogFormValues = {
   id: string
   title: string
+  is_active: boolean
+  is_pinned: boolean
   thumbnail_id: string
   description: string
   tags: string[]
@@ -72,6 +87,21 @@ export default function BlogEditorTab({
         disabled={mutationPending}
         onChange={(event) => form.setFieldValue('title', event.target.value)}
       />
+
+      <Group>
+        <Checkbox
+          label="Active"
+          checked={form.values.is_active}
+          disabled={mutationPending}
+          onChange={(event) => form.setFieldValue('is_active', event.currentTarget.checked)}
+        />
+        <Checkbox
+          label="Pinned"
+          checked={form.values.is_pinned}
+          disabled={mutationPending}
+          onChange={(event) => form.setFieldValue('is_pinned', event.currentTarget.checked)}
+        />
+      </Group>
 
       <TextInput
         label="URL Preview"
@@ -216,4 +246,3 @@ export default function BlogEditorTab({
     </Stack>
   )
 }
-

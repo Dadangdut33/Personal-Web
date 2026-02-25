@@ -12,6 +12,8 @@ export class BlogDto {
   readonly url_segment: string
   readonly url_path: string
   readonly title: string
+  readonly is_active: boolean
+  readonly is_pinned: boolean
   readonly thumbnail_id: string | null
   readonly description: string | null
   readonly content: Record<string, any>
@@ -34,6 +36,8 @@ export class BlogDto {
     this.url_segment = safeTitle ? `${safeTitle}-${blog.slug_id}` : blog.slug_id
     this.url_path = `/blog/${this.url_segment}`
     this.title = blog.title
+    this.is_active = blog.is_active
+    this.is_pinned = blog.is_pinned
     this.thumbnail_id = blog.thumbnail_id
     this.description = blog.description
     this.content = signRteMediaUrlsForOutput(blog.content)

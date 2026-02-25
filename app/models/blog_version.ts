@@ -31,6 +31,12 @@ export default class BlogVersion extends BaseModel {
   declare title: string
 
   @column()
+  declare is_active: boolean
+
+  @column()
+  declare is_pinned: boolean
+
+  @column()
   declare thumbnail_id: string | null
 
   @column()

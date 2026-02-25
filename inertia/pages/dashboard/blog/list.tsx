@@ -167,6 +167,28 @@ export default function Page(props: PageProps) {
       ),
     },
     {
+      accessor: 'is_active',
+      title: 'Active',
+      sortable: true,
+      width: 100,
+      render: (record) => (
+        <Badge color={record.is_active ? 'green' : 'gray'} variant="light">
+          {record.is_active ? 'Yes' : 'No'}
+        </Badge>
+      ),
+    },
+    {
+      accessor: 'is_pinned',
+      title: 'Pinned',
+      sortable: true,
+      width: 100,
+      render: (record) => (
+        <Badge color={record.is_pinned ? 'yellow' : 'gray'} variant="light">
+          {record.is_pinned ? 'Yes' : 'No'}
+        </Badge>
+      ),
+    },
+    {
       accessor: 'slug_id',
       title: 'Slug',
       sortable: true,
@@ -204,6 +226,7 @@ export default function Page(props: PageProps) {
       accessor: 'projects',
       title: 'Projects',
       sortable: false,
+      width: 150,
       render: (record) => (
         <Group gap={6}>
           {record.projects?.length ? (

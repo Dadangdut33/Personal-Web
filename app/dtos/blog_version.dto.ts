@@ -11,6 +11,8 @@ export class BlogVersionDto {
   readonly change_type: 'create' | 'update'
   readonly slug_id: string
   readonly title: string
+  readonly is_active: boolean
+  readonly is_pinned: boolean
   readonly thumbnail_id: string | null
   readonly description: string | null
   readonly content: Record<string, any>
@@ -27,6 +29,8 @@ export class BlogVersionDto {
     this.change_type = version.change_type
     this.slug_id = version.slug_id
     this.title = version.title
+    this.is_active = version.is_active
+    this.is_pinned = version.is_pinned
     this.thumbnail_id = version.thumbnail_id
     this.description = version.description
     this.content = signRteMediaUrlsForOutput(version.content)

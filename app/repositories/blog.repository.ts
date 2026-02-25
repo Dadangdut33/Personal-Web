@@ -16,6 +16,8 @@ export type BlogUpsertPayload = {
   id?: string
   slug_id?: string
   title?: string
+  is_active?: boolean
+  is_pinned?: boolean
   thumbnail_id?: string | null
   description?: string | null
   content?: Record<string, any>
@@ -23,7 +25,14 @@ export type BlogUpsertPayload = {
   projectIds?: string[] | null
 }
 
-export type RevertableBlogField = 'title' | 'thumbnail_id' | 'description' | 'content' | 'tags'
+export type RevertableBlogField =
+  | 'title'
+  | 'is_active'
+  | 'is_pinned'
+  | 'thumbnail_id'
+  | 'description'
+  | 'content'
+  | 'tags'
 
 export default class BlogRepository extends BaseRepository<typeof Blog> {
   protected versionRepo: BlogVersionRepository
@@ -136,6 +145,8 @@ export default class BlogRepository extends BaseRepository<typeof Blog> {
         change_type: isCreate ? 'create' : 'update',
         slug_id: blog.slug_id,
         title: blog.title,
+        is_active: blog.is_active,
+        is_pinned: blog.is_pinned,
         thumbnail_id: blog.thumbnail_id,
         description: blog.description,
         content: blog.content,
@@ -206,6 +217,8 @@ export default class BlogRepository extends BaseRepository<typeof Blog> {
     return {
       slug_id: revision.slug_id,
       title: revision.title,
+      is_active: revision.is_active,
+      is_pinned: revision.is_pinned,
       thumbnail_id: revision.thumbnail_id,
       description: revision.description,
       content: revision.content,
@@ -234,9 +247,14 @@ export default class BlogRepository extends BaseRepository<typeof Blog> {
         blog.merge(rest)
         await blog.save()
       } else {
+        const createPayload = {
+          is_active: true,
+          is_pinned: false,
+          ...rest,
+        }
         blog = new Blog()
         blog.useTransaction(trx)
-        blog.fill(rest)
+        blog.fill(createPayload)
         await blog.save()
       }
 
@@ -310,6 +328,8 @@ export default class BlogRepository extends BaseRepository<typeof Blog> {
     const partialPayload: BlogUpsertPayload = { id: blogId }
     for (const field of fields) {
       if (field === 'title') partialPayload.title = snapshot.title
+      if (field === 'is_active') partialPayload.is_active = snapshot.is_active
+      if (field === 'is_pinned') partialPayload.is_pinned = snapshot.is_pinned
       if (field === 'thumbnail_id') partialPayload.thumbnail_id = snapshot.thumbnail_id
       if (field === 'description') partialPayload.description = snapshot.description
       if (field === 'content') partialPayload.content = snapshot.content

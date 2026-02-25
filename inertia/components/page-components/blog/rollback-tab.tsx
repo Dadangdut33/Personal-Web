@@ -6,6 +6,8 @@ type BlogVersion = {
   version: number
   change_type: 'create' | 'update'
   title: string
+  is_active: boolean
+  is_pinned: boolean
   description: string | null
   content: Record<string, any>
   tags?: BlogTag[]
@@ -13,13 +15,22 @@ type BlogVersion = {
   created_at: string
 }
 
-type RollbackField = 'title' | 'thumbnail_id' | 'description' | 'content' | 'tags'
+type RollbackField =
+  | 'title'
+  | 'is_active'
+  | 'is_pinned'
+  | 'thumbnail_id'
+  | 'description'
+  | 'content'
+  | 'tags'
 
 type Props = {
   selectedRevisionId: string | null
   selectedRevision: BlogVersion | undefined
   selectedRollbackFields: string[]
   currentTitle: string
+  currentIsActive: boolean
+  currentIsPinned: boolean
   currentDescription: string
   currentTagsText: string
   contentCurrentText: string
@@ -35,6 +46,8 @@ type Props = {
 
 const rollbackFieldOptions: { value: RollbackField; label: string }[] = [
   { value: 'title', label: 'Title' },
+  { value: 'is_active', label: 'Active' },
+  { value: 'is_pinned', label: 'Pinned' },
   { value: 'thumbnail_id', label: 'Thumbnail' },
   { value: 'description', label: 'Description' },
   { value: 'content', label: 'Content' },
@@ -46,6 +59,8 @@ export default function BlogRollbackTab({
   selectedRevision,
   selectedRollbackFields,
   currentTitle,
+  currentIsActive,
+  currentIsPinned,
   currentDescription,
   currentTagsText,
   contentCurrentText,
@@ -192,6 +207,48 @@ export default function BlogRollbackTab({
             <Group grow align="flex-start">
               <Stack>
                 <Text size="xs" fw={600}>
+                  Active (Current)
+                </Text>
+                <Textarea value={currentIsActive ? 'Yes' : 'No'} readOnly autosize minRows={2} maxRows={2} />
+              </Stack>
+              <Stack>
+                <Text size="xs" fw={600}>
+                  Active (Revision)
+                </Text>
+                <Textarea
+                  value={selectedRevision.is_active ? 'Yes' : 'No'}
+                  readOnly
+                  autosize
+                  minRows={2}
+                  maxRows={2}
+                />
+              </Stack>
+            </Group>
+
+            <Group grow align="flex-start">
+              <Stack>
+                <Text size="xs" fw={600}>
+                  Pinned (Current)
+                </Text>
+                <Textarea value={currentIsPinned ? 'Yes' : 'No'} readOnly autosize minRows={2} maxRows={2} />
+              </Stack>
+              <Stack>
+                <Text size="xs" fw={600}>
+                  Pinned (Revision)
+                </Text>
+                <Textarea
+                  value={selectedRevision.is_pinned ? 'Yes' : 'No'}
+                  readOnly
+                  autosize
+                  minRows={2}
+                  maxRows={2}
+                />
+              </Stack>
+            </Group>
+
+            <Group grow align="flex-start">
+              <Stack>
+                <Text size="xs" fw={600}>
                   Tags (Current)
                 </Text>
                 <Textarea value={currentTagsText} readOnly autosize minRows={2} maxRows={4} />
@@ -234,4 +291,3 @@ export default function BlogRollbackTab({
     </Paper>
   )
 }
-

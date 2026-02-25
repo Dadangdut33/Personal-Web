@@ -26,6 +26,8 @@ const title = 'Blog'
 type BlogFormValues = {
   id: string
   title: string
+  is_active: boolean
+  is_pinned: boolean
   thumbnail_id: string
   description: string
   tags: string[]
@@ -95,6 +97,8 @@ export default function Page(
     initialValues: {
       id: data ? data.id : '',
       title: data ? data.title : '',
+      is_active: data?.is_active ?? true,
+      is_pinned: data?.is_pinned ?? false,
       thumbnail_id: data?.thumbnail_id || '',
       description: data?.description || '',
       tags: data?.tags?.map((tag) => tag.name) || [],
@@ -149,6 +153,8 @@ export default function Page(
       mutation.mutate({
         id: form.values.id || undefined,
         title: form.values.title,
+        is_active: form.values.is_active,
+        is_pinned: form.values.is_pinned,
         thumbnail_id: form.values.thumbnail_id ? form.values.thumbnail_id : null,
         description: form.values.description ? form.values.description : null,
         content,
@@ -255,6 +261,8 @@ export default function Page(
     form.setValues({
       id: data.id,
       title: data.title,
+      is_active: data.is_active,
+      is_pinned: data.is_pinned,
       thumbnail_id: data.thumbnail_id || '',
       description: data.description || '',
       tags: data.tags?.map((tag) => tag.name) || [],
@@ -368,6 +376,8 @@ export default function Page(
                   selectedRevision={selectedRevision}
                   selectedRollbackFields={selectedRollbackFields}
                   currentTitle={form.values.title}
+                  currentIsActive={form.values.is_active}
+                  currentIsPinned={form.values.is_pinned}
                   currentDescription={form.values.description || ''}
                   currentTagsText={currentTagsText}
                   contentCurrentText={contentCurrentText}

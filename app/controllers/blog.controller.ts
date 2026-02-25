@@ -203,7 +203,15 @@ export default class BlogController {
         return response.badRequest('Fields must be a non-empty array')
       }
 
-      const allowedFields = ['title', 'thumbnail_id', 'description', 'content', 'tags']
+      const allowedFields = [
+        'title',
+        'is_active',
+        'is_pinned',
+        'thumbnail_id',
+        'description',
+        'content',
+        'tags',
+      ]
       const invalid = fields.filter((field: string) => !allowedFields.includes(String(field)))
       if (invalid.length > 0) {
         return response.badRequest(`Invalid fields: ${invalid.join(', ')}`)
