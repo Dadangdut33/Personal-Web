@@ -36,6 +36,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   UMAMI_ID: Env.schema.string.optional(),
   UMAMI_PUBLIC_URL: Env.schema.string.optional(),
   UMAMI_SHARE_URL: Env.schema.string.optional(),
+  GISCUS_REPO_OWNER: Env.schema.string.optional(),
+  GISCUS_REPO_NAME: Env.schema.string.optional(),
+  GISCUS_GITHUB_TOKEN: Env.schema.string.optional(),
 
   /*
   |----------------------------------------------------------
