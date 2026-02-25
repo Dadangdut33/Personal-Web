@@ -1,7 +1,7 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 import { ReactNodeViewRenderer } from '@tiptap/react'
 
-import AudioAttachmentNodeView from '../components/Audio/audio-attachment-node-view'
+import AudioAttachmentNodeView from '../components/audio/audio-attachment-node-view'
 
 export interface AudioAttachmentOptions {
   HTMLAttributes: Record<string, string>
@@ -69,7 +69,7 @@ export const AudioAttachment = Node.create<AudioAttachmentOptions>({
       'div',
       mergeAttributes(this.options.HTMLAttributes, {
         'data-audio-attachment': 'true',
-        class: 'audio-attachment-node',
+        'class': 'audio-attachment-node',
         ...HTMLAttributes,
       }),
     ]
@@ -81,4 +81,3 @@ export const AudioAttachment = Node.create<AudioAttachmentOptions>({
 })
 
 export default AudioAttachment
-

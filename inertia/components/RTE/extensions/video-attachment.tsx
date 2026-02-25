@@ -1,7 +1,7 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 import { ReactNodeViewRenderer } from '@tiptap/react'
 
-import VideoAttachmentNodeView from '../components/Video/video-attachment-node-view'
+import VideoAttachmentNodeView from '../components/video/video-attachment-node-view'
 
 export interface VideoAttachmentOptions {
   HTMLAttributes: Record<string, string>
@@ -69,7 +69,7 @@ export const VideoAttachment = Node.create<VideoAttachmentOptions>({
       'div',
       mergeAttributes(this.options.HTMLAttributes, {
         'data-video-attachment': 'true',
-        class: 'video-attachment-node',
+        'class': 'video-attachment-node',
         ...HTMLAttributes,
       }),
     ]

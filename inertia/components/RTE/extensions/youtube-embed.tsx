@@ -1,7 +1,7 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 import { ReactNodeViewRenderer } from '@tiptap/react'
 
-import YoutubeNodeView from '../components/Youtube/youtube-node-view'
+import YoutubeNodeView from '../components/youtube/youtube-node-view'
 
 export interface YoutubeEmbedOptions {
   HTMLAttributes: Record<string, string>
@@ -42,9 +42,7 @@ export const YoutubeEmbed = Node.create<YoutubeEmbedOptions>({
         default: null,
         parseHTML: (element) => element.getAttribute('data-thumbnail-url'),
         renderHTML: (attributes) =>
-          attributes.thumbnailUrl
-            ? { 'data-thumbnail-url': String(attributes.thumbnailUrl) }
-            : {},
+          attributes.thumbnailUrl ? { 'data-thumbnail-url': String(attributes.thumbnailUrl) } : {},
       },
       size: {
         default: 'md',
@@ -67,7 +65,8 @@ export const YoutubeEmbed = Node.create<YoutubeEmbedOptions>({
       },
       startAt: {
         default: 0,
-        parseHTML: (element) => Number.parseInt(element.getAttribute('data-start-at') || '0', 10) || 0,
+        parseHTML: (element) =>
+          Number.parseInt(element.getAttribute('data-start-at') || '0', 10) || 0,
         renderHTML: (attributes) => ({ 'data-start-at': String(attributes.startAt || 0) }),
       },
     }
@@ -82,7 +81,7 @@ export const YoutubeEmbed = Node.create<YoutubeEmbedOptions>({
       'div',
       mergeAttributes(this.options.HTMLAttributes, {
         'data-youtube-embed': 'true',
-        class: 'youtube-embed-node',
+        'class': 'youtube-embed-node',
         ...HTMLAttributes,
       }),
     ]
@@ -94,4 +93,3 @@ export const YoutubeEmbed = Node.create<YoutubeEmbedOptions>({
 })
 
 export default YoutubeEmbed
-

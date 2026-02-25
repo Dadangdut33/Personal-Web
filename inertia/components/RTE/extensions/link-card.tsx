@@ -1,7 +1,7 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 import { ReactNodeViewRenderer } from '@tiptap/react'
 
-import LinkCardNodeView from '../components/Link/linkCard-node-view'
+import LinkCardNodeView from '../components/link/linkCard-node-view'
 
 export interface LinkCardOptions {
   HTMLAttributes: Record<string, string>

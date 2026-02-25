@@ -1,6 +1,7 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 import { ReactNodeViewRenderer } from '@tiptap/react'
-import GridBlockNodeView from '../components/Grid/grid-block-node-view'
+
+import GridBlockNodeView from '../components/grid/grid-block-node-view'
 
 export interface GridBlockOptions {
   HTMLAttributes: Record<string, string>
@@ -24,19 +25,23 @@ export const GridBlock = Node.create<GridBlockOptions>({
     return {
       columns: {
         default: 3,
-        parseHTML: (element) => Number.parseInt(element.getAttribute('data-columns') || '3', 10) || 3,
+        parseHTML: (element) =>
+          Number.parseInt(element.getAttribute('data-columns') || '3', 10) || 3,
         renderHTML: (attributes) => ({ 'data-columns': String(attributes.columns || 3) }),
       },
       itemCount: {
         default: 6,
-        parseHTML: (element) => Number.parseInt(element.getAttribute('data-item-count') || '6', 10) || 6,
+        parseHTML: (element) =>
+          Number.parseInt(element.getAttribute('data-item-count') || '6', 10) || 6,
         renderHTML: (attributes) => ({ 'data-item-count': String(attributes.itemCount || 6) }),
       },
       itemMinWidth: {
         default: 220,
         parseHTML: (element) =>
           Number.parseInt(element.getAttribute('data-item-min-width') || '220', 10) || 220,
-        renderHTML: (attributes) => ({ 'data-item-min-width': String(attributes.itemMinWidth || 220) }),
+        renderHTML: (attributes) => ({
+          'data-item-min-width': String(attributes.itemMinWidth || 220),
+        }),
       },
       gap: {
         default: 12,
@@ -99,13 +104,17 @@ export const GridBlock = Node.create<GridBlockOptions>({
           }
         },
         renderHTML: (attributes) => ({
-          'data-item-data': JSON.stringify(Array.isArray(attributes.itemData) ? attributes.itemData : []),
+          'data-item-data': JSON.stringify(
+            Array.isArray(attributes.itemData) ? attributes.itemData : []
+          ),
         }),
       },
       gridStyle: {
         default: 'card',
         parseHTML: (element) =>
-          element.getAttribute('data-grid-style') || element.getAttribute('data-item-style') || 'card',
+          element.getAttribute('data-grid-style') ||
+          element.getAttribute('data-item-style') ||
+          'card',
         renderHTML: (attributes) => ({ 'data-grid-style': String(attributes.gridStyle || 'card') }),
       },
     }
@@ -120,7 +129,7 @@ export const GridBlock = Node.create<GridBlockOptions>({
       'div',
       mergeAttributes(this.options.HTMLAttributes, {
         'data-grid-block': 'true',
-        class: 'grid-block-node',
+        'class': 'grid-block-node',
         ...HTMLAttributes,
       }),
     ]

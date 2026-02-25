@@ -1,6 +1,7 @@
 import { Node, mergeAttributes } from '@tiptap/core'
 import { ReactNodeViewRenderer } from '@tiptap/react'
-import AlertBlockNodeView from '../components/Alert/alert-node-view'
+
+import AlertBlockNodeView from '../components/alert/alert-node-view'
 
 export interface AlertBlockOptions {
   HTMLAttributes: Record<string, string>
@@ -60,7 +61,7 @@ export const AlertBlock = Node.create<AlertBlockOptions>({
       'div',
       mergeAttributes(this.options.HTMLAttributes, {
         'data-alert-block': 'true',
-        class: 'alert-block-node',
+        'class': 'alert-block-node',
         ...HTMLAttributes,
       }),
     ]
