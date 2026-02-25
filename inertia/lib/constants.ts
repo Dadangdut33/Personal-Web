@@ -3,6 +3,7 @@ import {
   BookText,
   Bot,
   Boxes,
+  BriefcaseBusiness,
   History,
   Images,
   LayoutDashboard,
@@ -73,6 +74,13 @@ export const DASHBOARD_NAV = {
     },
   ],
   management: [
+    {
+      title: 'Projects',
+      url: '/dashboard/projects',
+      icon: BriefcaseBusiness,
+      flat: true,
+      requiredPermission: 'project.view',
+    },
     {
       title: 'Blogs',
       url: '/dashboard/blogs',

@@ -7,7 +7,7 @@ export class ProjectDto {
   readonly is_active: boolean
   readonly is_pinned: boolean
   readonly title: string
-  readonly thumbnail_id: number | null
+  readonly thumbnail_id: string | null
   readonly description: string | null
   readonly tags: string[] | null
   readonly created_at: string

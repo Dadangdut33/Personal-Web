@@ -11,6 +11,7 @@ const RoleController = () => import('#controllers/role.controller')
 const ActivityLogController = () => import('#controllers/activity_log.controller')
 const MediaController = () => import('#controllers/media.controller')
 const BlogController = () => import('#controllers/blog.controller')
+const ProjectController = () => import('#controllers/project.controller')
 
 type ControllerImport<T> = T | LazyImport<T>
 
@@ -51,6 +52,7 @@ router
     mapGenericRoutes('/roles', RoleController, 'role', true)
     mapGenericRoutes('/media', MediaController, 'media', true)
     mapGenericRoutes('/blogs', BlogController, 'blog', true)
+    mapGenericRoutes('/projects', ProjectController, 'project', true)
     router.post('/blogs/rollback', [BlogController, 'rollbackRevision']).as('blog.rollback')
     router
       .post('/blogs/rollback-fields', [BlogController, 'rollbackRevisionFields'])

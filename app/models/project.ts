@@ -23,14 +23,19 @@ export default class Project extends BaseModel {
   declare title: string
 
   @column()
-  declare thumbnail_id: number | null
+  declare thumbnail_id: string | null
 
   @column()
   declare description: string | null
 
   @column({
-    prepare: (value) => JSON.stringify(value),
-    consume: (value) => JSON.parse(value),
+    prepare: (value) => (typeof value === 'string' ? value : JSON.stringify(value)),
+    consume: (value) => {
+      if (value === null || value === undefined) return null
+      if (typeof value === 'string') return JSON.parse(value)
+      if (Array.isArray(value)) return value
+      return null
+    },
   })
   declare tags: string[] | null
 

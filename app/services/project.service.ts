@@ -1,5 +1,5 @@
 import Project from '#models/project'
-import ProjectRepository from '#repositories/project.repository'
+import ProjectRepository, { ProjectUpsertPayload } from '#repositories/project.repository'
 import { QueryBuilderParams } from '#types/app'
 
 import { inject } from '@adonisjs/core'
@@ -9,14 +9,40 @@ export default class ProjectService {
   constructor(protected repo: ProjectRepository) {}
 
   async index(queryParams: QueryBuilderParams<typeof Project>) {
-    return await this.repo.query(queryParams)
+    const preload = queryParams.preload ? [...queryParams.preload] : []
+    if (!preload.includes('thumbnail')) preload.push('thumbnail')
+
+    const q = this.repo.query({
+      ...queryParams,
+      preload,
+    })
+
+    return await this.repo.paginate(q, queryParams)
   }
 
-  async createUpdate(data: Partial<Project>) {
+  async createUpdate(data: ProjectUpsertPayload) {
     return this.repo.updateOrCreateProject(data)
   }
 
-  async delete(id: any) {
-    return await this.repo.deleteGeneric(id)
+  async findOrFail(id: string) {
+    return this.repo.findOrFail(id)
+  }
+
+  async findByIds(ids: string[]) {
+    return this.repo.model.query().whereIn('id', ids)
+  }
+
+  async delete(id: string) {
+    const project = await this.repo.findOrFail(id)
+    await this.repo.deleteGeneric(project.id)
+    return true
+  }
+
+  async deleteProjects(ids: string[]) {
+    for (const id of ids) {
+      await this.delete(id)
+    }
+
+    return true
   }
 }

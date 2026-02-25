@@ -20,5 +20,6 @@ export const policies = {
   DashboardPolicy: () => import('#policies/dashboard_policy'),
   MediaPolicy: () => import('#policies/media_policy'),
   BlogPolicy: () => import('#policies/blog_policy'),
+  ProjectPolicy: () => import('#policies/project_policy'),
   ActivityLogPolicy: () => import('#policies/activity_log_policy'),
 }
