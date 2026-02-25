@@ -25,8 +25,10 @@ import { cn } from '~/lib/utils'
 import ImageBubbleMenu from './components/Image/image-bubble-menu'
 import ImageDialogButton from './components/Image/image-dialog-button'
 import ImageResizePopover from './components/Image/image-resize-popover'
+import AlertDialogButton from './components/Alert/alert-dialog-button'
 import AudioDialogButton from './components/Audio/audio-dialog-button'
 import FileDialogButton from './components/File/file-dialog-button'
+import GridDialogButton from './components/Grid/grid-dialog-button'
 import LinkDialogButton from './components/Link/link-dialog-button'
 import TableBubbleMenu from './components/Table/tabble-bubble-menu'
 import TableInsertDialogButton from './components/Table/table-insert-dialog-button'
@@ -36,9 +38,11 @@ import VideoDialogButton from './components/Video/video-dialog-button'
 import YoutubeDialogButton from './components/Youtube/youtube-dialog-button'
 import UtilsBubbleMenu from './components/utils-bubble-menu'
 import { lowlight } from './code-languages'
+import AlertBlock from './extensions/alert-block'
 import AudioAttachment from './extensions/audio-attachment'
 import CustomCodeBlockLowlight from './extensions/code-block-lowlight'
 import FileAttachment from './extensions/file-attachment'
+import GridBlock from './extensions/grid-block'
 import LinkCard from './extensions/link-card'
 import ResizableImage from './extensions/resizeable-image'
 import VideoAttachment from './extensions/video-attachment'
@@ -134,6 +138,8 @@ export default function TiptapEditor({
       }),
       LinkCard,
       YoutubeEmbed,
+      AlertBlock,
+      GridBlock,
       AudioAttachment,
       VideoAttachment,
       FileAttachment,
@@ -702,6 +708,9 @@ export default function TiptapEditor({
                 setMediaLibraryOpen(true)
               }}
             />
+
+            <AlertDialogButton editor={editor} />
+            <GridDialogButton editor={editor} />
 
             <TableInsertDialogButton
               editor={editor}

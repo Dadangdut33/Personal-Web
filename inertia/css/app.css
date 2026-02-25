@@ -749,6 +749,28 @@ main,
   transition: outline 0.2s ease-in-out;
 }
 
+/* Grid block horizontal scroll behavior */
+.ProseMirror .rte-grid-scroll {
+  scrollbar-width: none;
+}
+
+.ProseMirror .rte-grid-scroll:hover {
+  scrollbar-width: thin;
+}
+
+.ProseMirror .rte-grid-scroll::-webkit-scrollbar {
+  height: 0;
+}
+
+.ProseMirror .rte-grid-scroll:hover::-webkit-scrollbar {
+  height: 8px;
+}
+
+.ProseMirror .rte-grid-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--color-main) 55%, transparent);
+  border-radius: 9999px;
+}
+
 /* Keyframes */
 
 /* Define keyframes */

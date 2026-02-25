@@ -28,7 +28,10 @@ import {
   IconCheck,
   IconCopy,
   IconEye,
+  IconFileTypeDoc,
   IconFileTypePdf,
+  IconFileTypeTxt,
+  IconFileTypeXls,
   IconFileZip,
   IconLayoutGrid,
   IconList,
@@ -64,35 +67,158 @@ const pageTitle = 'Media'
 type PageProps = SharedProps & InferPageProps<MediaController, 'viewList'>
 type DataType = PageProps['data'][number]
 
-function getIconForMime(mime: string) {
-  if (mime.startsWith('image/')) return <IconPhoto size={20} className="text-blue-500" />
-  if (mime.startsWith('video/')) return <IconMovie size={20} className="text-red-500" />
-  if (mime.startsWith('audio/')) return <IconMusic size={20} className="text-green-500" />
-  if (mime === 'application/pdf') return <IconFileTypePdf size={20} className="text-red-600" />
+function getIconForMime(mime: string, size = 20) {
+  if (mime.startsWith('image/')) return <IconPhoto size={size} className="text-blue-500" />
+  if (mime.startsWith('video/')) return <IconMovie size={size} className="text-red-500" />
+  if (mime.startsWith('audio/')) return <IconMusic size={size} className="text-green-500" />
+  if (mime === 'application/pdf') return <IconFileTypePdf size={size} className="text-red-600" />
+  if (mime.includes('word') || mime.includes('document'))
+    return <IconFileTypeDoc size={size} className="text-blue-600" />
+  if (mime.includes('sheet') || mime.includes('excel'))
+    return <IconFileTypeXls size={size} className="text-emerald-600" />
+  if (mime.startsWith('text/')) return <IconFileTypeTxt size={size} className="text-slate-500" />
   if (mime.includes('zip') || mime.includes('compressed'))
-    return <IconFileZip size={20} className="text-yellow-500" />
-  return <IconFileTypePdf size={20} className="text-gray-500" /> // Default fallback
+    return <IconFileZip size={size} className="text-yellow-500" />
+  return <IconFileTypeTxt size={size} className="text-gray-500" /> // Default fallback
 }
 
-function previewItem(record: DataType, { width, height }: { width?: string; height?: string }) {
-  return record.mime_type.startsWith('image/') ? (
-    <Image
-      src={record.url}
-      fit="cover"
-      w={width ?? '100%'}
-      h={height ?? '100%'}
-      fallbackSrc="https://placehold.co/200x200?text=Err"
-    />
-  ) : record.mime_type.startsWith('video/') ? (
-    <video src={record.url} controls className="w-full h-full object-cover" />
-  ) : record.mime_type.startsWith('audio/') ? (
-    <div className="w-full h-full flex items-center justify-center p-4 bg-gray-50">
-      <audio src={record.url} controls className="w-full" />
-    </div>
-  ) : (
-    <div className="flex flex-col items-center justify-center text-gray-400">
-      {getIconForMime(record.mime_type)}
-    </div>
+function mediaTypeFromMime(mime: string) {
+  if (mime.startsWith('image/')) return 'Image'
+  if (mime.startsWith('video/')) return 'Video'
+  if (mime.startsWith('audio/')) return 'Audio'
+  return 'File'
+}
+
+function extensionFromRecord(record: DataType) {
+  if (record.extension) return record.extension.toUpperCase()
+  const last = record.name?.split('.')?.pop()
+  return last ? last.toUpperCase() : 'FILE'
+}
+
+function previewItem(
+  record: DataType,
+  {
+    width,
+    height,
+    avoidTopLeftOverlay = false,
+  }: { width?: string; height?: string; avoidTopLeftOverlay?: boolean }
+) {
+  const badgePositionClass = avoidTopLeftOverlay ? 'right-2 top-2' : 'left-2 top-2'
+
+  if (record.mime_type.startsWith('image/')) {
+    return (
+      <div className="relative h-full w-full">
+        <div className={`absolute z-10 ${badgePositionClass}`}>
+          <Badge size="xs" radius="sm" variant="filled" color="blue">
+            Image
+          </Badge>
+        </div>
+        <Image
+          src={record.url}
+          fit="cover"
+          w={width ?? '100%'}
+          h={height ?? '100%'}
+          fallbackSrc="https://placehold.co/200x200?text=Err"
+        />
+      </div>
+    )
+  }
+
+  if (record.mime_type.startsWith('video/')) {
+    return (
+      <div className="relative h-full w-full overflow-hidden rounded-md bg-black">
+        <div className={`absolute z-10 ${badgePositionClass}`}>
+          <Badge size="xs" radius="sm" variant="filled" color="red">
+            Video
+          </Badge>
+        </div>
+        <video
+          src={record.url}
+          controls
+          preload="metadata"
+          className="h-full w-full object-cover"
+          style={{ width: width ?? '100%', height: height ?? '100%' }}
+        />
+      </div>
+    )
+  }
+
+  if (record.mime_type.startsWith('audio/')) {
+    return (
+      <Paper
+        withBorder
+        shadow="xs"
+        radius="md"
+        p="md"
+        className="relative h-full w-full bg-gradient-to-br from-emerald-50 to-lime-50"
+      >
+        {avoidTopLeftOverlay ? (
+          <div className="absolute right-2 top-2 z-10">
+            <Badge size="xs" radius="sm" variant="filled" color="green">
+              Audio
+            </Badge>
+          </div>
+        ) : null}
+
+        <Group justify="space-between" mb={8}>
+          {avoidTopLeftOverlay ? <div /> : <Badge size="xs" radius="sm" variant="filled" color="green">Audio</Badge>}
+          <Text c="dimmed" fz={10} fw={700}>
+            {extensionFromRecord(record)}
+          </Text>
+        </Group>
+
+        <Group gap={8} mb={10} wrap="nowrap">
+          <div className="rounded-md border border-emerald-200 bg-white p-2">
+            {getIconForMime(record.mime_type, 26)}
+          </div>
+          <Text fz="xs" fw={600} lineClamp={1}>
+            {record.name}
+          </Text>
+        </Group>
+
+        <audio src={record.url} controls className="w-full h-8" preload="metadata" />
+      </Paper>
+    )
+  }
+
+  return (
+    <Paper
+      withBorder
+      shadow="xs"
+      radius="md"
+      p="md"
+      className="relative h-full w-full bg-gradient-to-br from-slate-50 to-zinc-100"
+    >
+      {avoidTopLeftOverlay ? (
+        <div className="absolute right-2 top-2 z-10">
+          <Badge size="xs" radius="sm" variant="filled" color="gray">
+            {mediaTypeFromMime(record.mime_type)}
+          </Badge>
+        </div>
+      ) : null}
+
+      <Group justify="space-between" mb={8}>
+        {avoidTopLeftOverlay ? (
+          <div />
+        ) : (
+          <Badge size="xs" radius="sm" variant="filled" color="gray">
+            {mediaTypeFromMime(record.mime_type)}
+          </Badge>
+        )}
+        <Text c="dimmed" fz={10} fw={700}>
+          {extensionFromRecord(record)}
+        </Text>
+      </Group>
+
+      <div className="flex h-full min-h-[110px] flex-col items-center justify-center gap-3 text-center">
+        <div className="rounded-md border border-slate-200 bg-white p-3">
+          {getIconForMime(record.mime_type, 30)}
+        </div>
+        <Text fz="xs" fw={600} c="dimmed" lineClamp={2}>
+          {record.name}
+        </Text>
+      </div>
+    </Paper>
   )
 }
 
@@ -279,16 +405,16 @@ export default function page(props: PageProps) {
       title: 'Preview',
       toggleable: true,
       render: (record) => {
-        return previewItem(record, { width: '200px', height: '200px' })
+        return previewItem(record, { width: '450px', height: '300px' })
       },
-      width: 250,
+      width: 450,
     },
     {
       accessor: 'name',
       title: 'Name',
       toggleable: true,
       sortable: true,
-      width: 350,
+      width: 200,
       filter: () => (
         <FilterText
           column={'name'}
@@ -554,7 +680,7 @@ export default function page(props: PageProps) {
                     <Card.Section>
                       <AspectRatio ratio={1 / 1}>
                         <div className="relative w-full h-full bg-gray-100 flex items-center justify-center overflow-hidden">
-                          {previewItem(record, {})}
+                          {previewItem(record, { avoidTopLeftOverlay: true })}
 
                           <div className="absolute top-2 left-2 z-10">
                             <Checkbox
