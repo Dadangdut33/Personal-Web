@@ -275,7 +275,9 @@ export default function page(props: PageProps) {
             onPageChange={(page) => searchFilter.onPageChange(page)}
             onRecordsPerPageChange={(perPage) => searchFilter.onRecordsPerPage(perPage)}
             sortStatus={searchFilter.sortStatus as DataTableSortStatus<DataType>}
-            onSortStatusChange={(sortStatus) => searchFilter.onSortStatus(sortStatus as any)}
+            onSortStatusChange={(sortStatus: DataTableSortStatus<DataType>) =>
+              searchFilter.onSortStatus(sortStatus as DataTableSortStatus<any>)
+            }
           />
         </Paper>
       </div>

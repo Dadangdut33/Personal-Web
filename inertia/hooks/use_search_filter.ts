@@ -68,7 +68,7 @@ export default function useSearchFilter<T>(
     if (sort) {
       const direction = sort.startsWith('-') ? 'desc' : 'asc'
       const columnAccessor = sort.replace('-', '')
-      setSortStatus({ columnAccessor: columnAccessor as any, direction })
+      setSortStatus({ columnAccessor: columnAccessor, direction })
     }
   }, [])
 
@@ -91,7 +91,7 @@ export default function useSearchFilter<T>(
     }
 
     const payload = Object.fromEntries(queryParams)
-    router.get(route(endpoint as any).path as any, payload, {
+    router.get(route(endpoint).path, payload, {
       preserveState: true,
       replace: true, // Prevents flooding history stack
     })
@@ -136,7 +136,7 @@ export default function useSearchFilter<T>(
     setSearchBy({})
     setSortStatus({ columnAccessor: defaultColumnSort as any, direction: 'desc' })
     router.get(
-      route(endpoint as any).path as any,
+      route(endpoint).path,
       {},
       {
         preserveState: true,

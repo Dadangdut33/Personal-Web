@@ -132,19 +132,15 @@ export default function Page(
     )
   }
 
-  const rollbackMutation = useGenericMutation('POST', route('blog.rollback' as any).path, {
+  const rollbackMutation = useGenericMutation('POST', route('blog.rollback').path, {
     doRedirect: false,
     onSuccess: refreshEditData,
   })
 
-  const rollbackFieldsMutation = useGenericMutation(
-    'POST',
-    route('blog.rollbackFields' as any).path,
-    {
-      doRedirect: false,
-      onSuccess: refreshEditData,
-    }
-  )
+  const rollbackFieldsMutation = useGenericMutation('POST', route('blog.rollbackFields').path, {
+    doRedirect: false,
+    onSuccess: refreshEditData,
+  })
 
   const onSave = ConfirmAddModal({
     onConfirm: () => {

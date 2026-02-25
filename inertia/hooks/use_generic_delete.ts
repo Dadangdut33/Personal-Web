@@ -47,7 +47,7 @@ export function useDeleteGeneric<T>({
 
   const deleteMutation = useGenericMutation(
     'DELETE',
-    route(routeName as any, deleteParam as any).path,
+    route(routeName as RouteNameType, deleteParam as any).path,
     {
       onSuccess: (dataRes, variables, onMutateResult, context) => {
         onSuccess && onSuccess(dataRes, variables, onMutateResult, context)

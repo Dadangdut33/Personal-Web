@@ -17,7 +17,7 @@ export default class BlogService {
     if (!preload.includes('tags')) preload.push('tags')
     if (!preload.includes('projects')) preload.push('projects')
     if (!preload.includes('thumbnail')) preload.push('thumbnail')
-    const exclude = Array.from(new Set([...(queryParams.exclude || []), 'content'])) as any
+    const exclude = Array.from(new Set([...(queryParams.exclude || []), 'content']))
 
     const q = this.repo.query({
       ...queryParams,

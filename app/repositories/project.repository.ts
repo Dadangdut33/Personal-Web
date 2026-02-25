@@ -38,7 +38,7 @@ export default class ProjectRepository extends BaseRepository<typeof Project> {
 
     const project = id
       ? await this.model.updateOrCreate({ id }, payload)
-      : await this.model.create(payload as any)
+      : await this.model.create(payload)
     return project
   }
 }

@@ -87,7 +87,7 @@ export default class ProjectController {
       return response.status(200).json({
         status: 'success',
         message: `Successfully ${getMethodActName(request)} project.`,
-        redirect_to: route('project.index' as any).path,
+        redirect_to: route('project.index').path,
       })
     } catch (error) {
       return returnError(response, error, `PROJECT_${request.method()}`, { logErrors: true })

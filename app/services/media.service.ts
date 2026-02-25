@@ -57,7 +57,7 @@ export default class MediaService {
 
     const allowedTagIds = await this.getAllowedTagIdsForUser(user)
     if (allowedTagIds !== null) {
-      this.repo.applyTagAccessFilter(q as any, allowedTagIds)
+      this.repo.applyTagAccessFilter(q, allowedTagIds)
     }
 
     return await this.repo.paginate(q, params)

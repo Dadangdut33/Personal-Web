@@ -131,7 +131,7 @@ export default function LinkCardNodeView({ node, editor, updateAttributes }: Nod
     key: 'size' | 'position',
     value: FormState['size'] | FormState['position']
   ) => {
-    setForm((prev) => ({ ...prev, [key]: value as any }))
+    setForm((prev) => ({ ...prev, [key]: value }))
     if (!isEditable) return
     updateAttributes({ [key]: value })
   }

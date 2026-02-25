@@ -74,6 +74,11 @@ function isPathActive(currentPath: string, targetPath: string) {
   return current === target || current.startsWith(`${target}/`)
 }
 
+function isExactPathActive(currentPath: string, targetPath: string) {
+  if (!targetPath || targetPath === '#') return false
+  return normalizePath(currentPath) === normalizePath(targetPath)
+}
+
 function getBestMatchingPath(currentPath: string, paths: string[]) {
   const current = normalizePath(currentPath)
 
@@ -167,8 +172,8 @@ export function SidebarMenuEntry({
                 <SidebarMenuSubItem key={subItem.title}>
                   <SidebarMenuSubButton
                     asChild
-                    isActive={isPathActive(currentPath, subItem.url)}
-                    className="relative hover:bg-main/30 hover:text-foreground data-[active=true]:font-semibold data-[active=true]:before:absolute data-[active=true]:before:inset-y-1 data-[active=true]:before:left-0 data-[active=true]:before:w-0.5 data-[active=true]:before:rounded-r-full data-[active=true]:before:bg-main-foreground"
+                    isActive={isExactPathActive(currentPath, subItem.url)}
+                    className="relative rounded-md px-2 py-1 text-[13px] text-muted-foreground hover:bg-main/15 hover:text-foreground data-[active=true]:bg-main/20 data-[active=true]:text-foreground data-[active=true]:font-semibold data-[active=true]:before:absolute data-[active=true]:before:inset-y-1 data-[active=true]:before:left-0 data-[active=true]:before:w-0.5 data-[active=true]:before:rounded-r-full data-[active=true]:before:bg-main"
                   >
                     <Link href={subItem.url}>
                       <span>{subItem.title}</span>

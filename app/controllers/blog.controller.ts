@@ -52,7 +52,7 @@ export default class BlogController {
     await data.load('projects')
     await data.load('thumbnail')
     const versions = await this.blogSvc.versions(id)
-    data.$setRelated('versions', versions as any)
+    data.$setRelated('versions', versions)
 
     const projects = await Project.query().select(['id', 'title']).orderBy('title', 'asc')
     const availableTags = await Tag.query().where('type', 'blog').orderBy('name', 'asc')
@@ -107,7 +107,7 @@ export default class BlogController {
       return response.status(200).json({
         status: 'success',
         message: `Successfully ${getMethodActName(request)} blog.`,
-        redirect_to: route('blog.index' as any).path,
+        redirect_to: route('blog.index').path,
       })
     } catch (error) {
       return returnError(response, error, `BLOG_${request.method()}`, { logErrors: true })
@@ -220,7 +220,7 @@ export default class BlogController {
       const updated = await this.blogSvc.revertFieldsToRevision(
         String(id),
         String(revisionId),
-        fields as any
+        fields
       )
       await this.activityLogSvc.log(
         auth.user!.id,

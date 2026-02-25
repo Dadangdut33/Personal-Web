@@ -1,15 +1,12 @@
 import { route } from '@izzyjs/route/client'
 import {
   BookText,
-  Bot,
   Boxes,
   BriefcaseBusiness,
   History,
   Images,
   LayoutDashboard,
   ShieldUser,
-  SquareTerminal,
-  UserPen,
   UsersRound,
 } from 'lucide-react'
 
@@ -30,62 +27,39 @@ export const DASHBOARD_NAV = {
   ],
   menu: [
     {
-      title: 'need dashboard.view',
-      url: '#',
-      icon: SquareTerminal,
-      items: [
-        {
-          title: 'Submenu 1 (need profile.view)',
-          url: '#',
-          requiredPermission: 'profile.view',
-        },
-        {
-          title: 'Submenu 2 (no perm needed)',
-          url: '#',
-        },
-        {
-          title: 'Submenu 3 (no perm needed)',
-          url: '#',
-        },
-      ],
-      requiredPermission: 'dashboard.view',
-    },
-    {
-      title: 'no perm needed',
-      url: '#',
-      icon: Bot,
-      items: [
-        {
-          title: 'Submenu 1',
-          url: '#',
-        },
-        {
-          title: 'Submenu 2',
-          url: '#',
-        },
-      ],
-    },
-    {
-      title: 'Profile',
-      url: route('profile.view').path,
-      icon: UserPen,
-      flat: true,
-      requiredPermission: 'profile.view',
-    },
-  ],
-  management: [
-    {
       title: 'Projects',
-      url: '/dashboard/projects',
+      url: route('project.index').path,
       icon: BriefcaseBusiness,
-      flat: true,
+      items: [
+        {
+          title: 'List',
+          url: route('project.index').path,
+          requiredPermission: 'project.view',
+        },
+        {
+          title: 'Create',
+          url: route('project.create').path,
+          requiredPermission: 'project.create',
+        },
+      ],
       requiredPermission: 'project.view',
     },
     {
       title: 'Blogs',
-      url: '/dashboard/blogs',
+      url: route('blog.index').path,
       icon: BookText,
-      flat: true,
+      items: [
+        {
+          title: 'List',
+          url: route('blog.index').path,
+          requiredPermission: 'blog.view',
+        },
+        {
+          title: 'Create',
+          url: route('blog.create').path,
+          requiredPermission: 'blog.create',
+        },
+      ],
       requiredPermission: 'blog.view',
     },
     {
@@ -95,6 +69,8 @@ export const DASHBOARD_NAV = {
       flat: true,
       requiredPermission: 'media.view',
     },
+  ],
+  management: [
     {
       title: 'Users',
       url: route('user.index').path,
