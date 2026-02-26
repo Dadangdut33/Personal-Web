@@ -47,10 +47,12 @@ export default function LinkDialogButton({
   const [selection, setSelection] = useState(editor?.state.selection)
 
   useEffect(() => {
-    if (editor) {
-      editor.on('selectionUpdate', () => {
-        setSelection(editor.state.selection)
-      })
+    if (!editor) return
+
+    const onSelectionUpdate = () => setSelection(editor.state.selection)
+    editor.on('selectionUpdate', onSelectionUpdate)
+    return () => {
+      editor.off('selectionUpdate', onSelectionUpdate)
     }
   }, [editor])
 
@@ -79,8 +81,8 @@ export default function LinkDialogButton({
         <DialogHeader>
           <DialogTitle>Add Link</DialogTitle>
         </DialogHeader>
-        <div className="grid gap-4 py-4">
-          <div className="grid gap-2">
+        <div className="grid min-w-0 gap-4 py-4">
+          <div className="grid min-w-0 gap-2">
             <Label htmlFor="url">URL</Label>
             <Input
               id="url"
@@ -88,6 +90,7 @@ export default function LinkDialogButton({
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
               disabled={!isEditable}
+              className="min-w-0"
             />
           </div>
 

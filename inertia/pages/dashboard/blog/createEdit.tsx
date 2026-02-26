@@ -47,7 +47,7 @@ function extractMediaIdFromRedirectUrl(value: string): string | null {
 
   try {
     const parsed = new URL(value, window.location.origin)
-    const match = parsed.pathname.match(/^\/api\/v1\/media\/redirect\/([^/?#]+)$/)
+    const match = parsed.pathname.match(/^\/api\/v1\/public\/media\/redirect\/([^/?#]+)$/)
     return match?.[1] ? decodeURIComponent(match[1]) : null
   } catch {
     return null

@@ -1,4 +1,5 @@
 import { type NodeViewProps, NodeViewWrapper } from '@tiptap/react'
+import axios from 'axios'
 import { Loader2, Pencil, RefreshCw, Save, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Badge } from '~/components/ui/badge'
@@ -189,12 +190,9 @@ export default function YoutubeNodeView({ node, editor, updateAttributes }: Node
     setIsFetching(true)
     setFetchError(null)
     try {
-      const response = await fetch(
-        `https://noembed.com/embed?url=${encodeURIComponent(normalizedUrl)}`
-      )
-      if (!response.ok) throw new Error('Failed to fetch YouTube metadata')
-
-      const data = await response.json()
+      const { data } = await axios.get('https://noembed.com/embed', {
+        params: { url: normalizedUrl },
+      })
       const nextTitle = typeof data.title === 'string' ? data.title : null
       const nextThumb =
         typeof data.thumbnail_url === 'string'

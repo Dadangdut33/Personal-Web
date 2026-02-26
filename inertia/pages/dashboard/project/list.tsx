@@ -10,10 +10,10 @@ import {
   Badge,
   Group,
   Image,
+  Tooltip as MantineTooltip,
   Menu,
   Paper,
   Text,
-  Tooltip as MantineTooltip,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconAlertCircle, IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react'
@@ -286,7 +286,10 @@ export default function Page(props: PageProps) {
                 </Menu.Item>
               </TooltipIfTrue>
 
-              <TooltipIfTrue isTrue={!canDelete} label="You don't have permission to delete project">
+              <TooltipIfTrue
+                isTrue={!canDelete}
+                label="You don't have permission to delete project"
+              >
                 <Menu.Item
                   fw={600}
                   fz="sm"

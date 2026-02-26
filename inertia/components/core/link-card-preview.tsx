@@ -76,12 +76,11 @@ export default function LinkCardPreview({
             <ExternalLink className="h-4 w-4 shrink-0 opacity-70 transition-opacity group-hover:opacity-100" />
           </div>
 
-          <h4 className="line-clamp-2 text-sm font-heading">{resolvedTitle}</h4>
+          <h4 className="line-clamp-2 break-words text-sm font-heading">{resolvedTitle}</h4>
           <p className="line-clamp-2 text-xs text-muted-foreground">{resolvedDescription}</p>
-          <p className="text-xs text-muted-foreground/80">{limitString(displayUrl, 70)}</p>
+          <p className="break-all text-xs text-muted-foreground/80">{limitString(displayUrl, 70)}</p>
         </CardContent>
       </Card>
     </a>
   )
 }
-

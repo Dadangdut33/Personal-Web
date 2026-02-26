@@ -203,6 +203,17 @@ export default function Page(props: PageProps) {
       filtering: searchFilter.searchBy.slug_id ? true : false,
     },
     {
+      accessor: 'view_count',
+      title: 'Views',
+      sortable: false,
+      width: 100,
+      render: (record) => (
+        <Text fz="sm" fw={700}>
+          {typeof record.view_count === 'number' ? record.view_count.toLocaleString() : '-'}
+        </Text>
+      ),
+    },
+    {
       accessor: 'description',
       title: 'Description',
       sortable: false,

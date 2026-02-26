@@ -7,6 +7,7 @@ import { Toaster } from '~/components/ui/sonner'
 
 import { ModalProvider } from '../core/modal/modal-context'
 import { ThemeSwitcher } from '../core/theme-switcher'
+import { TooltipProvider } from '../ui/tooltip'
 
 const queryClient = new QueryClient()
 
@@ -19,7 +20,9 @@ export default function AppProvider({ children }: { children: React.ReactNode })
         {/* Hidden theme switcher */}
         <ThemeSwitcher hidden />
         {/* Wrapped in Modal provider */}
-        <ModalProvider>{children}</ModalProvider>
+        <ModalProvider>
+          <TooltipProvider>{children}</TooltipProvider>
+        </ModalProvider>
       </Suspense>
     </QueryClientProvider>
   )

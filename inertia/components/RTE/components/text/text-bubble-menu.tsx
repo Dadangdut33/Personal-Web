@@ -1,6 +1,7 @@
 import { Editor } from '@tiptap/react'
 import {
   Bold,
+  Droplet,
   Code,
   Heading1,
   Heading2,
@@ -12,7 +13,10 @@ import {
   Pilcrow,
   SquareCode,
 } from 'lucide-react'
+import { useMemo } from 'react'
 import { Button } from '~/components/ui/button'
+import { Input } from '~/components/ui/input'
+import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover'
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 
 export default function TextBubbleMenu({
@@ -22,6 +26,21 @@ export default function TextBubbleMenu({
 }) {
   if (!editor) return null
   const isEditable = !!editor.isEditable
+  const activeColor = (editor.getAttributes('textColor')?.color as string | undefined) || ''
+  const colorSwatches = useMemo(
+    () => ['#ef4444', '#f97316', '#eab308', '#22c55e', '#0ea5e9', '#3b82f6', '#8b5cf6', '#f43f5e'],
+    []
+  )
+
+  const applyColor = (color: string) => {
+    if (!isEditable) return
+    editor.chain().focus().setMark('textColor', { color }).run()
+  }
+
+  const clearColor = () => {
+    if (!isEditable) return
+    editor.chain().focus().unsetMark('textColor').run()
+  }
 
   return (
     <>
@@ -39,6 +58,48 @@ export default function TextBubbleMenu({
         </TooltipTrigger>
         <TooltipContent>Bold</TooltipContent>
       </Tooltip>
+
+      <Popover>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <PopoverTrigger asChild>
+              <Button variant="ghost" size="icon" disabled={!isEditable} className="relative">
+                <Droplet className="h-4 w-4" />
+                <span
+                  className="absolute -bottom-0.5 left-1/2 h-1.5 w-4 -translate-x-1/2 rounded-full border border-border"
+                  style={{ backgroundColor: activeColor || '#9ca3af' }}
+                />
+              </Button>
+            </PopoverTrigger>
+          </TooltipTrigger>
+          <TooltipContent>Text Color</TooltipContent>
+        </Tooltip>
+        <PopoverContent className="w-56">
+          <div className="space-y-3">
+            <div className="grid grid-cols-4 gap-2">
+              {colorSwatches.map((swatch) => (
+                <button
+                  key={swatch}
+                  type="button"
+                  aria-label={`Set color ${swatch}`}
+                  className="h-7 w-7 rounded-md border-2 border-border"
+                  style={{ backgroundColor: swatch }}
+                  onClick={() => applyColor(swatch)}
+                />
+              ))}
+            </div>
+            <Input
+              type="color"
+              value={activeColor || '#000000'}
+              onChange={(event) => applyColor(event.target.value)}
+              className="h-9 w-full cursor-pointer"
+            />
+            <Button type="button" variant="outline" size="sm" className="w-full" onClick={clearColor}>
+              Clear Color
+            </Button>
+          </div>
+        </PopoverContent>
+      </Popover>
 
       <Tooltip>
         <TooltipTrigger asChild>

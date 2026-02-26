@@ -1,6 +1,6 @@
 import router from '@adonisjs/core/services/router'
 
-const REDIRECT_PATH_REGEX = /^\/api\/v1\/media\/redirect\/([^/?#]+)$/
+const REDIRECT_PATH_REGEX = /^\/api\/v1\/public\/media\/redirect\/([^/?#]+)$/
 const MEDIA_NODE_URL_FIELD: Record<string, string> = {
   image: 'src',
   fileAttachment: 'url',

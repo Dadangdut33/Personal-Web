@@ -4,14 +4,7 @@ import { RouteNameType } from '#types/app'
 import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import { Head, Link } from '@inertiajs/react'
 import { route } from '@izzyjs/route/client'
-import {
-  ActionIcon,
-  Alert,
-  Tooltip as MantineTooltip,
-  Menu,
-  Paper,
-  Text,
-} from '@mantine/core'
+import { ActionIcon, Alert, Tooltip as MantineTooltip, Menu, Paper, Text } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import {
   IconAlertCircle,

@@ -1,5 +1,3 @@
-import router from '@adonisjs/core/services/router'
-
 /*
 |--------------------------------------------------------------------------
 | Routes file
@@ -11,12 +9,4 @@ import router from '@adonisjs/core/services/router'
 import './routes/api.js'
 import './routes/auth.js'
 import './routes/dashboard.js'
-
-const HomeController = () => import('#controllers/home.controller')
-
-router.group(() => {
-  router.get('/', [HomeController, 'view']).as('home')
-  // temp
-  router.get('/blog', [HomeController, 'view']).as('blog')
-  router.get('/projects', [HomeController, 'view']).as('projects')
-})
+import './routes/public.js'

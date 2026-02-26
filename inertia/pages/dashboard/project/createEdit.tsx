@@ -18,7 +18,15 @@ import {
   Textarea,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { IconArrowLeft, IconCancel, IconDeviceFloppy, IconPhoto, IconPhotoPlus, IconTrash, IconUpload } from '@tabler/icons-react'
+import {
+  IconArrowLeft,
+  IconCancel,
+  IconDeviceFloppy,
+  IconPhoto,
+  IconPhotoPlus,
+  IconTrash,
+  IconUpload,
+} from '@tabler/icons-react'
 import type React from 'react'
 import { useRef, useState } from 'react'
 import MediaLibraryDialog from '~/components/RTE/media-library-dialog'
@@ -48,7 +56,7 @@ function extractMediaIdFromRedirectUrl(value: string): string | null {
 
   try {
     const parsed = new URL(value, window.location.origin)
-    const match = parsed.pathname.match(/^\/api\/v1\/media\/redirect\/([^/?#]+)$/)
+    const match = parsed.pathname.match(/^\/api\/v1\/public\/media\/redirect\/([^/?#]+)$/)
     return match?.[1] ? decodeURIComponent(match[1]) : null
   } catch {
     return null
@@ -57,7 +65,10 @@ function extractMediaIdFromRedirectUrl(value: string): string | null {
 
 export default function Page(
   props: SharedProps &
-    (InferPageProps<ProjectController, 'viewEdit'> | InferPageProps<ProjectController, 'viewCreate'>)
+    (
+      | InferPageProps<ProjectController, 'viewEdit'>
+      | InferPageProps<ProjectController, 'viewCreate'>
+    )
 ) {
   const { data } = props
   const [thumbnailPreviewUrl, setThumbnailPreviewUrl] = useState<string>(data?.thumbnail?.url || '')
@@ -308,7 +319,9 @@ export default function Page(
                   variant="light"
                   color="red"
                   leftSection={<IconTrash size={16} />}
-                  disabled={mutation.isPending || (!form.values.thumbnail_id && !thumbnailPreviewUrl)}
+                  disabled={
+                    mutation.isPending || (!form.values.thumbnail_id && !thumbnailPreviewUrl)
+                  }
                   onClick={clearThumbnail}
                 >
                   Remove

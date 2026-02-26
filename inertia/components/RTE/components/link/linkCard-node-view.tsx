@@ -1,4 +1,6 @@
+import { route } from '@izzyjs/route/client'
 import { type NodeViewProps, NodeViewWrapper } from '@tiptap/react'
+import axios from 'axios'
 import { Loader2, Pencil, RefreshCw, Save, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { Badge } from '~/components/ui/badge'
@@ -168,36 +170,17 @@ export default function LinkCardNodeView({ node, editor, updateAttributes }: Nod
     setIsFetching(true)
     setFetchError(null)
     try {
-      const response = await fetch(
-        `https://api.microlink.io/?url=${encodeURIComponent(normalizedUrl)}&screenshot=false&video=false&audio=false`
-      )
-      if (!response.ok) {
-        throw new Error('Failed to fetch metadata')
-      }
-
-      const payload = await response.json()
-      const data = payload?.data
-      if (!data) {
-        throw new Error('Metadata response is empty')
-      }
-
-      const imageUrl =
-        (typeof data.image === 'string' ? data.image : data.image?.url) ||
-        (typeof data.logo === 'string' ? data.logo : data.logo?.url) ||
-        null
-
-      const siteName =
-        (typeof data.publisher === 'string' ? data.publisher : data.publisher?.name) ||
-        (typeof data.site === 'string' ? data.site : data.site?.name) ||
-        (typeof data.author === 'string' ? data.author : data.author?.name) ||
-        null
+      const response = await axios.get(route('api.v1.utils.link-metadata').path, {
+        params: { url: normalizedUrl },
+      })
+      const data = response.data?.data
 
       const nextAttrs: LinkCardAttrs = {
         url: normalizedUrl,
-        title: typeof data.title === 'string' ? data.title : null,
-        description: typeof data.description === 'string' ? data.description : null,
-        imageUrl,
-        siteName,
+        title: typeof data?.title === 'string' ? data.title : null,
+        description: typeof data?.description === 'string' ? data.description : null,
+        imageUrl: typeof data?.imageUrl === 'string' ? data.imageUrl : null,
+        siteName: typeof data?.siteName === 'string' ? data.siteName : null,
         size: form.size,
         position: form.position,
       }

@@ -3,7 +3,7 @@ import ActivityLog from '#models/activity_log'
 import { UserDto } from './user.dto.js'
 
 export class ActivityLogDto {
-  readonly id: number
+  readonly id: string
   readonly userId: string | null
   readonly action: string
   readonly target: string

@@ -67,18 +67,19 @@ export type FlashAlertType = {
 // Helper for routename type - we copy pasted it from izzyjs
 export type RouteNameType = Exclude<RouteWithName, RouteWithParams>['name']
 
+// * IMPORTANT *
 // Helper for paginated data
+// This appear as snake_case because of how we set the naming strategy in each model
 export type PaginationMeta = {
-  current_page: number
-  per_page: number
   total: number
+  per_page: number
 
+  current_page: number
   first_page: number
-  first_page_url: string
-
   last_page: number
-  last_page_url: string
 
+  first_page_url: string
+  last_page_url: string
   next_page_url: string | null
-  prev_page_url: string | null
+  previous_page_url: string | null
 }

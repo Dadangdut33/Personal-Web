@@ -69,9 +69,10 @@ export default class BlogController {
 
     const q = mapRequestToQueryParams<typeof Blog>(request)
     const dataQ = await this.blogSvc.index(q)
+    const blogsWithViews = await this.blogSvc.attachViewCounts(BlogDto.collect(dataQ.all()))
 
     return inertia.render('dashboard/blog/list', {
-      data: BlogDto.collect(dataQ.all()),
+      data: blogsWithViews,
       meta: dataQ.getMeta() as PaginationMeta,
     })
   }

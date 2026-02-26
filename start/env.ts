@@ -37,6 +37,10 @@ export default await Env.create(new URL('../', import.meta.url), {
   UMAMI_ID: Env.schema.string.optional(),
   UMAMI_SCRIPT_URL: Env.schema.string.optional(),
   UMAMI_SHARE_URL: Env.schema.string.optional(),
+  UMAMI_API_URL: Env.schema.string.optional(),
+  UMAMI_API_KEY: Env.schema.string.optional(),
+  UMAMI_USERNAME: Env.schema.string.optional(),
+  UMAMI_PASSWORD: Env.schema.string.optional(),
 
   /*
   |----------------------------------------------------------
@@ -46,6 +50,17 @@ export default await Env.create(new URL('../', import.meta.url), {
   GISCUS_REPO_OWNER: Env.schema.string.optional(),
   GISCUS_REPO_NAME: Env.schema.string.optional(),
   GISCUS_GITHUB_TOKEN: Env.schema.string.optional(),
+  GISCUS_REPO: Env.schema.string.optional(), // owner/repo for frontend embed
+  GISCUS_HOST: Env.schema.string.optional(), // default https://giscus.app
+  GISCUS_REPO_ID: Env.schema.string.optional(),
+  GISCUS_CATEGORY: Env.schema.string.optional(),
+  GISCUS_CATEGORY_ID: Env.schema.string.optional(),
+  GISCUS_MAPPING: Env.schema.string.optional(),
+  GISCUS_STRICT: Env.schema.string.optional(),
+  GISCUS_REACTIONS_ENABLED: Env.schema.string.optional(),
+  GISCUS_INPUT_POSITION: Env.schema.string.optional(),
+  GISCUS_THEME: Env.schema.string.optional(),
+  GISCUS_LANG: Env.schema.string.optional(),
 
   /*
   |----------------------------------------------------------

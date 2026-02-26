@@ -208,7 +208,12 @@ export default function MediaLibraryDialog({
   const renderPagination = () => {
     if (!mediaData || mediaMeta!.last_page <= 1) return null
 
-    const { current_page, last_page, prev_page_url, next_page_url } = mediaMeta!
+    const {
+      current_page: current_page,
+      last_page: last_page,
+      previous_page_url: prev_page_url,
+      next_page_url: next_page_url,
+    } = mediaMeta!
     const from = (current_page - 1) * perPage + 1
     const to = Math.min(current_page * perPage, mediaMeta!.total)
 

@@ -5,11 +5,13 @@ import type { BelongsTo, ManyToMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 import { randomUUID } from 'node:crypto'
 
+import SnakeCaseNamingStrategy from './_naming_strategy.js'
 import Blog from './blog.js'
 import Media from './media.js'
 import Tag from './tag.js'
 
 export default class BlogVersion extends BaseModel {
+  static namingStrategy = new SnakeCaseNamingStrategy()
   static table = Tables.BLOG_VERSIONS
 
   @column({ isPrimary: true })

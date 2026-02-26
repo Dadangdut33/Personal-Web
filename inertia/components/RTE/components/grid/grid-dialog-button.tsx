@@ -34,6 +34,7 @@ export default function GridDialogButton({ editor }: { editor: Editor | null }) 
   const [cardSize, setCardSize] = useState<CardSize>('md')
   const [position, setPosition] = useState<Position>('center')
   const [gridStyle, setGridStyle] = useState<GridStyle>('card')
+  const [textColor, setTextColor] = useState('#111827')
 
   const insertGrid = () => {
     if (!isEditable) return
@@ -50,6 +51,7 @@ export default function GridDialogButton({ editor }: { editor: Editor | null }) 
           cardSize,
           position,
           gridStyle,
+          textColor,
         },
       },
       { type: 'paragraph' },
@@ -185,6 +187,15 @@ export default function GridDialogButton({ editor }: { editor: Editor | null }) 
                 <option value="card">Card</option>
                 <option value="plain">Plain</option>
               </select>
+            </div>
+            <div className="grid gap-1.5">
+              <Label>Text Color</Label>
+              <Input
+                type="color"
+                value={textColor}
+                onChange={(e) => setTextColor(e.target.value)}
+                className="h-9 cursor-pointer"
+              />
             </div>
           </div>
         </div>

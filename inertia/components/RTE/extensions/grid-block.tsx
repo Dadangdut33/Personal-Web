@@ -98,6 +98,16 @@ export const GridBlock = Node.create<GridBlockOptions>({
               icon: String(value?.icon ?? ''),
               title: String(value?.title ?? ''),
               description: String(value?.description ?? ''),
+              titleFormat: {
+                bold: !!value?.titleFormat?.bold,
+                italic: !!value?.titleFormat?.italic,
+                underline: !!value?.titleFormat?.underline,
+              },
+              descriptionFormat: {
+                bold: !!value?.descriptionFormat?.bold,
+                italic: !!value?.descriptionFormat?.italic,
+                underline: !!value?.descriptionFormat?.underline,
+              },
             }))
           } catch {
             return []
@@ -116,6 +126,13 @@ export const GridBlock = Node.create<GridBlockOptions>({
           element.getAttribute('data-item-style') ||
           'card',
         renderHTML: (attributes) => ({ 'data-grid-style': String(attributes.gridStyle || 'card') }),
+      },
+      textColor: {
+        default: null,
+        parseHTML: (element) => element.getAttribute('data-text-color') || null,
+        renderHTML: (attributes) => ({
+          'data-text-color': attributes.textColor ? String(attributes.textColor) : null,
+        }),
       },
     }
   },

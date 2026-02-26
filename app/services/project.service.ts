@@ -32,6 +32,31 @@ export default class ProjectService {
     return this.repo.model.query().whereIn('id', ids)
   }
 
+  async publicIndex({
+    search = '',
+    page = 1,
+    perPage = 25,
+  }: {
+    search?: string
+    page?: number
+    perPage?: number
+  }) {
+    const q = this.repo.query({
+      page,
+      perPage,
+      search: search.trim(),
+      filters: { is_active: true },
+      preload: ['thumbnail', 'blogs'],
+      searchableCol: ['title', 'description', 'tags'],
+      searchRelations: [{ relation: 'blogs', columns: ['title'] }],
+      sortBy: 'is_pinned',
+      sortDirection: 'desc',
+    })
+
+    q.orderBy('updated_at', 'desc')
+    return this.repo.paginate(q, { page, perPage })
+  }
+
   async delete(id: string) {
     const project = await this.repo.findOrFail(id)
     await this.repo.deleteGeneric(project.id)

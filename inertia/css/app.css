@@ -771,6 +771,48 @@ main,
   border-radius: 9999px;
 }
 
+/* Public horizontal drag scroll (tags, chips) */
+.horizontal-drag-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in oklab, var(--color-main) 42%, transparent) transparent;
+  scroll-behavior: smooth;
+}
+
+.horizontal-drag-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.horizontal-drag-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.horizontal-drag-scroll::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--color-main) 48%, transparent);
+  border-radius: 9999px;
+}
+
+.horizontal-drag-scroll:hover::-webkit-scrollbar-thumb {
+  background: color-mix(in oklab, var(--color-main) 62%, transparent);
+}
+
+@keyframes blog-read-arrow-invite {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+  50% {
+    transform: translateX(4px);
+  }
+}
+
+.blog-read-arrow {
+  transform: translateX(0);
+}
+
+.group:hover .blog-read-arrow {
+  animation: blog-read-arrow-invite 0.7s ease-in-out infinite;
+}
+
 /* Keyframes */
 
 /* Define keyframes */

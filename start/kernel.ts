@@ -53,4 +53,5 @@ export const middleware = router.named({
   verify_email: () => import('#middleware/verify_email_middleware'),
   auth: () => import('#middleware/auth_middleware'),
   silent_auth: () => import('#middleware/silent_auth_middleware'),
+  internal_api_only: () => import('#middleware/internal_api_only_middleware'),
 })

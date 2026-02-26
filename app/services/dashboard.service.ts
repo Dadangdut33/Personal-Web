@@ -3,6 +3,7 @@ import ActivityLog from '#models/activity_log'
 import Blog from '#models/blog'
 import Project from '#models/project'
 import User from '#models/user'
+import UmamiService from '#services/umami.service'
 import env from '#start/env'
 
 import cache from '@adonisjs/cache/services/main'
@@ -103,6 +104,7 @@ export type DashboardOverview = {
 
 @inject()
 export default class DashboardService {
+  constructor(protected umamiSvc: UmamiService) {}
   private readonly externalFetchTtl = '5m'
 
   private async count(tableName: Tables, where?: Record<string, any>) {
@@ -356,29 +358,7 @@ export default class DashboardService {
     }
   }
 
-  private parseUmamiShareConfig() {
-    const shareUrl = env.get('UMAMI_SHARE_URL')
-    if (!shareUrl) return null
-
-    try {
-      const url = new URL(shareUrl)
-      const parts = url.pathname.split('/').filter(Boolean)
-      const shareIndex = parts.findIndex((part) => part === 'share')
-      if (shareIndex === -1 || !parts[shareIndex + 1]) return null
-
-      return {
-        origin: url.origin,
-        shareId: parts[shareIndex + 1],
-      }
-    } catch {
-      return null
-    }
-  }
-
-  private async fetchUmamiStatsUncached(
-    config: { origin: string; shareId: string },
-    range: DashboardRange
-  ) {
+  private async fetchUmamiStatsWithApiConfig(range: DashboardRange) {
     const resolved = this.resolveRange(range)
     const endAt = Date.now()
     const startAt =
@@ -388,25 +368,12 @@ export default class DashboardService {
             .minus({ days: (resolved.days || 7) - 1 })
             .startOf('day')
             .toMillis()
-    const statsUrl = new URL(`/api/share/${config.shareId}/stats`, config.origin)
-    statsUrl.searchParams.set('startAt', String(startAt))
-    statsUrl.searchParams.set('endAt', String(endAt))
 
-    const pageviewsUrl = new URL(`/api/share/${config.shareId}/pageviews`, config.origin)
-    pageviewsUrl.searchParams.set('startAt', String(startAt))
-    pageviewsUrl.searchParams.set('endAt', String(endAt))
-    pageviewsUrl.searchParams.set('unit', resolved.unit)
-
-    const [statsRes, pageviewsRes] = await Promise.all([
-      fetch(statsUrl.toString(), { method: 'GET' }),
-      fetch(pageviewsUrl.toString(), { method: 'GET' }),
-    ])
-
-    if (!statsRes.ok) throw new Error(`Umami stats API returned ${statsRes.status}`)
-    if (!pageviewsRes.ok) throw new Error(`Umami pageviews API returned ${pageviewsRes.status}`)
-
-    const statsJson = (await statsRes.json()) as any
-    const pageviewsJson = (await pageviewsRes.json()) as any
+    const { stats: statsJson, pageviews: pageviewsJson } = await this.umamiSvc.fetchWebsiteStats({
+      startAt,
+      endAt,
+      unit: resolved.unit,
+    })
 
     const rawSeries = Array.isArray(pageviewsJson)
       ? pageviewsJson
@@ -427,7 +394,6 @@ export default class DashboardService {
       }
 
       if (!isoDate) continue
-
       map.set(isoDate, Number(item?.y ?? item?.value ?? item?.count ?? 0))
     }
 
@@ -474,8 +440,8 @@ export default class DashboardService {
 
   private async fetchUmamiStats(range: DashboardRange): Promise<UmamiStats> {
     const resolved = this.resolveRange(range)
-    const config = this.parseUmamiShareConfig()
-    if (!config) {
+    const apiConfig = this.umamiSvc.getApiConfig()
+    if (!apiConfig) {
       return {
         enabled: false,
         configured: false,
@@ -497,10 +463,12 @@ export default class DashboardService {
     }
 
     try {
+      const cacheKey = `dashboard:umami:api:${apiConfig.websiteId}:range:${range}`
+
       return await cache.getOrSet({
-        key: `dashboard:umami:${config.shareId}:range:${range}`,
+        key: cacheKey,
         ttl: this.externalFetchTtl,
-        factory: async () => this.fetchUmamiStatsUncached(config, range),
+        factory: async () => this.fetchUmamiStatsWithApiConfig(range),
       })
     } catch (error) {
       return {

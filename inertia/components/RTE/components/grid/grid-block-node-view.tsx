@@ -1,6 +1,7 @@
-import { NumberInput, Select, Textarea } from '@mantine/core'
+import { NumberInput, Select } from '@mantine/core'
 import { type NodeViewProps, NodeViewWrapper } from '@tiptap/react'
-import { GripHorizontal, Pencil, Rows3, Save, X } from 'lucide-react'
+import DOMPurify from 'dompurify'
+import { Bold, GripHorizontal, Italic, Pencil, Rows3, Save, Underline, X } from 'lucide-react'
 import { type MouseEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
@@ -29,6 +30,7 @@ type GridBlockAttrs = {
   itemContents?: string[]
   itemData?: GridItemData[]
   gridStyle?: GridStyle
+  textColor?: string | null
 }
 
 type FormState = {
@@ -41,15 +43,43 @@ type FormState = {
   position: Position
   itemData: GridItemData[]
   gridStyle: GridStyle
+  textColor: string
 }
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
 
+const escapeHtml = (value: string) =>
+  value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+
+const looksLikeHtml = (value: string) => /<\/?[a-z][\s\S]*>/i.test(value)
+
+const normalizeRichText = (value: string | undefined, fallback = '', allowMultiline = false) => {
+  const source = (value ?? '').trim() || fallback
+  if (!source) return ''
+  if (looksLikeHtml(source)) return source
+  const escaped = escapeHtml(source)
+  return allowMultiline ? escaped.replace(/\n/g, '<br />') : escaped
+}
+
+const hasRichTextContent = (html: string) => {
+  const plain = html
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .trim()
+  return plain.length > 0
+}
+
 const normalizeItemData = (itemCount: number, values?: GridItemData[], fallback?: string[]) =>
   Array.from({ length: itemCount }, (_, index) => ({
     icon: values?.[index]?.icon ?? '✨',
-    title: values?.[index]?.title ?? fallback?.[index] ?? `Item ${index + 1}`,
-    description: values?.[index]?.description ?? '',
+    title: normalizeRichText(values?.[index]?.title, fallback?.[index] ?? `Item ${index + 1}`),
+    description: normalizeRichText(values?.[index]?.description, '', true),
   }))
 
 const attrsToForm = (attrs: GridBlockAttrs): FormState => ({
@@ -62,7 +92,53 @@ const attrsToForm = (attrs: GridBlockAttrs): FormState => ({
   position: attrs.position || 'center',
   itemData: normalizeItemData(attrs.itemCount || 6, attrs.itemData, attrs.itemContents),
   gridStyle: attrs.gridStyle || 'card',
+  textColor: attrs.textColor || '#111827',
 })
+
+function RichEditable({
+  value,
+  className,
+  onFocus,
+  onBlur,
+  onChange,
+}: {
+  value: string
+  className: string
+  onFocus?: () => void
+  onBlur?: () => void
+  onChange: (html: string) => void
+}) {
+  const ref = useRef<HTMLDivElement | null>(null)
+  const [isFocused, setIsFocused] = useState(false)
+
+  useEffect(() => {
+    if (!ref.current || isFocused) return
+    const sanitized = DOMPurify.sanitize(value || '')
+    if (ref.current.innerHTML !== sanitized) {
+      ref.current.innerHTML = sanitized
+    }
+  }, [value, isFocused])
+
+  return (
+    <div
+      ref={ref}
+      contentEditable
+      suppressContentEditableWarning
+      className={className}
+      onFocus={() => {
+        setIsFocused(true)
+        onFocus?.()
+      }}
+      onBlur={() => {
+        setIsFocused(false)
+        onBlur?.()
+      }}
+      onInput={(e) => {
+        onChange((e.currentTarget as HTMLDivElement).innerHTML)
+      }}
+    />
+  )
+}
 
 export default function GridBlockNodeView({ node, editor, updateAttributes }: NodeViewProps) {
   const attrs = node.attrs as GridBlockAttrs
@@ -70,6 +146,7 @@ export default function GridBlockNodeView({ node, editor, updateAttributes }: No
   const [isEditing, setIsEditing] = useState(false)
   const [form, setForm] = useState<FormState>(() => attrsToForm(attrs))
   const scrollContainerRef = useRef<HTMLDivElement | null>(null)
+  const [activeEditor, setActiveEditor] = useState<{ index: number; field: 'title' | 'description' } | null>(null)
   const dragStateRef = useRef<{ isDown: boolean; startX: number; startScrollLeft: number }>({
     isDown: false,
     startX: 0,
@@ -103,6 +180,7 @@ export default function GridBlockNodeView({ node, editor, updateAttributes }: No
     attrs.cardSize,
     attrs.position,
     attrs.gridStyle,
+    attrs.textColor,
     isEditing,
   ])
 
@@ -132,6 +210,7 @@ export default function GridBlockNodeView({ node, editor, updateAttributes }: No
   const cardSize = (isEditing ? form.cardSize : attrs.cardSize || 'md') as CardSize
   const position = (isEditing ? form.position : attrs.position || 'center') as Position
   const gridStyle = (isEditing ? form.gridStyle : attrs.gridStyle || 'card') as GridStyle
+  const textColor = (isEditing ? form.textColor : attrs.textColor || '#111827') as string
 
   const widthClass =
     cardSize === 'sm'
@@ -169,6 +248,11 @@ export default function GridBlockNodeView({ node, editor, updateAttributes }: No
     })
   }
 
+  const applyInlineFormat = (command: 'bold' | 'italic' | 'underline') => {
+    if (!isEditable || !activeEditor) return
+    document.execCommand(command, false)
+  }
+
   const ensureItemDataLength = (count: number) => {
     setForm((prev) => ({
       ...prev,
@@ -189,6 +273,7 @@ export default function GridBlockNodeView({ node, editor, updateAttributes }: No
       position,
       itemData: normalizeItemData(itemCount, form.itemData),
       gridStyle,
+      textColor,
     })
     setIsEditing(false)
   }
@@ -250,6 +335,7 @@ export default function GridBlockNodeView({ node, editor, updateAttributes }: No
         onMouseMove={handleScrollMouseMove}
         onMouseUp={endScrollDrag}
         onMouseLeave={endScrollDrag}
+        style={{ color: textColor }}
       >
         <div className="flex" style={{ gap }}>
           {items.map((item, index) => (
@@ -260,18 +346,26 @@ export default function GridBlockNodeView({ node, editor, updateAttributes }: No
             >
               <GripHorizontal className="mx-auto mb-2 h-4 w-4 text-muted-foreground" />
               <p className="mb-1 text-2xl leading-none">{displayItemData[index].icon}</p>
-              <p className="text-sm font-heading">{displayItemData[index].title}</p>
-              {displayItemData[index].description ? (
-                <p className="mt-1 whitespace-pre-line text-xs text-muted-foreground">
-                  {displayItemData[index].description}
-                </p>
+              <p
+                className="text-sm font-heading"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(displayItemData[index].title),
+                }}
+              />
+              {hasRichTextContent(displayItemData[index].description) ? (
+                <p
+                  className="mt-1 text-xs opacity-80"
+                  dangerouslySetInnerHTML={{
+                    __html: DOMPurify.sanitize(displayItemData[index].description),
+                  }}
+                />
               ) : null}
             </div>
           ))}
         </div>
       </div>
     ) : (
-      <div className="flex flex-wrap" style={{ gap }}>
+      <div className="flex flex-wrap" style={{ gap, color: textColor }}>
         {items.map((item, index) => (
           <div
             key={item}
@@ -284,11 +378,19 @@ export default function GridBlockNodeView({ node, editor, updateAttributes }: No
           >
             <GripHorizontal className="mx-auto mb-2 h-4 w-4 text-muted-foreground" />
             <p className="mb-1 text-2xl leading-none">{displayItemData[index].icon}</p>
-            <p className="text-sm font-heading">{displayItemData[index].title}</p>
-            {displayItemData[index].description ? (
-              <p className="mt-1 whitespace-pre-line text-xs text-muted-foreground">
-                {displayItemData[index].description}
-              </p>
+            <p
+              className="text-sm font-heading"
+              dangerouslySetInnerHTML={{
+                __html: DOMPurify.sanitize(displayItemData[index].title),
+              }}
+            />
+            {hasRichTextContent(displayItemData[index].description) ? (
+              <p
+                className="mt-1 text-xs opacity-80"
+                dangerouslySetInnerHTML={{
+                  __html: DOMPurify.sanitize(displayItemData[index].description),
+                }}
+              />
             ) : null}
           </div>
         ))}
@@ -460,6 +562,12 @@ export default function GridBlockNodeView({ node, editor, updateAttributes }: No
               ]}
               allowDeselect={false}
             />
+            <Input
+              type="color"
+              value={form.textColor}
+              onChange={(e) => updateField('textColor', e.target.value)}
+              className="h-9 cursor-pointer"
+            />
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
@@ -473,19 +581,85 @@ export default function GridBlockNodeView({ node, editor, updateAttributes }: No
                   onChange={(e) => updateItemData(index, 'icon', e.target.value)}
                   placeholder={`Item ${index + 1} icon (eg. ✨)`}
                 />
-                <Input
-                  value={item.title}
-                  onChange={(e) => updateItemData(index, 'title', e.target.value)}
-                  placeholder={`Item ${index + 1} title`}
+                <div className="flex flex-wrap gap-1">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applyInlineFormat('bold')}
+                  >
+                    <Bold className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applyInlineFormat('italic')}
+                  >
+                    <Italic className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applyInlineFormat('underline')}
+                  >
+                    <Underline className="h-4 w-4" />
+                  </Button>
+                </div>
+                <RichEditable
+                  value={item.title || ''}
+                  className="min-h-9 rounded-base border-2 border-border bg-secondary-background px-3 py-2 text-sm font-heading"
+                  onFocus={() => setActiveEditor({ index, field: 'title' })}
+                  onBlur={() => {
+                    setActiveEditor((prev) =>
+                      prev?.index === index && prev.field === 'title' ? null : prev
+                    )
+                  }}
+                  onChange={(html) => updateItemData(index, 'title', html)}
                 />
-                <Textarea
-                  value={item.description}
-                  onChange={(e) => updateItemData(index, 'description', e.target.value)}
-                  minRows={3}
-                  maxRows={6}
-                  resize="vertical"
-                  autosize
-                  placeholder={`Item ${index + 1} description (supports new lines)`}
+                <div className="flex flex-wrap gap-1">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applyInlineFormat('bold')}
+                  >
+                    <Bold className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applyInlineFormat('italic')}
+                  >
+                    <Italic className="h-4 w-4" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    onMouseDown={(e) => e.preventDefault()}
+                    onClick={() => applyInlineFormat('underline')}
+                  >
+                    <Underline className="h-4 w-4" />
+                  </Button>
+                </div>
+                <RichEditable
+                  value={item.description || ''}
+                  className="min-h-24 rounded-base border-2 border-border bg-secondary-background px-3 py-2 text-sm"
+                  onFocus={() => setActiveEditor({ index, field: 'description' })}
+                  onBlur={() => {
+                    setActiveEditor((prev) =>
+                      prev?.index === index && prev.field === 'description' ? null : prev
+                    )
+                  }}
+                  onChange={(html) => updateItemData(index, 'description', html)}
                 />
               </div>
             ))}

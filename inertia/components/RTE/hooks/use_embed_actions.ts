@@ -1,4 +1,6 @@
+import { route } from '@izzyjs/route/client'
 import type { Editor } from '@tiptap/react'
+import axios from 'axios'
 import { NodeSelection } from 'prosemirror-state'
 import { useCallback, useEffect, useState } from 'react'
 
@@ -102,32 +104,17 @@ export default function useEmbedActions(editor: Editor | null) {
     setIsFetchingLinkMetadata(true)
     setLinkMetadataError(null)
     try {
-      const response = await fetch(
-        `https://api.microlink.io/?url=${encodeURIComponent(normalizedUrl)}&screenshot=false&video=false&audio=false`
-      )
-      if (!response.ok) throw new Error('Failed to fetch link metadata')
-
-      const payload = await response.json()
-      const data = payload?.data
-      if (!data) throw new Error('Metadata response is empty')
-
-      const imageUrl =
-        (typeof data.image === 'string' ? data.image : data.image?.url) ||
-        (typeof data.logo === 'string' ? data.logo : data.logo?.url) ||
-        null
-
-      const siteName =
-        (typeof data.publisher === 'string' ? data.publisher : data.publisher?.name) ||
-        (typeof data.site === 'string' ? data.site : data.site?.name) ||
-        (typeof data.author === 'string' ? data.author : data.author?.name) ||
-        null
+      const response = await axios.get(route('api.v1.utils.link-metadata').path, {
+        params: { url: normalizedUrl },
+      })
+      const data = response.data?.data
 
       setLinkMetadata({
         url: normalizedUrl,
-        title: typeof data.title === 'string' ? data.title : null,
-        description: typeof data.description === 'string' ? data.description : null,
-        imageUrl,
-        siteName,
+        title: typeof data?.title === 'string' ? data.title : null,
+        description: typeof data?.description === 'string' ? data.description : null,
+        imageUrl: typeof data?.imageUrl === 'string' ? data.imageUrl : null,
+        siteName: typeof data?.siteName === 'string' ? data.siteName : null,
       })
     } catch (err) {
       setLinkMetadata({
@@ -156,18 +143,15 @@ export default function useEmbedActions(editor: Editor | null) {
     setIsFetchingYoutubeMetadata(true)
     setYoutubeMetadataError(null)
     try {
-      const response = await fetch(
-        `https://noembed.com/embed?url=${encodeURIComponent(normalizedUrl)}`
-      )
-      if (!response.ok) throw new Error('Failed to fetch YouTube metadata')
-
-      const data = await response.json()
+      const { data } = await axios.get('https://noembed.com/embed', {
+        params: { url: normalizedUrl },
+      })
       setYoutubeMetadata({
         url: normalizedUrl,
         videoId,
-        title: typeof data.title === 'string' ? data.title : null,
+        title: typeof data?.title === 'string' ? data.title : null,
         thumbnailUrl:
-          typeof data.thumbnail_url === 'string'
+          typeof data?.thumbnail_url === 'string'
             ? data.thumbnail_url
             : `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
       })

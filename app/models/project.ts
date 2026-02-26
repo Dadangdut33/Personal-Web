@@ -1,13 +1,16 @@
 import Tables from '#enums/tables'
 
-import { BaseModel, beforeCreate, belongsTo, column } from '@adonisjs/lucid/orm'
-import type { BelongsTo } from '@adonisjs/lucid/types/relations'
+import { BaseModel, beforeCreate, belongsTo, column, manyToMany } from '@adonisjs/lucid/orm'
+import type { BelongsTo, ManyToMany } from '@adonisjs/lucid/types/relations'
 import { DateTime } from 'luxon'
 import { randomUUID } from 'node:crypto'
 
+import SnakeCaseNamingStrategy from './_naming_strategy.js'
+import Blog from './blog.js'
 import Media from './media.js'
 
 export default class Project extends BaseModel {
+  static namingStrategy = new SnakeCaseNamingStrategy()
   static table = Tables.PROJECTS
 
   @column({ isPrimary: true })
@@ -43,6 +46,11 @@ export default class Project extends BaseModel {
     foreignKey: 'thumbnail_id',
   })
   declare thumbnail: BelongsTo<typeof Media>
+
+  @manyToMany(() => Blog, {
+    pivotTable: Tables.BLOGS_PROJECTS,
+  })
+  declare blogs: ManyToMany<typeof Blog>
 
   @column.dateTime({ autoCreate: true })
   declare created_at: DateTime

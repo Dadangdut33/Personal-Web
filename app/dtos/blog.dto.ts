@@ -1,4 +1,5 @@
 import { signRteMediaUrlsForOutput } from '#lib/rte_media_url'
+import { buildBlogUrlPath, toSafeSlug } from '#lib/url_slug'
 import Blog from '#models/blog'
 
 import { BlogVersionDto } from './blog_version.dto.js'
@@ -25,16 +26,12 @@ export class BlogDto {
   readonly versions?: BlogVersionDto[]
 
   constructor(blog: Blog) {
-    const safeTitle = blog.title
-      .toLowerCase()
-      .trim()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-+|-+$/g, '')
+    const safeTitle = toSafeSlug(blog.title)
 
     this.id = blog.id
     this.slug_id = blog.slug_id
     this.url_segment = safeTitle ? `${safeTitle}-${blog.slug_id}` : blog.slug_id
-    this.url_path = `/blog/${this.url_segment}`
+    this.url_path = buildBlogUrlPath(blog.title, blog.slug_id)
     this.title = blog.title
     this.is_active = blog.is_active
     this.is_pinned = blog.is_pinned

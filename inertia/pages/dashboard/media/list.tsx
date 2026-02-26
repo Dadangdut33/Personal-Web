@@ -161,7 +161,13 @@ function previewItem(
         ) : null}
 
         <Group justify="space-between" mb={8}>
-          {avoidTopLeftOverlay ? <div /> : <Badge size="xs" radius="sm" variant="filled" color="green">Audio</Badge>}
+          {avoidTopLeftOverlay ? (
+            <div />
+          ) : (
+            <Badge size="xs" radius="sm" variant="filled" color="green">
+              Audio
+            </Badge>
+          )}
           <Text c="dimmed" fz={10} fw={700}>
             {extensionFromRecord(record)}
           </Text>

@@ -13,12 +13,14 @@ import { DateTime } from 'luxon'
 import { nanoid } from 'nanoid'
 import { randomUUID } from 'node:crypto'
 
+import SnakeCaseNamingStrategy from './_naming_strategy.js'
 import BlogVersion from './blog_version.js'
 import Media from './media.js'
 import Project from './project.js'
 import Tag from './tag.js'
 
 export default class Blog extends BaseModel {
+  static namingStrategy = new SnakeCaseNamingStrategy()
   static table = Tables.BLOGS
 
   @column({ isPrimary: true })

@@ -121,7 +121,7 @@ export default class MediaController {
       return response.status(200).json({
         status: 'success',
         data: MediaDto.collect(dataQ.all()),
-        meta: dataQ.getMeta(),
+        meta: dataQ.getMeta() as PaginationMeta,
       })
     } catch (error) {
       return returnError(response, error, 'MEDIA_LIST', {})
