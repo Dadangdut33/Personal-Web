@@ -18,6 +18,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   HOST: Env.schema.string({ format: 'host' }),
   VITE_APP_NAME: Env.schema.string.optional(),
   LOG_LEVEL: Env.schema.string(),
+  PROJECT_REPO_URL: Env.schema.string.optional(),
 
   // Some auth feature that can be disabled
   ENABLE_REGISTRATION: Env.schema.boolean.optional(),
@@ -34,8 +35,14 @@ export default await Env.create(new URL('../', import.meta.url), {
   |----------------------------------------------------------
   */
   UMAMI_ID: Env.schema.string.optional(),
-  UMAMI_PUBLIC_URL: Env.schema.string.optional(),
+  UMAMI_SCRIPT_URL: Env.schema.string.optional(),
   UMAMI_SHARE_URL: Env.schema.string.optional(),
+
+  /*
+  |----------------------------------------------------------
+  | Comments
+  |----------------------------------------------------------
+  */
   GISCUS_REPO_OWNER: Env.schema.string.optional(),
   GISCUS_REPO_NAME: Env.schema.string.optional(),
   GISCUS_GITHUB_TOKEN: Env.schema.string.optional(),

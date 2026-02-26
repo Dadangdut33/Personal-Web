@@ -11,7 +11,7 @@ export default function PublicLayout({ children }: { children: React.ReactNode }
 
   return (
     <>
-      <Analytics id={props.umami_id} url={props.umami_public_url} />
+      <Analytics id={props.umami_id} url={props.umami_script_url} />
       <div className="flex flex-col min-h-screen w-full" id="main">
         <Navbar />
         <div className="pt-[85px] mb-8" id="content">

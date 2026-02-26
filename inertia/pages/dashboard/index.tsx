@@ -1,14 +1,26 @@
 import DashboardController from '#controllers/dashboard.controller'
 
 import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
-import { Head } from '@inertiajs/react'
+import { Head, router } from '@inertiajs/react'
 import { route } from '@izzyjs/route/client'
-import { Badge, Group, Paper, SimpleGrid, Stack, Text, ThemeIcon } from '@mantine/core'
+import {
+  Badge,
+  Group,
+  Paper,
+  SegmentedControl,
+  SimpleGrid,
+  Stack,
+  Text,
+  ThemeIcon,
+} from '@mantine/core'
 import {
   IconAlertCircle,
   IconBook2,
   IconBox,
   IconBrandGithub,
+  IconChartBar,
+  IconDatabase,
+  IconExternalLink,
   IconPhoto,
   IconTimeline,
   IconUser,
@@ -58,6 +70,16 @@ function StatCard({ label, value, sub, icon, color }: StatCardProps) {
       </Group>
     </Paper>
   )
+}
+
+function formatBytes(bytes: number | null | undefined): string {
+  if (!bytes || bytes <= 0) return '0 B'
+
+  const units = ['B', 'KB', 'MB', 'GB', 'TB']
+  const exponent = Math.min(Math.floor(Math.log(bytes) / Math.log(1024)), units.length - 1)
+  const value = bytes / 1024 ** exponent
+
+  return `${value >= 10 || exponent === 0 ? value.toFixed(0) : value.toFixed(1)} ${units[exponent]}`
 }
 
 function ContentRecentList({
@@ -161,10 +183,12 @@ function TrendChart({
   title,
   data,
   color,
+  unit,
 }: {
   title: string
   data: { date: string; count: number }[]
   color: string
+  unit: 'day' | 'month'
 }) {
   const chartConfig = {
     count: {
@@ -185,7 +209,9 @@ function TrendChart({
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => dayjs(value).format('MM/DD')}
+              tickFormatter={(value) =>
+                unit === 'month' ? dayjs(value).format('MMM YY') : dayjs(value).format('MM/DD')
+              }
             />
             <YAxis allowDecimals={false} width={30} />
             <ChartTooltip content={<ChartTooltipContent indicator="dot" />} />
@@ -203,8 +229,78 @@ function TrendChart({
   )
 }
 
+function QuickLinksCard({
+  umamiPublicUrl,
+  repoUrl,
+}: {
+  umamiPublicUrl?: string | null
+  repoUrl?: string | null
+}) {
+  return (
+    <Paper withBorder p="md" radius="md">
+      <Stack gap="sm">
+        <Text fw={700}>Quick Links</Text>
+
+        <Group justify="space-between" align="center">
+          <Group gap={8}>
+            <ThemeIcon variant="light" color="dark" radius="md" size="sm">
+              <IconBrandGithub size={14} />
+            </ThemeIcon>
+            <Text fz="sm">Project Repository</Text>
+          </Group>
+          {repoUrl ? (
+            <a href={repoUrl} target="_blank" rel="noopener noreferrer">
+              <Badge variant="outline" rightSection={<IconExternalLink size={12} />}>
+                Open
+              </Badge>
+            </a>
+          ) : (
+            <Text fz="xs" c="dimmed">
+              Repo URL not configured
+            </Text>
+          )}
+        </Group>
+
+        <Group justify="space-between" align="center">
+          <Group gap={8}>
+            <ThemeIcon variant="light" color="cyan" radius="md" size="sm">
+              <IconChartBar size={14} />
+            </ThemeIcon>
+            <Text fz="sm">Umami Public URL</Text>
+          </Group>
+          {umamiPublicUrl ? (
+            <a href={umamiPublicUrl} target="_blank" rel="noopener noreferrer">
+              <Badge variant="outline" rightSection={<IconExternalLink size={12} />}>
+                Open
+              </Badge>
+            </a>
+          ) : (
+            <Text fz="xs" c="dimmed">
+              Umami env not configured
+            </Text>
+          )}
+        </Group>
+      </Stack>
+    </Paper>
+  )
+}
+
 export default function Page(props: PageProps) {
   const { overview } = props
+  const rangeOptions = [
+    { label: '7D', value: '7d' },
+    { label: '14D', value: '14d' },
+    { label: '30D', value: '30d' },
+    { label: 'All', value: 'all' },
+  ]
+
+  const onRangeChange = (value: string) => {
+    router.get(
+      route('dashboard.view').path,
+      { range: value },
+      { preserveState: true, preserveScroll: true, replace: true }
+    )
+  }
 
   return (
     <DashboardLayout
@@ -217,8 +313,21 @@ export default function Page(props: PageProps) {
       className="gap-4"
     >
       <Head title="Dashboard" />
+      <Paper withBorder p="sm" radius="md">
+        <Group justify="space-between" align="center">
+          <Text fw={700} fz="sm">
+            Time Range
+          </Text>
+          <SegmentedControl
+            data={rangeOptions}
+            value={overview.range}
+            onChange={onRangeChange}
+            size="sm"
+          />
+        </Group>
+      </Paper>
 
-      <SimpleGrid cols={{ base: 1, sm: 2, lg: 5 }} spacing="md">
+      <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing="md">
         {overview.visibility.blogs ? (
           <StatCard
             label="Blogs"
@@ -265,35 +374,150 @@ export default function Page(props: PageProps) {
             color="orange"
           />
         ) : null}
+
+        {overview.visibility.umami ? (
+          <StatCard
+            label="Umami Page Views"
+            value={overview.umami.pageviews}
+            sub={`${overview.umami.visitors || 0} visitors • ${overview.umami.visits || 0} visits`}
+            icon={<IconChartBar size={18} />}
+            color="cyan"
+          />
+        ) : null}
+
+        <StatCard
+          label="Database Size"
+          value={overview.counts.databaseSizeBytes}
+          sub={formatBytes(overview.counts.databaseSizeBytes)}
+          icon={<IconDatabase size={18} />}
+          color="gray"
+        />
       </SimpleGrid>
 
-      <SimpleGrid cols={{ base: 1, md: 2, xl: 4 }} spacing="md">
+      <SimpleGrid cols={{ base: 1, md: 2, xl: 3 }} spacing="md">
         {overview.visibility.blogs ? (
-          <TrendChart title="Blogs (7d)" data={overview.trends.blogs} color="hsl(217 91% 60%)" />
+          <TrendChart
+            title={`Blogs (${overview.rangeLabel})`}
+            data={overview.trends.blogs}
+            color="hsl(217 91% 60%)"
+            unit={overview.trendUnit}
+          />
         ) : null}
 
         {overview.visibility.projects ? (
           <TrendChart
-            title="Projects (7d)"
+            title={`Projects (${overview.rangeLabel})`}
             data={overview.trends.projects}
             color="hsl(267 84% 70%)"
+            unit={overview.trendUnit}
           />
         ) : null}
 
         {overview.visibility.media ? (
-          <TrendChart title="Media (7d)" data={overview.trends.media} color="hsl(173 80% 40%)" />
+          <TrendChart
+            title={`Media (${overview.rangeLabel})`}
+            data={overview.trends.media}
+            color="hsl(173 80% 40%)"
+            unit={overview.trendUnit}
+          />
         ) : null}
 
         {overview.visibility.activityLogs ? (
           <TrendChart
-            title="Activity Logs (7d)"
+            title={`Activity Logs (${overview.rangeLabel})`}
             data={overview.trends.activityLogs}
             color="hsl(24 95% 53%)"
+            unit={overview.trendUnit}
           />
         ) : null}
+
+        {overview.visibility.umami ? (
+          <TrendChart
+            title={`Page Views (Umami ${overview.rangeLabel})`}
+            data={overview.umami.trend}
+            color="hsl(188 95% 43%)"
+            unit={overview.trendUnit}
+          />
+        ) : null}
+
+        <QuickLinksCard umamiPublicUrl={props.umami_share_url} repoUrl={props.project_repo_url} />
       </SimpleGrid>
 
-      <SimpleGrid cols={{ base: 1, lg: 3 }} spacing="md">
+      <SimpleGrid cols={{ base: 1, lg: 2 }} spacing="md">
+        {overview.visibility.umami ? (
+          <Paper withBorder p="md" radius="md">
+            <Stack gap="sm">
+              <Group justify="space-between">
+                <Text fw={700}>Umami Analytics</Text>
+                <Badge variant="outline">{overview.rangeLabel}</Badge>
+              </Group>
+
+              {!overview.umami.configured ? (
+                <Group gap="xs" align="flex-start" wrap="nowrap">
+                  <IconAlertCircle size={16} className="mt-0.5" />
+                  <Text fz="sm" c="dimmed">
+                    Umami stats are not configured yet. Set `UMAMI_SHARE_URL`.
+                  </Text>
+                </Group>
+              ) : overview.umami.error ? (
+                <Group gap="xs" align="flex-start" wrap="nowrap">
+                  <IconAlertCircle size={16} className="mt-0.5" />
+                  <Text fz="sm" c="red">
+                    Failed to fetch stats: {overview.umami.error}
+                  </Text>
+                </Group>
+              ) : (
+                <SimpleGrid cols={2} spacing="xs">
+                  <Paper withBorder p="sm" radius="md">
+                    <Text c="dimmed" fz="xs" tt="uppercase" fw={700}>
+                      Page Views
+                    </Text>
+                    <Text fw={800} fz="lg">
+                      {(overview.umami.pageviews || 0).toLocaleString()}
+                    </Text>
+                  </Paper>
+                  <Paper withBorder p="sm" radius="md">
+                    <Text c="dimmed" fz="xs" tt="uppercase" fw={700}>
+                      Visitors
+                    </Text>
+                    <Text fw={800} fz="lg">
+                      {(overview.umami.visitors || 0).toLocaleString()}
+                    </Text>
+                  </Paper>
+                  <Paper withBorder p="sm" radius="md">
+                    <Text c="dimmed" fz="xs" tt="uppercase" fw={700}>
+                      Visits
+                    </Text>
+                    <Text fw={800} fz="lg">
+                      {(overview.umami.visits || 0).toLocaleString()}
+                    </Text>
+                  </Paper>
+                  <Paper withBorder p="sm" radius="md">
+                    <Text c="dimmed" fz="xs" tt="uppercase" fw={700}>
+                      Bounce / Avg Time
+                    </Text>
+                    <Text fw={800} fz="sm">
+                      {overview.umami.bounceRate !== null
+                        ? `${overview.umami.bounceRate.toFixed(2)}%`
+                        : '-'}{' '}
+                      /{' '}
+                      {overview.umami.averageVisitTime !== null
+                        ? `${Math.round(overview.umami.averageVisitTime)}s`
+                        : '-'}
+                    </Text>
+                  </Paper>
+                </SimpleGrid>
+              )}
+
+              {overview.umami.fetchedAt ? (
+                <Text fz="xs" c="dimmed">
+                  Last sync: {dayjs(overview.umami.fetchedAt).format('YYYY-MM-DD HH:mm:ss')}
+                </Text>
+              ) : null}
+            </Stack>
+          </Paper>
+        ) : null}
+
         {overview.visibility.giscus ? (
           <Paper withBorder p="md" radius="md">
             <Stack gap="sm">

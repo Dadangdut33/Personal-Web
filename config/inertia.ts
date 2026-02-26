@@ -60,8 +60,9 @@ const inertiaConfig = defineConfig({
     currentURL: (ctx) => ctx.request.completeUrl(),
     previousURL: (ctx) => ctx.request.header('referer'),
     umami_id: () => env.get('UMAMI_ID'),
-    umami_public_url: () => env.get('UMAMI_PUBLIC_URL'),
+    umami_script_url: () => env.get('UMAMI_SCRIPT_URL'),
     umami_share_url: () => env.get('UMAMI_SHARE_URL'),
+    project_repo_url: () => env.get('PROJECT_REPO_URL'),
   },
 
   /**
