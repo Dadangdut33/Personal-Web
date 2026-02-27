@@ -2,6 +2,7 @@ import env from '#start/env'
 
 import cache from '@adonisjs/cache/services/main'
 import { inject } from '@adonisjs/core'
+import axios from 'axios'
 
 type UmamiApiConfig = {
   baseUrl: string
@@ -65,20 +66,24 @@ export default class UmamiService {
       key: `umami:auth:token:${config.baseUrl}:${config.username}`,
       ttl: '5m',
       factory: async () => {
-        const loginRes = await fetch(`${config.baseUrl}/auth/login`, {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            username: config.username,
-            password: config.password,
-          }),
-        })
+        try {
+          const loginRes = await axios.post<{ token?: string }>(
+            `${config.baseUrl}/auth/login`,
+            {
+              username: config.username,
+              password: config.password,
+            },
+            {
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            }
+          )
 
-        if (!loginRes.ok) return null
-        const loginJson = (await loginRes.json()) as any
-        return loginJson?.token || null
+          return loginRes.data?.token || null
+        } catch {
+          return null
+        }
       },
     })
 
@@ -115,15 +120,12 @@ export default class UmamiService {
     }
 
     const [statsRes, pageviewsRes] = await Promise.all([
-      fetch(statsUrl.toString(), { method: 'GET', headers }),
-      fetch(pageviewsUrl.toString(), { method: 'GET', headers }),
+      axios.get(statsUrl.toString(), { headers }),
+      axios.get(pageviewsUrl.toString(), { headers }),
     ])
 
-    if (!statsRes.ok) throw new Error(`Umami stats API returned ${statsRes.status}`)
-    if (!pageviewsRes.ok) throw new Error(`Umami pageviews API returned ${pageviewsRes.status}`)
-
-    const stats = (await statsRes.json()) as any
-    const pageviews = (await pageviewsRes.json()) as any
+    const stats = statsRes.data as any
+    const pageviews = pageviewsRes.data as any
     return { stats, pageviews }
   }
 
@@ -151,13 +153,10 @@ export default class UmamiService {
     const headers = await this.getAuthHeaders(config)
     if (!Object.keys(headers).length) return null
 
-    const res = await fetch(statsUrl.toString(), {
-      method: 'GET',
+    const res = await axios.get(statsUrl.toString(), {
       headers,
     })
-    if (!res.ok) return null
-
-    const json = (await res.json()) as any
+    const json = res.data as any
     const raw = json?.pageviews?.value ?? json?.pageviews ?? null
     const count = Number(raw)
     return Number.isFinite(count) ? count : null

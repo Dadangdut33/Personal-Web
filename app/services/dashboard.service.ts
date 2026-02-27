@@ -9,6 +9,7 @@ import env from '#start/env'
 import cache from '@adonisjs/cache/services/main'
 import { inject } from '@adonisjs/core'
 import db from '@adonisjs/lucid/services/db'
+import axios from 'axios'
 import { DateTime } from 'luxon'
 
 type TrendPoint = {
@@ -237,20 +238,15 @@ export default class DashboardService {
         }
       }
     `
-    const metaResponse = await fetch(endpoint, {
-      method: 'POST',
-      headers,
-      body: JSON.stringify({
+    const metaResponse = await axios.post<any>(
+      endpoint,
+      {
         query: metaQuery,
         variables: { owner, name: repo },
-      }),
-    })
-
-    if (!metaResponse.ok) {
-      throw new Error(`GitHub API returned ${metaResponse.status}`)
-    }
-
-    const metaJson = (await metaResponse.json()) as any
+      },
+      { headers }
+    )
+    const metaJson = metaResponse.data as any
     if (metaJson.errors?.length) {
       throw new Error(metaJson.errors[0]?.message || 'Failed to fetch repository discussions')
     }
@@ -279,20 +275,15 @@ export default class DashboardService {
         }
       `
 
-      const commentsResponse = await fetch(endpoint, {
-        method: 'POST',
-        headers,
-        body: JSON.stringify({
+      const commentsResponse = await axios.post<any>(
+        endpoint,
+        {
           query: commentsQuery,
           variables: { owner, name: repo, after: cursor },
-        }),
-      })
-
-      if (!commentsResponse.ok) {
-        throw new Error(`GitHub API returned ${commentsResponse.status}`)
-      }
-
-      const commentsJson = (await commentsResponse.json()) as any
+        },
+        { headers }
+      )
+      const commentsJson = commentsResponse.data as any
       if (commentsJson.errors?.length) {
         throw new Error(commentsJson.errors[0]?.message || 'Failed to fetch discussion comments')
       }

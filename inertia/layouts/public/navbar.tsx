@@ -65,7 +65,12 @@ export default function Navbar() {
 
           <div className="hidden items-center gap-5 text-base font-base sm:flex xl:gap-7">
             {NAVIGATION_LINKS.map(({ text, href }) => (
-              <Link key={href} href={href} className="link-underline" data-active={url === href}>
+              <Link
+                key={href}
+                href={href}
+                className="link-underline"
+                data-active={url.includes(href) ? 'true' : 'false'}
+              >
                 {text}
               </Link>
             ))}
