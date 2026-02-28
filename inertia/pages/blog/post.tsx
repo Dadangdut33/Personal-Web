@@ -9,15 +9,8 @@ import { useEffect, useRef, useState } from 'react'
 import TiptapEditor from '~/components/RTE'
 import GiscusComments from '~/components/core/giscus-comments'
 import HorizontalDragScroll from '~/components/core/horizontal-drag-scroll'
+import PublicPageShell from '~/components/page-components/public/public-page-shell'
 import { Badge } from '~/components/ui/badge'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '~/components/ui/breadcrumb'
 import { Button } from '~/components/ui/button'
 import PublicLayout from '~/layouts/public'
 
@@ -71,28 +64,30 @@ export default function BlogPostPage(props: PageProps) {
         />
       </div>
 
-      <main className="mx-auto w-[980px] max-w-full px-2 md:px-5 pt-6 pb-10 font-geistmono">
-        <Breadcrumb className="mb-3">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href={route('home').path}>Home</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href={route('blog').path}>Blog</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage className="max-w-[420px] truncate">{data.title}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+      {showScrollTop ? (
+        <Button
+          type="button"
+          variant="default"
+          size="icon"
+          className="fixed bottom-6 right-6 z-50 h-11 w-11 rounded-full border-2 border-border shadow-shadow"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+          aria-label="Scroll to top"
+        >
+          <ArrowUp className="size-5" />
+        </Button>
+      ) : null}
 
-        <div className="mb-4">
+      <PublicPageShell
+        widthClassName="w-[1100px]"
+        className="px-0 sm:px-5 pt-2 sm:pt-5 pb-10"
+        breadCrumbsClassName="px-5 sm:px-0"
+        breadcrumbs={[
+          { label: 'Home', href: route('home').path },
+          { label: 'Blog', href: route('blog').path },
+          { label: data.title, current: true, className: 'max-w-[420px] truncate' },
+        ]}
+      >
+        <div className="mb-4 px-5 sm:px-0">
           <Button asChild variant="neutral" size="sm">
             <Link href={route('blog').path}>
               <ArrowLeft className="size-4" />
@@ -103,7 +98,7 @@ export default function BlogPostPage(props: PageProps) {
 
         <article
           ref={articleRef}
-          className="rounded-base border-2 border-border bg-secondary-background shadow-shadow"
+          className="rounded-none border-0 bg-secondary-background shadow-none sm:rounded-base sm:border-2 sm:border-border sm:shadow-shadow"
         >
           {data.thumbnail?.url ? (
             <div className="overflow-hidden border-b-2 border-border">
@@ -115,7 +110,7 @@ export default function BlogPostPage(props: PageProps) {
             </div>
           ) : null}
 
-          <header className="border-b-2 border-border p-5">
+          <header className="border-b-2 border-border p-4 sm:p-5">
             <div className="mb-2 flex items-start justify-between gap-3">
               <h1 className="text-2xl font-heading sm:text-3xl">{data.title}</h1>
               {data.is_pinned ? (
@@ -179,12 +174,12 @@ export default function BlogPostPage(props: PageProps) {
             ) : null}
           </header>
 
-          <div className="p-5">
+          <div className="blog-post-content p-4 sm:p-5">
             <TiptapEditor content={data.content} readOnly ssr />
           </div>
         </article>
 
-        <section className="mt-8 rounded-base border-2 border-border bg-secondary-background p-5 shadow-shadow">
+        <section className="mx-2 sm:mx-0 mt-8 rounded-base border-2 border-border bg-secondary-background p-5 shadow-shadow">
           <h2 className="mb-4 text-xl font-heading">Comments</h2>
           <GiscusComments
             host={props.giscus_host}
@@ -200,19 +195,7 @@ export default function BlogPostPage(props: PageProps) {
             lang={props.giscus_lang}
           />
         </section>
-      </main>
-      {showScrollTop ? (
-        <Button
-          type="button"
-          variant="default"
-          size="icon"
-          className="fixed bottom-6 right-6 z-50 h-11 w-11 rounded-full border-2 border-border shadow-shadow"
-          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
-          aria-label="Scroll to top"
-        >
-          <ArrowUp className="size-5" />
-        </Button>
-      ) : null}
+      </PublicPageShell>
     </PublicLayout>
   )
 }

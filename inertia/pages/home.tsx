@@ -7,6 +7,7 @@ import { Stack } from '@mantine/core'
 import { ArrowRight } from 'lucide-react'
 import Logo from '~/components/homepage/logo'
 import BlogCard from '~/components/page-components/blog/blog-card'
+import PublicPageShell from '~/components/page-components/public/public-page-shell'
 import { Button } from '~/components/ui/button'
 import PublicLayout from '~/layouts/public'
 
@@ -15,10 +16,10 @@ type PageProps = SharedProps & InferPageProps<HomeController, 'view'>
 export default function Home(props: PageProps) {
   return (
     <PublicLayout>
-      <div className="mx-auto w-[1300px] max-w-full px-5 pt-5">
+      <PublicPageShell className="pb-0">
         <Logo />
         <Stack>
-          <h1 className="text-4xl font-extrabold text-center">Dadangdut33</h1>
+          <h1 className="text-4xl font-extrabold text-center font-geist">Dadangdut33</h1>
           <p className="text-xl text-neutral-500 dark:text-white/80 text-center">
             Code, Create, Contribute—One Commit at a Time.
           </p>
@@ -30,7 +31,9 @@ export default function Home(props: PageProps) {
           </div>
 
           <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {props.latestBlogs?.map((blog) => <BlogCard key={blog.id} blog={blog} variant="compact" />)}
+            {props.latestBlogs?.map((blog) => (
+              <BlogCard key={blog.id} blog={blog} variant="compact" />
+            ))}
           </div>
 
           <div className="flex justify-center">
@@ -42,7 +45,7 @@ export default function Home(props: PageProps) {
             </Button>
           </div>
         </section>
-      </div>
+      </PublicPageShell>
     </PublicLayout>
   )
 }

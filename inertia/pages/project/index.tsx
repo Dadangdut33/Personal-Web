@@ -1,20 +1,13 @@
 import ProjectPublicController from '#controllers/project_public.controller'
 
 import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
-import { Head, Link, router } from '@inertiajs/react'
+import { Head, router } from '@inertiajs/react'
 import { route } from '@izzyjs/route/client'
 import { Search, Sparkles } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import ProjectCard from '~/components/page-components/project/project-card'
+import PublicPageShell from '~/components/page-components/public/public-page-shell'
 import { Badge } from '~/components/ui/badge'
-import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from '~/components/ui/breadcrumb'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
@@ -65,21 +58,12 @@ export default function ProjectPage(props: PageProps) {
     <PublicLayout>
       <Head title="Projects" />
 
-      <main className="mx-auto w-[1300px] max-w-full px-5 pt-6 pb-10 font-geistmono">
-        <Breadcrumb className="mb-3">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link href={route('home').path}>Home</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator />
-            <BreadcrumbItem>
-              <BreadcrumbPage>Projects</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
-
+      <PublicPageShell
+        breadcrumbs={[
+          { label: 'Home', href: route('home').path },
+          { label: 'Projects', current: true },
+        ]}
+      >
         <section className="rounded-base border-2 border-border bg-main dark:bg-secondary-background p-5 shadow-shadow">
           <div className="flex items-start justify-between gap-3 flex-wrap">
             <div>
@@ -163,7 +147,7 @@ export default function ProjectPage(props: PageProps) {
             </Button>
           </section>
         ) : null}
-      </main>
+      </PublicPageShell>
     </PublicLayout>
   )
 }
