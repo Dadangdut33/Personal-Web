@@ -154,6 +154,7 @@
     "framer-motion": "^12.34.2",
     "highlight.js": "^11.11.1",
     "input-otp": "^1.4.2",
+    "libsql": "^0.5.22",
     "lodash-es": "^4.17.23",
     "lowlight": "^3.3.0",
     "lucide-react": "^0.563.0",
