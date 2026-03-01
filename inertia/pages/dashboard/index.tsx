@@ -1,8 +1,6 @@
-import DashboardController from '#controllers/dashboard.controller'
+import type { DashboardOverview } from '#services/dashboard.service'
 
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import { Head, router } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
 import {
   Badge,
   Group,
@@ -36,8 +34,10 @@ import {
   ChartTooltipContent,
 } from '~/components/ui/chart'
 import DashboardLayout from '~/layouts/dashboard'
+import { urlFor } from '~/lib/client'
+import { InertiaProps } from '~/types'
 
-type PageProps = SharedProps & InferPageProps<DashboardController, 'view'>
+type PageProps = InertiaProps<{ overview: DashboardOverview }>
 
 type StatCardProps = {
   label: string
@@ -296,7 +296,7 @@ export default function Page(props: PageProps) {
 
   const onRangeChange = (value: string) => {
     router.get(
-      route('dashboard.view').path,
+      urlFor('dashboard.view'),
       { range: value },
       { preserveState: true, preserveScroll: true, replace: true }
     )
@@ -307,7 +307,7 @@ export default function Page(props: PageProps) {
       breadcrumbs={[
         {
           title: 'Dashboard',
-          href: route('dashboard.view').path,
+          href: urlFor('dashboard.view'),
         },
       ]}
       className="gap-4"

@@ -1,25 +1,15 @@
-import { Link } from '@inertiajs/react'
+import { Link } from '@adonisjs/inertia/react'
 import dayjs from 'dayjs'
 import { ArrowRight, CalendarDays, Clock3, Pin } from 'lucide-react'
 import HorizontalDragScroll from '~/components/core/horizontal-drag-scroll'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
+import type { Data } from '~data'
 
 import BlogViewCount from './blog-view-count'
 
 type BlogCardProps = {
-  blog: {
-    id: string
-    slug_id: string
-    title: string
-    is_pinned: boolean
-    description: string | null
-    created_at: string
-    updated_at: string
-    url_path: string
-    thumbnail?: { url?: string } | null
-    tags?: { id: string; name: string }[]
-  }
+  blog: Data.Blog
   variant?: 'default' | 'compact'
 }
 
@@ -64,7 +54,7 @@ export default function BlogCard({ blog, variant = 'default' }: BlogCardProps) {
         {blog.tags?.length ? (
           <HorizontalDragScroll className={`${isCompact ? 'mt-2' : 'mt-3'} pb-1`}>
             <div className="inline-flex gap-1.5">
-              {blog.tags.map((tag) => (
+              {blog.tags.map((tag: Data.Tag) => (
                 <Badge key={tag.id} variant="neutral" className="shrink-0">
                   {tag.name}
                 </Badge>

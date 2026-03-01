@@ -1,9 +1,7 @@
-import BlogController from '#controllers/blog.controller'
-import { RouteNameType } from '#types/app'
+import type { PaginationMeta } from '#types/app'
 
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
-import { Head, Link } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
+import { Link } from '@adonisjs/inertia/react'
+import { Head } from '@inertiajs/react'
 import {
   ActionIcon,
   Alert,
@@ -38,21 +36,27 @@ import { GenericBulkDeleteDescription, GenericDeleteTitle } from '~/components/c
 import { FilterDate } from '~/components/core/table-filter/date-filter'
 import { FilterText } from '~/components/core/table-filter/text-filter'
 import { TooltipIfTrue } from '~/components/core/tooltipper'
+import { Data } from '~/generated/data'
 import { useDeleteGeneric } from '~/hooks/use_generic_delete'
 import useSearchFilter from '~/hooks/use_search_filter'
 import DashboardLayout from '~/layouts/dashboard'
+import { urlFor } from '~/lib/client'
+import { InertiaProps } from '~/types'
 
 const baseRoute = 'blog'
 const basePerm = 'blog'
 const pageTitle = 'Blog'
-type PageProps = SharedProps & InferPageProps<BlogController, 'viewList'>
+type PageProps = InertiaProps<{
+  data: Data.Blog[]
+  meta: PaginationMeta
+}>
 type DataType = PageProps['data'][number]
 
 export default function Page(props: PageProps) {
   const breadcrumbs = [
     {
       title: 'Dashboard',
-      href: route('dashboard.view').path,
+      href: urlFor('dashboard.view'),
     },
     {
       title: pageTitle,
@@ -66,7 +70,7 @@ export default function Page(props: PageProps) {
   const canEdit = props.user?.permissions.includes(`${basePerm}.update`)
   const canDelete = props.user?.permissions.includes(`${basePerm}.delete`)
 
-  const searchFilter = useSearchFilter(`${baseRoute}.index` as RouteNameType)
+  const searchFilter = useSearchFilter(`${baseRoute}.index`)
   const [selected, setSelected] = useState<DataType>()
   const [selectedRecords, setSelectedRecords] = useState<DataType[]>([])
   const [isOpen, { open: onOpen, close: onClose }] = useDisclosure(false)
@@ -87,8 +91,8 @@ export default function Page(props: PageProps) {
       onClose()
       searchFilter.doSearch()
     },
-    deleteParam: { params: { id: selected?.id } },
-    routeName: `${baseRoute}.destroy` as RouteNameType,
+    deleteParam: { id: selected?.id ?? '' },
+    routeName: `${baseRoute}.destroy`,
     title: (
       <div className="flex items-center gap-2">
         <Trash2 className="size-5 text-red-400" />
@@ -107,7 +111,7 @@ export default function Page(props: PageProps) {
       setSelectedRecords([])
       searchFilter.doSearch()
     },
-    routeName: `${baseRoute}.bulkDestroy` as RouteNameType,
+    routeName: `${baseRoute}.bulkDestroy`,
     deleteParam: { params: {} },
     title: <GenericDeleteTitle bulk={true} />,
     message: (
@@ -336,7 +340,7 @@ export default function Page(props: PageProps) {
                   variant="filled"
                   component={!canEdit ? undefined : Link}
                   leftSection={<IconEdit size={16} />}
-                  href={route(`${baseRoute}.edit`, { params: { id: record.id } }).path}
+                  href={urlFor(`${baseRoute}.edit`, { id: record.id })}
                   disabled={!canEdit}
                 >
                   Edit
@@ -350,7 +354,7 @@ export default function Page(props: PageProps) {
                   variant="filled"
                   component={!canEdit ? undefined : Link}
                   leftSection={<IconHistory size={16} />}
-                  href={`${route(`${baseRoute}.edit`, { params: { id: record.id } }).path}?tab=rollback`}
+                  href={`${urlFor(`${baseRoute}.edit`, { id: record.id })}?tab=rollback`}
                   disabled={!canEdit}
                 >
                   Rollback
@@ -409,7 +413,7 @@ export default function Page(props: PageProps) {
           canDelete={canDelete}
           canAdd={canAdd}
           showAddButton={true}
-          addHref={route(`${baseRoute}.create`).path}
+          addHref={urlFor(`${baseRoute}.create`)}
           onToggleSearch={handleSearchingButton}
           onBulkDelete={confirmBulkDel}
           onResetFilter={() => {

@@ -1,9 +1,5 @@
-import ProjectController from '#controllers/project.controller'
-
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
 import {
   Alert,
   Button,
@@ -33,9 +29,12 @@ import MediaLibraryDialog from '~/components/RTE/media-library-dialog'
 import { uploadImage } from '~/components/RTE/upload-service'
 import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyInfo } from '~/components/core/notify'
+import { Data } from '~/generated/data'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import DashboardLayout from '~/layouts/dashboard'
+import { urlFor } from '~/lib/client'
 import { checkForm } from '~/lib/utils'
+import { InertiaProps } from '~/types'
 
 const baseRoute = 'project'
 const basePerm = 'project'
@@ -63,13 +62,11 @@ function extractMediaIdFromRedirectUrl(value: string): string | null {
   }
 }
 
-export default function Page(
-  props: SharedProps &
-    (
-      | InferPageProps<ProjectController, 'viewEdit'>
-      | InferPageProps<ProjectController, 'viewCreate'>
-    )
-) {
+type PageProps = InertiaProps<{
+  data: Data.Project | null
+}>
+
+export default function Page(props: PageProps) {
   const { data } = props
   const [thumbnailPreviewUrl, setThumbnailPreviewUrl] = useState<string>(data?.thumbnail?.url || '')
   const [thumbnailUploadError, setThumbnailUploadError] = useState<string | null>(null)
@@ -80,11 +77,11 @@ export default function Page(
   const breadcrumbs = [
     {
       title: 'Dashboard',
-      href: route('dashboard.view').path,
+      href: urlFor('dashboard.view'),
     },
     {
       title,
-      href: route(`${basePerm}.index`).path,
+      href: urlFor(`${basePerm}.index`),
     },
     {
       title: data ? 'Edit' : 'Create',
@@ -111,7 +108,7 @@ export default function Page(
 
   const mutation = useGenericMutation(
     data ? 'PATCH' : 'POST',
-    route(`${baseRoute}.${data ? 'update' : 'store'}`).path,
+    urlFor(`${baseRoute}.${data ? 'update' : 'store'}`),
     {
       onSuccess: () => {
         if (!data) {
@@ -161,7 +158,7 @@ export default function Page(
 
   const onBack = ConfirmModal({
     onConfirm: () => {
-      router.visit(route(`${baseRoute}.index`))
+      router.visit(urlFor(`${baseRoute}.index`))
     },
     message: 'Are you sure you want to go back?',
     confirmText: 'Go Back',
@@ -193,7 +190,8 @@ export default function Page(
     setThumbnailUploadError(null)
     setIsUploadingThumbnail(true)
     try {
-      const uploadedMedia = await uploadImage(file, route('api.v1.media.upload').path)
+      const uploadedMedia = await uploadImage(file, urlFor('api.v1.media.upload'))
+      console.log('Uploaded media:', uploadedMedia)
       form.setFieldValue('thumbnail_id', uploadedMedia.id)
       setThumbnailPreviewUrl(uploadedMedia.url)
     } catch (error) {
@@ -380,8 +378,8 @@ export default function Page(
         open={mediaLibraryOpen}
         onOpenChange={setMediaLibraryOpen}
         onSelectImage={setThumbnailFromUrl}
-        getURL={route('api.v1.media.list').path}
-        deleteURL={route('api.v1.media.destroy').path}
+        getURL={urlFor('api.v1.media.list')}
+        deleteURL={urlFor('api.v1.media.destroy')}
         pickerType="image"
       />
     </DashboardLayout>

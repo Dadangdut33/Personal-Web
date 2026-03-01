@@ -1,38 +1,34 @@
-import PermissionController from '#controllers/permission.controller'
-
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
 import { Button, Grid, Group, Paper, Stack, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconArrowLeft, IconCancel, IconDeviceFloppy } from '@tabler/icons-react'
 import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyInfo } from '~/components/core/notify'
+import { Data } from '~/generated/data'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import DashboardLayout from '~/layouts/dashboard'
+import { urlFor } from '~/lib/client'
 import { checkForm } from '~/lib/utils'
+import { InertiaProps } from '~/types'
 
 const baseRoute = 'permission'
 const basePerm = 'permission'
 const title = 'Permission'
+type PageProps = InertiaProps<{
+  data: Data.Permission | null
+}>
 
-export default function Page(
-  props: SharedProps &
-    (
-      | InferPageProps<PermissionController, 'viewEdit'>
-      | InferPageProps<PermissionController, 'viewCreate'>
-    )
-) {
+export default function Page(props: PageProps) {
   const { data } = props
   const breadcrumbs = [
     {
       title: 'Dashboard',
-      href: route('dashboard.view').path,
+      href: urlFor('dashboard.view'),
     },
     {
       title: title,
-      href: route(`${basePerm}.index`).path,
+      href: urlFor(`${basePerm}.index`),
     },
     {
       title: data ? 'Edit' : 'Create',
@@ -55,7 +51,6 @@ export default function Page(
         // check if the permission is valid it must be like this
         // permission.what
         const parts = value.split('.')
-        console.log(parts)
         if (parts.length === 2 && parts[0].length > 0 && parts[1].length > 0) return null
         return 'Format does not match. Correct Example: permission.view'
       },
@@ -64,7 +59,7 @@ export default function Page(
 
   const mutation = useGenericMutation(
     data ? 'PATCH' : 'POST',
-    route(`${baseRoute}.${data ? 'update' : 'store'}`).path,
+    urlFor(`${baseRoute}.${data ? 'update' : 'store'}`),
     {
       onSuccess: () => {
         form.reset()
@@ -89,7 +84,7 @@ export default function Page(
 
   const onBack = ConfirmModal({
     onConfirm: () => {
-      router.visit(route(`${baseRoute}.index`))
+      router.visit(urlFor(`${baseRoute}.index`))
     },
     message: 'Are you sure you want to go back?',
     confirmText: 'Go Back',

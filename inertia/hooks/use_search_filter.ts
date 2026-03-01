@@ -1,10 +1,10 @@
-import { RouteNameType } from '#types/app'
+import type { RouteNameType } from '#types/app'
 
 import { router } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
 import { useDebouncedCallback } from '@mantine/hooks'
-import { DataTableSortStatus } from 'mantine-datatable'
+import type { DataTableSortStatus } from 'mantine-datatable'
 import { useEffect, useState } from 'react'
+import { urlFor } from '~/lib/client'
 
 type SearchFilerProps<T> = {
   isFetching: boolean
@@ -91,7 +91,7 @@ export default function useSearchFilter<T>(
     }
 
     const payload = Object.fromEntries(queryParams)
-    router.get(route(endpoint).path, payload, {
+    router.get(urlFor(endpoint as any), payload, {
       preserveState: true,
       replace: true, // Prevents flooding history stack
     })
@@ -136,7 +136,7 @@ export default function useSearchFilter<T>(
     setSearchBy({})
     setSortStatus({ columnAccessor: defaultColumnSort as any, direction: 'desc' })
     router.get(
-      route(endpoint).path,
+      urlFor(endpoint as any),
       {},
       {
         preserveState: true,

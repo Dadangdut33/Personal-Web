@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react'
+import { Link } from '@adonisjs/inertia/react'
 import { Fragment, type ReactNode } from 'react'
 import {
   Breadcrumb,

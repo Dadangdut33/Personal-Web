@@ -1,11 +1,12 @@
 'use client'
 
-import { Link, usePage } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
+import { Link } from '@adonisjs/inertia/react'
+import { usePage } from '@inertiajs/react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Code2Icon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { ThemeSwitcher } from '~/components/core/theme-switcher'
+import { urlFor } from '~/lib/client'
 import { NAVIGATION_LINKS } from '~/lib/constants'
 import { cn } from '~/lib/utils'
 
@@ -15,10 +16,10 @@ const MotionLink = motion.create(Link)
 
 export default function Navbar() {
   const { url, props } = usePage()
-  const [isHome, setIsHome] = useState(props.previousPath === route('home').path)
+  const [isHome, setIsHome] = useState(props.previousPath === urlFor('home'))
 
   useEffect(() => {
-    setIsHome(url === route('home').path)
+    setIsHome(url === urlFor('home'))
   }, [url])
 
   return (
@@ -26,7 +27,7 @@ export default function Navbar() {
       <div className="mx-auto flex h-[70px] w-[1300px] max-w-full items-center justify-between text-foreground font-geistmono">
         <div className="flex items-center gap-10">
           <MotionLink
-            href={route('home').path}
+            href={urlFor('home')}
             initial={isHome ? true : false}
             animate={{ width: isHome ? '9.2rem' : '2rem' }}
             whileHover={

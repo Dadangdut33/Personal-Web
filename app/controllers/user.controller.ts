@@ -1,4 +1,3 @@
-import { UserDto } from '#dto/user.dto'
 import {
   generateRandomPassword,
   getMethodActName,
@@ -13,12 +12,13 @@ import MediaService from '#services/media.service'
 import ProfileService from '#services/profile.service'
 import RoleService from '#services/role.service'
 import UserService from '#services/user.service'
+import { UserTransformer } from '#transformers/user.transformer'
 import { PaginationMeta } from '#types/app'
 import { createEditUserValidator } from '#validators/user'
 
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { route } from '@izzyjs/route/client'
+import { urlFor } from '@adonisjs/core/services/url_builder'
 
 @inject()
 export default class UserController {
@@ -55,7 +55,7 @@ export default class UserController {
     let roles = await this.roleSvc.listWithCheck(auth.user?.roles || [])
 
     return inertia.render('dashboard/user/createEdit', {
-      data: new UserDto(data),
+      data: UserTransformer.transform(data),
       roles: roles,
     })
   }
@@ -67,7 +67,7 @@ export default class UserController {
     const dataQ = await this.userSvc.index(q)
 
     return inertia.render('dashboard/user/list', {
-      data: UserDto.collect(dataQ.all()),
+      data: UserTransformer.transform(dataQ.all()),
       meta: dataQ.getMeta() as PaginationMeta,
     })
   }
@@ -105,7 +105,7 @@ export default class UserController {
       return response.status(200).json({
         status: 'success',
         message: `Successfully ${getMethodActName(request)} user.`,
-        redirect_to: route(`user.index`).path,
+        redirect_to: urlFor(`user.index`),
       })
     } catch (error) {
       return returnError(response, error, `USER_${getMethodActName(request)}`, { logErrors: true })

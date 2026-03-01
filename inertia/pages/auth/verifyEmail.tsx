@@ -1,7 +1,6 @@
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
+import { InertiaProps } from '~/types'
 import type AuthController from '@app/controllers/auth.controller.ts'
 import { Head } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
 import { Alert, Group, Loader, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useInterval, useLocalStorage, useTimeout } from '@mantine/hooks'
@@ -23,11 +22,12 @@ import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import { useIsReady } from '~/hooks/use_is_ready'
 import { useLogout } from '~/hooks/use_logout'
 import AuthLayout from '~/layouts/auth'
+import { urlFor } from '~/lib/client'
 import { TIMEOUT_SHORT } from '~/lib/constants'
 import { checkFormWithCaptcha, cn } from '~/lib/utils'
 
 export default function Page(
-  props: SharedProps & InferPageProps<AuthController, 'viewVerifyEmail'>
+  props: InertiaProps<any>
 ) {
   const [isTimedOut, setIsTimedOut] = useLocalStorage({
     key: 'timeout_verify_email',
@@ -74,7 +74,7 @@ export default function Page(
       cf_token: (value) => (value.length > 0 ? null : 'Captcha is required'),
     },
   })
-  const mutation = useGenericMutation('POST', route('auth.verifyEmail.request').path, {
+  const mutation = useGenericMutation('POST', urlFor('auth.verifyEmail.request'), {
     onError(error, _variables, _context) {
       if (error.response?.data.form_errors) {
         form.setErrors(error.response?.data.form_errors)

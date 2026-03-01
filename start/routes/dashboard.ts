@@ -1,5 +1,5 @@
-import { LazyImport } from '@adonisjs/bouncer/types'
 import router from '@adonisjs/core/services/router'
+import type { LazyImport } from '@adonisjs/core/types/common'
 
 import { middleware } from '../kernel.js'
 

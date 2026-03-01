@@ -1,9 +1,10 @@
 'use client'
 
-import { AuthUser } from '#types/models'
+import type { AuthUser } from '#types/models'
 
+import { Link } from '@adonisjs/inertia/react'
 import { SharedProps } from '@adonisjs/inertia/types'
-import { Link, usePage } from '@inertiajs/react'
+import { usePage } from '@inertiajs/react'
 import { ChevronRight, ChevronsUpDown, GalleryVerticalEnd, LogOut, User2 } from 'lucide-react'
 import * as React from 'react'
 import { useModals } from '~/components/core/modal/modal-hooks'

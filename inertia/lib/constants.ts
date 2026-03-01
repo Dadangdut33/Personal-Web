@@ -1,4 +1,3 @@
-import { route } from '@izzyjs/route/client'
 import {
   BookText,
   Boxes,
@@ -7,19 +6,21 @@ import {
   Images,
   LayoutDashboard,
   ShieldUser,
+  UserPen,
   UsersRound,
 } from 'lucide-react'
+import { urlFor } from '~/lib/client'
 
 export const NAVIGATION_LINKS = [
-  { text: 'Projects', href: route('projects').path },
-  { text: 'Blog', href: route('blog').path },
+  { text: 'Projects', href: urlFor('projects') },
+  { text: 'Blog', href: urlFor('blog') },
 ]
 
 export const DASHBOARD_NAV = {
   flat: [
     {
       title: 'Dashboard',
-      url: route('dashboard.view').path,
+      url: urlFor('dashboard.view'),
       icon: LayoutDashboard,
       flat: true,
       requiredPermission: 'dashboard.view',
@@ -28,17 +29,17 @@ export const DASHBOARD_NAV = {
   menu: [
     {
       title: 'Projects',
-      url: route('project.index').path,
+      url: urlFor('project.index'),
       icon: BriefcaseBusiness,
       items: [
         {
           title: 'List',
-          url: route('project.index').path,
+          url: urlFor('project.index'),
           requiredPermission: 'project.view',
         },
         {
           title: 'Create',
-          url: route('project.create').path,
+          url: urlFor('project.create'),
           requiredPermission: 'project.create',
         },
       ],
@@ -46,17 +47,17 @@ export const DASHBOARD_NAV = {
     },
     {
       title: 'Blogs',
-      url: route('blog.index').path,
+      url: urlFor('blog.index'),
       icon: BookText,
       items: [
         {
           title: 'List',
-          url: route('blog.index').path,
+          url: urlFor('blog.index'),
           requiredPermission: 'blog.view',
         },
         {
           title: 'Create',
-          url: route('blog.create').path,
+          url: urlFor('blog.create'),
           requiredPermission: 'blog.create',
         },
       ],
@@ -64,37 +65,44 @@ export const DASHBOARD_NAV = {
     },
     {
       title: 'Media',
-      url: route('media.index').path,
+      url: urlFor('media.index'),
       icon: Images,
       flat: true,
       requiredPermission: 'media.view',
+    },
+    {
+      title: 'Profile',
+      url: urlFor('profile.view'),
+      icon: UserPen,
+      flat: true,
+      requiredPermission: 'profile.view',
     },
   ],
   management: [
     {
       title: 'Users',
-      url: route('user.index').path,
+      url: urlFor('user.index'),
       icon: UsersRound,
       flat: true,
       requiredPermission: 'user.view',
     },
     {
       title: 'Roles',
-      url: route('role.index').path,
+      url: urlFor('role.index'),
       icon: Boxes,
       flat: true,
       requiredPermission: 'role.view',
     },
     {
       title: 'Permissions',
-      url: route('permission.index').path,
+      url: urlFor('permission.index'),
       icon: ShieldUser,
       flat: true,
       requiredPermission: 'permission.view',
     },
     {
       title: 'Activity Log',
-      url: route('activity_log.index').path,
+      url: urlFor('activity_log.index'),
       icon: History,
       flat: true,
       requiredPermission: 'activity_log.view',

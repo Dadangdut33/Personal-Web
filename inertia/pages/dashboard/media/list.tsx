@@ -1,9 +1,6 @@
-import MediaController from '#controllers/media.controller'
-import { RouteNameType } from '#types/app'
+import type { PaginationMeta } from '#types/app'
 
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import { Head } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
 import {
   ActionIcon,
   AspectRatio,
@@ -56,15 +53,21 @@ import { useModals } from '~/components/core/modal/modal-hooks'
 import { FilterDate } from '~/components/core/table-filter/date-filter'
 import { FilterText } from '~/components/core/table-filter/text-filter'
 import { TooltipIfTrue } from '~/components/core/tooltipper'
+import { Data } from '~/generated/data'
 import { useDeleteGeneric } from '~/hooks/use_generic_delete'
 import useSearchFilter from '~/hooks/use_search_filter'
 import DashboardLayout from '~/layouts/dashboard'
+import { urlFor } from '~/lib/client'
 import { formatBytes } from '~/lib/utils'
+import { InertiaProps } from '~/types'
 
 const baseRoute = 'media'
 const basePerm = 'media'
 const pageTitle = 'Media'
-type PageProps = SharedProps & InferPageProps<MediaController, 'viewList'>
+type PageProps = InertiaProps<{
+  data: Data.Media[]
+  meta: PaginationMeta
+}>
 type DataType = PageProps['data'][number]
 
 function getIconForMime(mime: string, size = 20) {
@@ -232,7 +235,7 @@ export default function page(props: PageProps) {
   const breadcrumbs = [
     {
       title: 'Dashboard',
-      href: route('dashboard.view').path,
+      href: urlFor('dashboard.view'),
     },
     {
       title: pageTitle,
@@ -247,7 +250,7 @@ export default function page(props: PageProps) {
   const canDelete = props.user?.permissions.includes(`${basePerm}.delete`)
 
   // State
-  const searchFilter = useSearchFilter(`${baseRoute}.index` as RouteNameType)
+  const searchFilter = useSearchFilter(`${baseRoute}.index`)
   const [viewMode, setViewMode] = useState<'list' | 'grid'>('list')
   const [selected, setSelected] = useState<DataType>()
   const [selectedRecords, setSelectedRecords] = useState<DataType[]>([])
@@ -274,8 +277,8 @@ export default function page(props: PageProps) {
       onClose()
       searchFilter.doSearch()
     },
-    deleteParam: { params: { id: selected?.id } },
-    routeName: `${baseRoute}.destroy` as RouteNameType,
+    deleteParam: { id: selected?.id ?? '' },
+    routeName: `${baseRoute}.destroy`,
     title: (
       <div className="flex items-center gap-2">
         <Trash2 className="size-5 text-red-400" />
@@ -295,7 +298,7 @@ export default function page(props: PageProps) {
       setSelectedRecords([])
       searchFilter.doSearch()
     },
-    routeName: `${baseRoute}.bulkDestroy` as RouteNameType,
+    routeName: `${baseRoute}.bulkDestroy`,
     deleteParam: { params: {} }, // For bulk delete we delete using id in body
     title: <GenericDeleteTitle bulk={true} />,
     message: (
@@ -599,7 +602,7 @@ export default function page(props: PageProps) {
           selectedRecords={selectedRecords}
           canDelete={canDelete}
           showAddButton={false}
-          addHref={route(`${baseRoute}.create`).path}
+          addHref={urlFor(`${baseRoute}.create`)}
           onToggleSearch={handleSearchingButton}
           onBulkDelete={confirmBulkDel}
           onResetFilter={() => {

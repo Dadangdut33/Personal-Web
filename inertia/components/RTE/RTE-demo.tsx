@@ -1,6 +1,5 @@
 'use client'
 
-import { route } from '@izzyjs/route/client'
 import { RefreshCw } from 'lucide-react'
 import { useState } from 'react'
 import TiptapEditor from '~/components/RTE'
@@ -8,6 +7,7 @@ import JsonViewer from '~/components/RTE/json-viewer'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
+import { urlFor } from '~/lib/client'
 
 const SAMPLE_CONTENT = {
   type: 'doc',
@@ -138,9 +138,9 @@ export default function RTEDemo() {
                 onSave={handleContentSave}
                 className="min-h-[500px]"
                 stickyToolbar={true}
-                getMediaURL={route('api.v1.media.list').path}
-                uploadMediaURL={route('api.v1.media.upload').path}
-                deleteMediaURL={route('api.v1.media.destroy').path}
+                getMediaURL={urlFor('api.v1.media.list')}
+                uploadMediaURL={urlFor('api.v1.media.upload')}
+                deleteMediaURL={urlFor('api.v1.media.destroy')}
               />
             </CardContent>
           </Card>

@@ -1,5 +1,6 @@
 'use client'
 
+import { ActionIcon } from '@mantine/core'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import * as React from 'react'
 import { DayPicker } from 'react-day-picker'
@@ -52,11 +53,15 @@ function Calendar({ className, classNames, showOutsideDays = true, ...props }: C
         ...classNames,
       }}
       components={{
-        IconLeft: ({ className, ...props }) => (
-          <ChevronLeft className={cn('size-4', className)} {...props} />
+        PreviousMonthButton: ({ className, ...props }) => (
+          <ActionIcon {...props}>
+            <ChevronLeft className={cn('size-4', className)} />
+          </ActionIcon>
         ),
-        IconRight: ({ className, ...props }) => (
-          <ChevronRight className={cn('size-4', className)} {...props} />
+        NextMonthButton: ({ className, ...props }) => (
+          <ActionIcon {...props}>
+            <ChevronRight className={cn('size-4', className)} />
+          </ActionIcon>
         ),
       }}
       {...props}

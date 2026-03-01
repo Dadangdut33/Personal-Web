@@ -3,6 +3,7 @@ import { getRequestFingerprint, mapRequestToQueryParams, returnError } from '#li
 import ActivityLogService from '#services/activity_log.service'
 import MediaService from '#services/media.service'
 import PermissionCheckService from '#services/permission_check.service'
+import { MediaTransformer } from '#transformers/media.transformer'
 import { PaginationMeta } from '#types/app'
 import { mediaUploadAPIValidator } from '#validators/media'
 
@@ -26,7 +27,7 @@ export default class MediaController {
     const dataQ = await this.mediaSvc.indexByUser(auth.user!, q)
 
     return inertia.render('dashboard/media/list', {
-      data: MediaDto.collect(dataQ.all()),
+      data: MediaTransformer.transform(dataQ.all()),
       meta: dataQ.getMeta() as PaginationMeta,
     })
   }

@@ -1,8 +1,8 @@
-import { route } from '@izzyjs/route/client'
 import type { Editor } from '@tiptap/react'
 import axios from 'axios'
 import { NodeSelection } from 'prosemirror-state'
 import { useCallback, useEffect, useState } from 'react'
+import { urlFor } from '~/lib/client'
 
 type LinkMetadata = {
   url: string
@@ -104,7 +104,7 @@ export default function useEmbedActions(editor: Editor | null) {
     setIsFetchingLinkMetadata(true)
     setLinkMetadataError(null)
     try {
-      const response = await axios.get(route('api.v1.utils.link-metadata').path, {
+      const response = await axios.get(urlFor('api.v1.utils.link-metadata'), {
         params: { url: normalizedUrl },
       })
       const data = response.data?.data

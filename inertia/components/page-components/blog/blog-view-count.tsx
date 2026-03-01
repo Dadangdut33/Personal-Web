@@ -1,11 +1,11 @@
 'use client'
 
-import { BaseAPIResponse } from '#types/api'
+import type { BaseAPIResponse } from '#types/api'
 
-import { route } from '@izzyjs/route/client'
 import { useQuery } from '@tanstack/react-query'
 import { Eye } from 'lucide-react'
 import { api } from '~/lib/axios'
+import { urlFor } from '~/lib/client'
 
 type ViewCountResponse = {
   slug_id: string
@@ -14,7 +14,7 @@ type ViewCountResponse = {
 
 async function fetchBlogViewCount(slugId: string, urlPath: string): Promise<number | null> {
   const { data } = await api.get<BaseAPIResponse<ViewCountResponse>>(
-    route('api.v1.blog.viewCount', { params: { slugId } }).path,
+    urlFor('api.v1.blog.viewCount', { slugId }),
     {
       params: {
         url_path: urlPath,

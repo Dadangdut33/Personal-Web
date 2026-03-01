@@ -1,7 +1,6 @@
 'use client'
 
-import { MediaDto } from '#dto/media.dto'
-import { PaginationMeta } from '#types/app'
+import type { PaginationMeta } from '#types/app'
 
 import { format } from 'date-fns'
 import {
@@ -37,6 +36,7 @@ import {
 } from '~/components/ui/select'
 import { Skeleton } from '~/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
+import type { Data } from '~data'
 
 import { deleteMedia, getMediaLibrary } from './upload-service'
 
@@ -60,7 +60,7 @@ export default function MediaLibraryDialog({
   deleteURL,
   pickerType = 'image',
 }: MediaLibraryDialogProps) {
-  const [mediaData, setMediaData] = useState<MediaDto[] | null>(null)
+  const [mediaData, setMediaData] = useState<Data.Media[] | null>(null)
   const [mediaMeta, setMediaMeta] = useState<PaginationMeta | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -141,7 +141,7 @@ export default function MediaLibraryDialog({
     }
   }
 
-  const handleSelectMedia = (media: MediaDto) => {
+  const handleSelectMedia = (media: Data.Media) => {
     onSelectImage(media.url!)
     onOpenChange(false)
   }
@@ -490,7 +490,7 @@ export default function MediaLibraryDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-[900px] max-h-[80vh] flex flex-col">
+      <DialogContent className="sm:max-w-[900px] max-h-[80vh] flex flex-col overflow-y-scroll">
         <DialogHeader>
           <DialogTitle>Media Library</DialogTitle>
         </DialogHeader>

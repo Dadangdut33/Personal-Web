@@ -1,9 +1,5 @@
-import UserController from '#controllers/user.controller'
-
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
 import {
   Accordion,
   ActionIcon,
@@ -43,29 +39,34 @@ import {
 } from '~/components/auth/password'
 import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyInfo } from '~/components/core/notify'
+import { Data } from '~/generated/data'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import DashboardLayout from '~/layouts/dashboard'
+import { urlFor } from '~/lib/client'
 import { PASS_REGEX } from '~/lib/constants'
 import { checkForm, getImagePreviewURL, transformFullName, transformUsername } from '~/lib/utils'
+import { InertiaProps } from '~/types'
 
 const baseRoute = 'user'
 const basePerm = 'user'
 const title = 'User'
 
-export default function Page(
-  props: SharedProps &
-    (InferPageProps<UserController, 'viewEdit'> | InferPageProps<UserController, 'viewCreate'>)
-) {
+type PageProps = InertiaProps<{
+  data: Data.User | null
+  roles: Data.Role[]
+}>
+
+export default function Page(props: PageProps) {
   const { data, roles } = props
 
   const breadcrumbs = [
     {
       title: 'Dashboard',
-      href: route('dashboard.view').path,
+      href: urlFor('dashboard.view'),
     },
     {
       title: title,
-      href: route(`${basePerm}.index`).path,
+      href: urlFor(`${basePerm}.index`),
     },
     {
       title: data ? 'Edit' : 'Create',
@@ -133,7 +134,7 @@ export default function Page(
 
   const mutation = useGenericMutation(
     data ? 'PATCH' : 'POST',
-    route(`${baseRoute}.${data ? 'update' : 'store'}`).path,
+    urlFor(`${baseRoute}.${data ? 'update' : 'store'}`),
     {
       onSuccess: () => {
         form.reset()
@@ -143,7 +144,7 @@ export default function Page(
 
   const generateRandomPasswordMutation = useGenericMutation(
     'GET',
-    route('api.v1.utils.random-password').path,
+    urlFor('api.v1.utils.random-password'),
     {
       onSuccess: (data) => {
         form.setFieldValue('password', data.data)
@@ -170,7 +171,7 @@ export default function Page(
 
   const onBack = ConfirmModal({
     onConfirm: () => {
-      router.visit(route(`${baseRoute}.index`))
+      router.visit(urlFor(`${baseRoute}.index`))
     },
     message: 'Are you sure you want to go back?',
     confirmText: 'Go Back',

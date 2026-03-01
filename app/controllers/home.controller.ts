@@ -1,8 +1,8 @@
-import { BlogDto } from '#dto/blog.dto'
 import BlogService from '#services/blog.service'
+import { BlogTransformer } from '#transformers/blog.transformer'
 
 import { inject } from '@adonisjs/core'
-import { HttpContext } from '@adonisjs/core/http'
+import type { HttpContext } from '@adonisjs/core/http'
 
 @inject()
 export default class HomeController {
@@ -18,7 +18,7 @@ export default class HomeController {
     })
 
     return inertia.render('home', {
-      latestBlogs: BlogDto.collect(blogs.all()),
+      latestBlogs: BlogTransformer.transform(blogs.all()),
     })
   }
 }

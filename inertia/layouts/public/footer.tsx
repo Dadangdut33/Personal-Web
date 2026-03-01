@@ -1,7 +1,8 @@
 'use client'
 
+import { Link } from '@adonisjs/inertia/react'
 import { SharedProps } from '@adonisjs/inertia/types'
-import { Link, usePage } from '@inertiajs/react'
+import { usePage } from '@inertiajs/react'
 import { Container, Group, Text, Tooltip } from '@mantine/core'
 import {
   IconBrandGithub,

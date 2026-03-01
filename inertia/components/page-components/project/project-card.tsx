@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react'
+import { Link } from '@adonisjs/inertia/react'
 import dayjs from 'dayjs'
 import { ArrowRight, Pin } from 'lucide-react'
 import HorizontalDragScroll from '~/components/core/horizontal-drag-scroll'

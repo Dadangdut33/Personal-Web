@@ -1,11 +1,15 @@
-import { loginValidator, registerValidator, resetPasswordValidator } from '#validators/auth/auth'
-import { createEditBlogValidator } from '#validators/auth/blog'
-import { createEditPermissionValidator } from '#validators/auth/permission'
-import { createEditRoleValidator } from '#validators/auth/role'
-import { createProfileValidator, updateProfileValidator } from '#validators/profile'
-import { createEditUserValidator } from '#validators/user'
+import type {
+  loginValidator,
+  registerValidator,
+  resetPasswordValidator,
+} from '#validators/auth/auth'
+import type { createEditPermissionValidator } from '#validators/auth/permission'
+import type { createEditRoleValidator } from '#validators/auth/role'
+import type { createEditBlogValidator } from '#validators/blog'
+import type { createProfileValidator, updateProfileValidator } from '#validators/profile'
+import type { createEditUserValidator } from '#validators/user'
 
-import { Infer } from '@vinejs/vine/types'
+import type { Infer } from '@vinejs/vine/types'
 
 export type RegisterPayload = Infer<typeof registerValidator>
 export type LoginPayload = Infer<typeof loginValidator>

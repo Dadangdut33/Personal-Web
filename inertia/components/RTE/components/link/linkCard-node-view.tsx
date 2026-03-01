@@ -1,4 +1,3 @@
-import { route } from '@izzyjs/route/client'
 import { type NodeViewProps, NodeViewWrapper } from '@tiptap/react'
 import axios from 'axios'
 import { Loader2, Pencil, RefreshCw, Save, X } from 'lucide-react'
@@ -8,6 +7,7 @@ import { Button } from '~/components/ui/button'
 import { Card, CardContent } from '~/components/ui/card'
 import { Input } from '~/components/ui/input'
 import { Textarea } from '~/components/ui/textarea'
+import { urlFor } from '~/lib/client'
 import { cn, limitString } from '~/lib/utils'
 
 const normalizeExternalUrl = (rawUrl: string) => {
@@ -170,7 +170,7 @@ export default function LinkCardNodeView({ node, editor, updateAttributes }: Nod
     setIsFetching(true)
     setFetchError(null)
     try {
-      const response = await axios.get(route('api.v1.utils.link-metadata').path, {
+      const response = await axios.get(urlFor('api.v1.utils.link-metadata'), {
         params: { url: normalizedUrl },
       })
       const data = response.data?.data

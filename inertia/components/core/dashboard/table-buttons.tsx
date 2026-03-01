@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react'
+import { Link } from '@adonisjs/inertia/react'
 import { ActionIcon, Button, Group, Tooltip as MantineTooltip, Paper } from '@mantine/core'
 import { IconPlus, IconSearch, IconSearchOff, IconTrash } from '@tabler/icons-react'
 import { ListRestart } from 'lucide-react'

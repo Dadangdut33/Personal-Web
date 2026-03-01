@@ -1,4 +1,3 @@
-import { PermissionDto } from '#dto/permission.dto'
 import {
   getMethodActName,
   getRequestFingerprint,
@@ -10,12 +9,13 @@ import {
 import ActivityLogService from '#services/activity_log.service'
 import PermissionService from '#services/permission.service'
 import PermissionCheckService from '#services/permission_check.service'
+import { PermissionTransformer } from '#transformers/permission.transformer'
 import { PaginationMeta } from '#types/app'
 import { createEditPermissionValidator } from '#validators/auth/permission'
 
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { route } from '@izzyjs/route/client'
+import { urlFor } from '@adonisjs/core/services/url_builder'
 
 @inject()
 export default class PermissionController {
@@ -40,7 +40,7 @@ export default class PermissionController {
     if (data.is_protected) return throwForbidden()
 
     return inertia.render('dashboard/permission/createEdit', {
-      data: new PermissionDto(data),
+      data: PermissionTransformer.transform(data),
     })
   }
 
@@ -51,7 +51,7 @@ export default class PermissionController {
     const dataQ = await this.permSvc.index(q)
 
     return inertia.render('dashboard/permission/list', {
-      data: PermissionDto.collect(dataQ.all()),
+      data: PermissionTransformer.transform(dataQ.all()),
       meta: dataQ.getMeta() as PaginationMeta,
     })
   }
@@ -90,7 +90,7 @@ export default class PermissionController {
       return response.status(200).json({
         status: 'success',
         message: `Successfully ${getMethodActName(request)} permission.`,
-        redirect_to: route('permission.index').path,
+        redirect_to: urlFor('permission.index'),
       })
     } catch (error) {
       return returnError(response, error, `PERMISSION_${request.method()}`, { logErrors: true })

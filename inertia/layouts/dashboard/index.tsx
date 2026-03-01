@@ -1,5 +1,6 @@
+import { Link } from '@adonisjs/inertia/react'
 import { SharedProps } from '@adonisjs/inertia/types'
-import { Link, usePage } from '@inertiajs/react'
+import { usePage } from '@inertiajs/react'
 import React from 'react'
 import { ThemeSwitcher } from '~/components/core/theme-switcher'
 import {

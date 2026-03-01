@@ -1,6 +1,6 @@
 import type { FormErrors } from '@mantine/form'
 
-import { PaginationMeta } from './app.js'
+import type { PaginationMeta } from './app'
 
 export interface TurnstileResponse {
   'success': boolean

@@ -1,4 +1,3 @@
-import { route } from '@izzyjs/route/client'
 import {
   Alert,
   Button,
@@ -17,6 +16,7 @@ import { UseFormReturnType } from '@mantine/form'
 import { IconPhoto, IconPhotoPlus, IconTrash, IconUpload } from '@tabler/icons-react'
 import type { ChangeEvent, RefObject } from 'react'
 import TiptapEditor from '~/components/RTE'
+import { urlFor } from '~/lib/client'
 
 type BlogFormValues = {
   id: string
@@ -235,9 +235,9 @@ export default function BlogEditorTab({
         <TiptapEditor
           content={content}
           onSave={onContentChange}
-          getMediaURL={route('api.v1.media.list').path}
-          uploadMediaURL={route('api.v1.media.upload').path}
-          deleteMediaURL={route('api.v1.media.destroy').path}
+          getMediaURL={urlFor('api.v1.media.list')}
+          uploadMediaURL={urlFor('api.v1.media.upload')}
+          deleteMediaURL={urlFor('api.v1.media.destroy')}
           className="min-h-[500px]"
           stickyToolbar={true}
           imageTags={['blog-content']}

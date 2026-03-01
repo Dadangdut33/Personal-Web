@@ -1,9 +1,6 @@
-import ActivityLogController from '#controllers/activity_log.controller'
-import { RouteNameType } from '#types/app'
+import type { PaginationMeta } from '#types/app'
 
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import { Head } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
 import {
   ActionIcon,
   Badge,
@@ -33,20 +30,26 @@ import { LogMarkdown } from '~/components/core/log/log-markdown'
 import { FilterDate } from '~/components/core/table-filter/date-filter'
 import { FilterText } from '~/components/core/table-filter/text-filter'
 import classes from '~/css/TableUtils.module.css'
+import { Data } from '~/generated/data'
 import useSearchFilter from '~/hooks/use_search_filter'
 import DashboardLayout from '~/layouts/dashboard'
+import { urlFor } from '~/lib/client'
 import { cn } from '~/lib/utils'
+import { InertiaProps } from '~/types'
 
 const baseRoute = 'activity_log'
 const pageTitle = 'Activity Log'
-type PageProps = SharedProps & InferPageProps<ActivityLogController, 'viewList'>
+type PageProps = InertiaProps<{
+  data: Data.ActivityLog[]
+  meta: PaginationMeta
+}>
 type DataType = PageProps['data'][number]
 
 export default function page(props: PageProps) {
   const breadcrumbs = [
     {
       title: 'Dashboard',
-      href: route('dashboard.view').path,
+      href: urlFor('dashboard.view'),
     },
     {
       title: pageTitle,
@@ -58,7 +61,7 @@ export default function page(props: PageProps) {
   const { data, meta } = props
 
   // State
-  const searchFilter = useSearchFilter(`${baseRoute}.index` as RouteNameType)
+  const searchFilter = useSearchFilter(`${baseRoute}.index`)
   const [selectedMetadata, setSelectedMetadata] = useState<any>(null)
   const [metadataModalOpened, { open: openMetadataModal, close: closeMetadataModal }] =
     useDisclosure(false)

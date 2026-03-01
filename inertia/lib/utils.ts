@@ -1,6 +1,6 @@
-import { type RequestError } from '#types/app'
+import type { RequestError } from '#types/app'
 
-import { FormErrors, UseFormReturnType } from '@mantine/form'
+import type { FormErrors, UseFormReturnType } from '@mantine/form'
 import { type ClassValue, clsx } from 'clsx'
 import { isString } from 'lodash-es'
 import { twMerge } from 'tailwind-merge'

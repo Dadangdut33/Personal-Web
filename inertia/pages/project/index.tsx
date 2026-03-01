@@ -1,8 +1,6 @@
-import ProjectPublicController from '#controllers/project_public.controller'
+import type { PaginationMeta } from '#types/app'
 
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import { Head, router } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
 import { Search, Sparkles } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import ProjectCard from '~/components/page-components/project/project-card'
@@ -11,9 +9,18 @@ import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
+import { Data } from '~/generated/data'
 import PublicLayout from '~/layouts/public'
+import { urlFor } from '~/lib/client'
+import { InertiaProps } from '~/types'
 
-type PageProps = SharedProps & InferPageProps<ProjectPublicController, 'view'>
+type PageProps = InertiaProps<{
+  data: Data.Project[]
+  meta: PaginationMeta
+  filters: {
+    search: string
+  }
+}>
 
 export default function ProjectPage(props: PageProps) {
   const { data, meta, filters } = props
@@ -22,7 +29,7 @@ export default function ProjectPage(props: PageProps) {
 
   const doSearch = (search: string, page = 1) => {
     router.get(
-      route('projects').path,
+      urlFor('projects'),
       {
         search,
         page,
@@ -60,7 +67,7 @@ export default function ProjectPage(props: PageProps) {
 
       <PublicPageShell
         breadcrumbs={[
-          { label: 'Home', href: route('home').path },
+          { label: 'Home', href: urlFor('home') },
           { label: 'Projects', current: true },
         ]}
       >

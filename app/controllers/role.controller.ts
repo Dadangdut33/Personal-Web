@@ -1,5 +1,3 @@
-import { RoleDto } from '#dto/role.dto'
-import { TagDto } from '#dto/tag.dto'
 import {
   getMethodActName,
   getRequestFingerprint,
@@ -12,12 +10,14 @@ import Tag from '#models/tag'
 import ActivityLogService from '#services/activity_log.service'
 import PermissionService from '#services/permission.service'
 import RoleService from '#services/role.service'
+import { RoleTransformer } from '#transformers/role.transformer'
+import { TagTransformer } from '#transformers/tag.transformer'
 import { PaginationMeta } from '#types/app'
 import { createEditRoleValidator } from '#validators/auth/role'
 
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { route } from '@izzyjs/route/client'
+import { urlFor } from '@adonisjs/core/services/url_builder'
 
 @inject()
 export default class RoleController {
@@ -39,7 +39,7 @@ export default class RoleController {
     return inertia.render('dashboard/role/createEdit', {
       data: null,
       permissions: permissions,
-      mediaTags: TagDto.collect(mediaTags),
+      mediaTags: TagTransformer.transform(mediaTags),
     })
   }
 
@@ -60,9 +60,9 @@ export default class RoleController {
       .orderBy('name', 'asc')
 
     return inertia.render('dashboard/role/createEdit', {
-      data: new RoleDto(data),
+      data: RoleTransformer.transform(data),
       permissions: permissions,
-      mediaTags: TagDto.collect(mediaTags),
+      mediaTags: TagTransformer.transform(mediaTags),
     })
   }
 
@@ -73,7 +73,7 @@ export default class RoleController {
     const dataQ = await this.roleSvc.index(q)
 
     return inertia.render('dashboard/role/list', {
-      data: RoleDto.collect(dataQ.all()),
+      data: RoleTransformer.transform(dataQ.all()),
       meta: dataQ.getMeta() as PaginationMeta,
     })
   }
@@ -112,7 +112,7 @@ export default class RoleController {
       return response.status(200).json({
         status: 'success',
         message: `Successfully ${getMethodActName(request)} role.`,
-        redirect_to: route('role.index').path,
+        redirect_to: urlFor('role.index'),
       })
     } catch (error) {
       return returnError(response, error, `ROLE_${request.method()}`, { logErrors: true })

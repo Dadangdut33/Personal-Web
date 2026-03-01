@@ -1,7 +1,7 @@
-import { BlogDto } from '#dto/blog.dto'
 import { throwNotFound } from '#lib/utils'
 import BlogService from '#services/blog.service'
 import env from '#start/env'
+import { BlogTransformer } from '#transformers/blog.transformer'
 import { PaginationMeta } from '#types/app'
 
 import { inject } from '@adonisjs/core'
@@ -61,7 +61,7 @@ export default class BlogPublicController {
     })
 
     return inertia.render('blog/index', {
-      data: BlogDto.collect(data.all()),
+      data: BlogTransformer.transform(data.all()),
       meta: data.getMeta() as PaginationMeta,
       filters: {
         search,
@@ -105,7 +105,7 @@ export default class BlogPublicController {
     }
 
     return inertia.render('blog/post', {
-      data: new BlogDto(detail.blog),
+      data: BlogTransformer.transform(detail.blog),
       ...this.getGiscusConfig(),
     })
   }

@@ -1,6 +1,4 @@
 import { BlogDto } from '#dto/blog.dto'
-import { ProjectDto } from '#dto/project.dto'
-import { TagDto } from '#dto/tag.dto'
 import {
   getMethodActName,
   getRequestFingerprint,
@@ -14,12 +12,15 @@ import Project from '#models/project'
 import Tag from '#models/tag'
 import ActivityLogService from '#services/activity_log.service'
 import BlogService from '#services/blog.service'
+import { BlogTransformer } from '#transformers/blog.transformer'
+import { ProjectTransformer } from '#transformers/project.transformer'
+import { TagTransformer } from '#transformers/tag.transformer'
 import { PaginationMeta } from '#types/app'
-import { createEditBlogValidator } from '#validators/auth/blog'
+import { createEditBlogValidator } from '#validators/blog'
 
 import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
-import { route } from '@izzyjs/route/client'
+import { urlFor } from '@adonisjs/core/services/url_builder'
 
 @inject()
 export default class BlogController {
@@ -36,8 +37,8 @@ export default class BlogController {
 
     return inertia.render('dashboard/blog/createEdit', {
       data: null,
-      projects: ProjectDto.collect(projects),
-      availableTags: TagDto.collect(availableTags),
+      projects: ProjectTransformer.transform(projects),
+      availableTags: TagTransformer.transform(availableTags),
     })
   }
 
@@ -58,9 +59,9 @@ export default class BlogController {
     const availableTags = await Tag.query().where('type', 'blog').orderBy('name', 'asc')
 
     return inertia.render('dashboard/blog/createEdit', {
-      data: new BlogDto(data),
-      projects: ProjectDto.collect(projects),
-      availableTags: TagDto.collect(availableTags),
+      data: BlogTransformer.transform(data),
+      projects: ProjectTransformer.transform(projects),
+      availableTags: TagTransformer.transform(availableTags),
     })
   }
 
@@ -108,7 +109,7 @@ export default class BlogController {
       return response.status(200).json({
         status: 'success',
         message: `Successfully ${getMethodActName(request)} blog.`,
-        redirect_to: route('blog.index').path,
+        redirect_to: urlFor('blog.index'),
       })
     } catch (error) {
       return returnError(response, error, `BLOG_${request.method()}`, { logErrors: true })

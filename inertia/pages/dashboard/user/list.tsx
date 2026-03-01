@@ -1,10 +1,8 @@
-import UserController from '#controllers/user.controller'
-import { RouteNameType } from '#types/app'
-import { AuthUser } from '#types/models'
+import type { PaginationMeta } from '#types/app'
+import type { AuthUser } from '#types/models'
 
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
-import { Head, Link } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
+import { Link } from '@adonisjs/inertia/react'
+import { Head } from '@inertiajs/react'
 import {
   ActionIcon,
   Avatar,
@@ -35,15 +33,21 @@ import { FilterBoolean } from '~/components/core/table-filter/boolean-filter'
 import { FilterDate } from '~/components/core/table-filter/date-filter'
 import { FilterText } from '~/components/core/table-filter/text-filter'
 import { TooltipIfTrue } from '~/components/core/tooltipper'
+import { Data } from '~/generated/data'
 import { useDeleteGeneric } from '~/hooks/use_generic_delete'
 import useSearchFilter from '~/hooks/use_search_filter'
 import DashboardLayout from '~/layouts/dashboard'
+import { urlFor } from '~/lib/client'
 import { getInitials } from '~/lib/utils'
+import { InertiaProps } from '~/types'
 
 const baseRoute = 'user'
 const basePerm = 'user'
 const pageTitle = 'User'
-type PageProps = SharedProps & InferPageProps<UserController, 'viewList'>
+type PageProps = InertiaProps<{
+  data: Data.User[]
+  meta: PaginationMeta
+}>
 type DataType = PageProps['data'][number]
 
 function mapRoleToBadgeComponent(role: string) {
@@ -85,7 +89,7 @@ export default function page(props: PageProps) {
   const breadcrumbs = [
     {
       title: 'Dashboard',
-      href: route('dashboard.view').path,
+      href: urlFor('dashboard.view'),
     },
     {
       title: pageTitle,
@@ -101,7 +105,7 @@ export default function page(props: PageProps) {
   const canDelete = props.user?.permissions.includes(`${basePerm}.delete`)
 
   // State
-  const searchFilter = useSearchFilter(`${baseRoute}.index` as RouteNameType)
+  const searchFilter = useSearchFilter(`${baseRoute}.index`)
   const [selected, setSelected] = useState<DataType>()
   const [selectedRecords, setSelectedRecords] = useState<DataType[]>([])
   const [isOpen, { open: onOpen, close: onClose }] = useDisclosure(false)
@@ -127,8 +131,8 @@ export default function page(props: PageProps) {
       onClose()
       searchFilter.doSearch()
     },
-    deleteParam: { params: { id: selected?.id } },
-    routeName: `${baseRoute}.destroy` as RouteNameType,
+    deleteParam: { id: selected?.id ?? '' },
+    routeName: `${baseRoute}.destroy`,
     title: (
       <div className="flex items-center gap-2">
         <Trash2 className="size-5 text-red-400" />
@@ -148,7 +152,7 @@ export default function page(props: PageProps) {
       setSelectedRecords([])
       searchFilter.doSearch()
     },
-    routeName: `${baseRoute}.bulkDestroy` as RouteNameType,
+    routeName: `${baseRoute}.bulkDestroy`,
     deleteParam: { params: {} }, // For bulk delete we delete using id in body
     title: <GenericDeleteTitle bulk={true} />,
     message: (
@@ -346,7 +350,7 @@ export default function page(props: PageProps) {
                 variant="filled"
                 component={Link}
                 leftSection={<IconEdit size={16} />}
-                href={route(`${baseRoute}.edit`, { params: { id: record.id } }).path}
+                href={urlFor(`${baseRoute}.edit`, { id: record.id })}
               >
                 Edit
               </Menu.Item>
@@ -411,7 +415,7 @@ export default function page(props: PageProps) {
           canDelete={canDelete}
           canAdd={canAdd}
           showAddButton={true}
-          addHref={route(`${baseRoute}.create`).path}
+          addHref={urlFor(`${baseRoute}.create`)}
           onToggleSearch={handleSearchingButton}
           onBulkDelete={confirmBulkDel}
           onResetFilter={() => {

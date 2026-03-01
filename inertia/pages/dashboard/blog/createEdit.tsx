@@ -1,9 +1,5 @@
-import BlogController from '#controllers/blog.controller'
-
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
 import { Button, Group, Paper, Tabs } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconArrowLeft, IconCancel, IconDeviceFloppy } from '@tabler/icons-react'
@@ -15,9 +11,12 @@ import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyInfo } from '~/components/core/notify'
 import BlogEditorTab from '~/components/page-components/blog/editor-tab'
 import BlogRollbackTab from '~/components/page-components/blog/rollback-tab'
+import { Data } from '~/generated/data'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import DashboardLayout from '~/layouts/dashboard'
+import { urlFor } from '~/lib/client'
 import { checkForm } from '~/lib/utils'
+import { InertiaProps } from '~/types'
 
 const baseRoute = 'blog'
 const basePerm = 'blog'
@@ -54,10 +53,13 @@ function extractMediaIdFromRedirectUrl(value: string): string | null {
   }
 }
 
-export default function Page(
-  props: SharedProps &
-    (InferPageProps<BlogController, 'viewEdit'> | InferPageProps<BlogController, 'viewCreate'>)
-) {
+type PageProps = InertiaProps<{
+  data: Data.Blog | null
+  projects: Data.Project[]
+  availableTags: Data.Tag[]
+}>
+
+export default function Page(props: PageProps) {
   const { data, projects, availableTags } = props
   const defaultContent = { type: 'doc', content: [] }
   const [content, setContent] = useState<Record<string, any>>(data?.content || defaultContent)
@@ -79,11 +81,11 @@ export default function Page(
   const breadcrumbs = [
     {
       title: 'Dashboard',
-      href: route('dashboard.view').path,
+      href: urlFor('dashboard.view'),
     },
     {
       title,
-      href: route(`${basePerm}.index`).path,
+      href: urlFor(`${basePerm}.index`),
     },
     {
       title: data ? 'Edit' : 'Create',
@@ -111,7 +113,7 @@ export default function Page(
 
   const mutation = useGenericMutation(
     data ? 'PATCH' : 'POST',
-    route(`${baseRoute}.${data ? 'update' : 'store'}`).path,
+    urlFor(`${baseRoute}.${data ? 'update' : 'store'}`),
     {
       onSuccess: () => {
         form.reset()
@@ -122,22 +124,19 @@ export default function Page(
   const refreshEditData = () => {
     if (!data?.id) return
 
-    router.visit(
-      `${route(`${baseRoute}.edit`, { params: { id: data.id } }).path}?tab=${activeTab}`,
-      {
-        replace: true,
-        preserveState: false,
-        preserveScroll: true,
-      }
-    )
+    router.visit(`${urlFor(`${baseRoute}.edit`, { id: data.id })}?tab=${activeTab}`, {
+      replace: true,
+      preserveState: false,
+      preserveScroll: true,
+    })
   }
 
-  const rollbackMutation = useGenericMutation('POST', route('blog.rollback').path, {
+  const rollbackMutation = useGenericMutation('POST', urlFor('blog.rollback'), {
     doRedirect: false,
     onSuccess: refreshEditData,
   })
 
-  const rollbackFieldsMutation = useGenericMutation('POST', route('blog.rollbackFields').path, {
+  const rollbackFieldsMutation = useGenericMutation('POST', urlFor('blog.rollbackFields'), {
     doRedirect: false,
     onSuccess: refreshEditData,
   })
@@ -175,7 +174,7 @@ export default function Page(
 
   const onBack = ConfirmModal({
     onConfirm: () => {
-      router.visit(route(`${baseRoute}.index`))
+      router.visit(urlFor(`${baseRoute}.index`))
     },
     message: 'Are you sure you want to go back?',
     confirmText: 'Go Back',
@@ -207,9 +206,7 @@ export default function Page(
     setThumbnailUploadError(null)
     setIsUploadingThumbnail(true)
     try {
-      const uploadedMedia = await uploadImage(file, route('api.v1.media.upload').path, [
-        'blog-content',
-      ])
+      const uploadedMedia = await uploadImage(file, urlFor('api.v1.media.upload'), ['blog-content'])
       form.setFieldValue('thumbnail_id', uploadedMedia.id)
       setThumbnailPreviewUrl(uploadedMedia.url)
     } catch (error) {
@@ -397,8 +394,8 @@ export default function Page(
         onOpenChange={setMediaLibraryOpen}
         pickerType="image"
         onSelectImage={setThumbnailFromUrl}
-        getURL={route('api.v1.media.list').path}
-        deleteURL={route('api.v1.media.destroy').path}
+        getURL={urlFor('api.v1.media.list')}
+        deleteURL={urlFor('api.v1.media.destroy')}
       />
     </DashboardLayout>
   )

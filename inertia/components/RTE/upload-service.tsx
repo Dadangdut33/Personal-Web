@@ -1,9 +1,7 @@
-// Production-ready image upload service using axios
-import { MediaDto } from '#dto/media.dto'
-import Media from '#models/media'
-import { BaseAPIResponse } from '#types/api'
+import type { BaseAPIResponse } from '#types/api'
 
 import axios from 'axios'
+import type { Data } from '~data'
 
 export interface UploadedImage {
   id: string
@@ -31,7 +29,7 @@ export const getMediaLibrary = async (params: {
   search?: string
   sort?: string
   filter?: string
-}): Promise<BaseAPIResponse<MediaDto[]>> => {
+}): Promise<BaseAPIResponse<Data.Media[]>> => {
   try {
     const response = await axios.get(params.getURL, {
       params: {
@@ -62,7 +60,7 @@ export const uploadImage = async (
   uploadURL: string,
   imageTags?: string[],
   onProgress?: (progress: number) => void
-): Promise<Media> => {
+): Promise<Data.Media> => {
   // Validate file type
   if (!file.type.startsWith('image/')) {
     throw new Error('Only image files are allowed')

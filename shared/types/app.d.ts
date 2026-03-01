@@ -1,4 +1,4 @@
-import type { RouteWithName, RouteWithParams } from '@izzyjs/route/routes'
+import type { RoutesList } from '@adonisjs/core/types/http'
 
 export interface QueryBuilderParams<T extends LucidModel> {
   page?: number
@@ -64,8 +64,7 @@ export type FlashAlertType = {
   warning?: string
 }
 
-// Helper for routename type - we copy pasted it from izzyjs
-export type RouteNameType = Exclude<RouteWithName, RouteWithParams>['name']
+export type RouteNameType = keyof RoutesList['ALL']
 
 // * IMPORTANT *
 // Helper for paginated data

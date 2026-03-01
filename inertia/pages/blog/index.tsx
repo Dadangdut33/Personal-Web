@@ -1,8 +1,6 @@
-import BlogPublicController from '#controllers/blog_public.controller'
+import type { PaginationMeta } from '#types/app'
 
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import { Head, router } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
 import { Search, Sparkles } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import BlogCard from '~/components/page-components/blog/blog-card'
@@ -11,8 +9,21 @@ import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { Input } from '~/components/ui/input'
 import PublicLayout from '~/layouts/public'
+import { urlFor } from '~/lib/client'
+import { InertiaProps } from '~/types'
+import type { Data } from '~data'
 
-type PageProps = SharedProps & InferPageProps<BlogPublicController, 'view'>
+type BlogSort = 'created_desc' | 'created_asc' | 'updated_desc' | 'updated_asc'
+
+type PageProps = InertiaProps<{
+  data: Data.Blog[]
+  meta: PaginationMeta
+  filters: {
+    search: string
+    sort: BlogSort
+    per_page: number
+  }
+}>
 
 const SORT_OPTIONS = [
   { value: 'created_desc', label: 'Created: Newest' },
@@ -29,7 +40,7 @@ export default function BlogPage(props: PageProps) {
 
   const doSearch = (search: string, page = 1, sort = sortInput) => {
     router.get(
-      route('blog').path,
+      urlFor('blog'),
       {
         search,
         page,
@@ -74,7 +85,7 @@ export default function BlogPage(props: PageProps) {
 
       <PublicPageShell
         breadcrumbs={[
-          { label: 'Home', href: route('home').path },
+          { label: 'Home', href: urlFor('home') },
           { label: 'Blog', current: true },
         ]}
       >

@@ -1,8 +1,6 @@
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
-import type AuthController from '@app/controllers/auth.controller.ts'
+import { Link } from '@adonisjs/inertia/react'
 import { router } from '@inertiajs/core'
-import { Head, Link } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
+import { Head } from '@inertiajs/react'
 import { Box, Loader, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { Turnstile } from '@marsidev/react-turnstile'
@@ -14,10 +12,13 @@ import { Input } from '~/components/ui/input'
 import { Label } from '~/components/ui/label'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import AuthLayout from '~/layouts/auth'
+import { urlFor } from '~/lib/client'
 import { checkFormWithCaptcha, cn } from '~/lib/utils'
+import { InertiaProps } from '~/types'
 
 const maxWidth = 'max-w-md'
-export default function Page(props: SharedProps & InferPageProps<AuthController, 'viewLogin'>) {
+
+export default function Page(props: InertiaProps<any>) {
   const form = useForm({
     initialValues: {
       email: '',
@@ -31,7 +32,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
     },
   })
 
-  const mutation = useGenericMutation('POST', route('auth.login.post').path, {
+  const mutation = useGenericMutation('POST', urlFor('auth.login.post'), {
     onError(error, _variables, _context) {
       if (error.response?.data.form_errors) {
         form.setErrors(error.response?.data.form_errors)
@@ -85,7 +86,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
                   <Label htmlFor="password">Password*</Label>
                   {!props.hide_forgot_password && (
                     <Link
-                      href={route('auth.resetPassword', { params: { token: '' } }).path}
+                      href={urlFor('auth.resetPassword', { token: '' })}
                       className="ml-auto text-sm underline-offset-4 hover:underline"
                     >
                       Forgot your password?
@@ -129,7 +130,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
               {!props.hide_registration && (
                 <div className="text-center text-sm">
                   Don&apos;t have an account?{' '}
-                  <Link href={route('auth.register').path} className="underline underline-offset-4">
+                  <Link href={urlFor('auth.register')} className="underline underline-offset-4">
                     Sign up
                   </Link>
                 </div>

@@ -1,5 +1,5 @@
-import { ProjectDto } from '#dto/project.dto'
 import ProjectService from '#services/project.service'
+import { ProjectTransformer } from '#transformers/project.transformer'
 import { PaginationMeta } from '#types/app'
 
 import { inject } from '@adonisjs/core'
@@ -19,7 +19,7 @@ export default class ProjectPublicController {
     })
 
     return inertia.render('project/index', {
-      data: ProjectDto.collect(data.all()),
+      data: ProjectTransformer.transform(data.all()),
       meta: data.getMeta() as PaginationMeta,
       filters: {
         search,

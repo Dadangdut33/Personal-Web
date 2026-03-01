@@ -1,6 +1,6 @@
 'use client'
 
-import { AllowedImageTags } from '#validators/media'
+import type { AllowedImageTags } from '#validators/media'
 
 import { Skeleton } from '@mantine/core'
 import Link from '@tiptap/extension-link'
@@ -23,7 +23,7 @@ import { Button } from '~/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 import { cn } from '~/lib/utils'
 
-import { lowlight } from './code-languages'
+import { lowlight } from './code_languages'
 import AlertDialogButton from './components/alert/alert-dialog-button'
 import AudioDialogButton from './components/audio/audio-dialog-button'
 import FileDialogButton from './components/file/file-dialog-button'

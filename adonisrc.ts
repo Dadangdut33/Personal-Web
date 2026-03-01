@@ -1,4 +1,8 @@
+import { indexPolicies } from '@adonisjs/bouncer'
+import { indexEntities } from '@adonisjs/core'
 import { defineConfig } from '@adonisjs/core/app'
+import { indexPages } from '@adonisjs/inertia'
+import { generateRegistry } from '@tuyau/core/hooks'
 
 export default defineConfig({
   /*
@@ -30,7 +34,6 @@ export default defineConfig({
     () => import('@adonisjs/lucid/commands'),
     () => import('@adonisjs/mail/commands'),
     () => import('@adonisjs/cache/commands'),
-    () => import('@izzyjs/route/commands'),
     () => import('@adonisjs/bouncer/commands'),
   ],
 
@@ -64,9 +67,9 @@ export default defineConfig({
     () => import('@adonisjs/mail/mail_provider'),
     () => import('@adonisjs/cache/cache_provider'),
     () => import('@adonisjs/redis/redis_provider'),
-    () => import('@izzyjs/route/izzy_provider'),
     () => import('@adonisjs/bouncer/bouncer_provider'),
     () => import('@adonisjs/limiter/limiter_provider'),
+    () => import('#providers/api_providers'),
   ],
 
   /*
@@ -91,12 +94,12 @@ export default defineConfig({
   tests: {
     suites: [
       {
-        files: ['tests/unit/**/*.spec(.ts|.js)'],
+        files: ['tests/unit/**/*.spec.{ts,js}'],
         name: 'unit',
         timeout: 2000,
       },
       {
-        files: ['tests/functional/**/*.spec(.ts|.js)'],
+        files: ['tests/functional/**/*.spec.{ts,js}'],
         name: 'functional',
         timeout: 30000,
       },
@@ -124,9 +127,17 @@ export default defineConfig({
     },
   ],
 
-  assetsBundler: false,
   hooks: {
-    onBuildStarting: [() => import('@adonisjs/vite/build_hook')],
-    onDevServerStarted: [() => import('@izzyjs/route/dev_hook')],
+    init: [
+      indexEntities({
+        transformers: { enabled: true, withSharedProps: true },
+        controllers: { enabled: true },
+      }),
+      indexPages({ framework: 'react' }),
+      indexPolicies(),
+      generateRegistry(),
+    ],
+    buildStarting: [() => import('@adonisjs/vite/build_hook')],
+    devServerStarted: [],
   },
 })

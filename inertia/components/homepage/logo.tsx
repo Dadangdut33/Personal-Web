@@ -40,8 +40,6 @@ export default function Logo({
       main?.removeEventListener('mousemove', handleMouseMove)
       main?.removeEventListener('mouseleave', handleMouseLeave)
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const comp = (

@@ -1,8 +1,7 @@
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
+import { InertiaProps } from '~/types'
 import type AuthController from '@app/controllers/auth.controller.ts'
 import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
 import { Box, Loader, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useLocalStorage } from '@mantine/hooks'
@@ -21,11 +20,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/com
 import { Input } from '~/components/ui/input'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import AuthLayout from '~/layouts/auth'
+import { urlFor } from '~/lib/client'
 import { PASS_REGEX } from '~/lib/constants'
 import { checkFormWithCaptcha, cn, transformFullName, transformUsername } from '~/lib/utils'
 
 const maxWidth = 'max-w-md'
-export default function Page(props: SharedProps & InferPageProps<AuthController, 'viewRegister'>) {
+export default function Page(props: InertiaProps<any>) {
   const [_, setTimeoutVerifEmailStart] = useLocalStorage<null | number>({
     key: 'timeout_verify_email_start',
     defaultValue: null,
@@ -62,7 +62,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
     },
   })
 
-  const mutation = useGenericMutation('POST', route('auth.register.post').path, {
+  const mutation = useGenericMutation('POST', urlFor('auth.register.post'), {
     onError(error, _variables, _context) {
       if (error.response?.data.form_errors) {
         form.setErrors(error.response?.data.form_errors)
@@ -108,7 +108,7 @@ export default function Page(props: SharedProps & InferPageProps<AuthController,
         <Button
           disabled={mutation.isPending}
           onClick={() => {
-            router.visit(route('auth.login').path)
+            router.visit(urlFor('auth.login'))
           }}
         >
           {mutation.isPending ? <Loader size={16} color="black" /> : <IconArrowLeft stroke={2} />}

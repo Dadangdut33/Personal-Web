@@ -2,7 +2,7 @@ import { CopyButton, Select, Tooltip } from '@mantine/core'
 import { NodeViewContent, type NodeViewProps, NodeViewWrapper } from '@tiptap/react'
 import { Clipboard, ClipboardCheck } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
-import { CODE_LANGUAGE_OPTIONS } from '~/components/RTE/code-languages'
+import { CODE_LANGUAGE_OPTIONS } from '~/components/RTE/code_languages'
 import { Button } from '~/components/ui/button'
 
 export default function CodeBlockNodeView({ editor, node, updateAttributes }: NodeViewProps) {

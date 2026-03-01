@@ -1,6 +1,6 @@
 import { signRteMediaUrlsForOutput } from '#lib/rte_media_url'
 import { buildBlogUrlPath, toSafeSlug } from '#lib/url_slug'
-import Blog from '#models/blog'
+import type Blog from '#models/blog'
 
 import { BlogVersionDto } from './blog_version.dto.js'
 import { MediaDto } from './media.dto.js'

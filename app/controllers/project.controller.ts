@@ -1,4 +1,3 @@
-import { ProjectDto } from '#dto/project.dto'
 import {
   getMethodActName,
   getRequestFingerprint,
@@ -10,12 +9,13 @@ import {
 import Project from '#models/project'
 import ActivityLogService from '#services/activity_log.service'
 import ProjectService from '#services/project.service'
+import { ProjectTransformer } from '#transformers/project.transformer'
 import { PaginationMeta } from '#types/app'
-import { createEditProjectValidator } from '#validators/auth/project'
+import { createEditProjectValidator } from '#validators/project'
 
 import { inject } from '@adonisjs/core'
 import type { HttpContext } from '@adonisjs/core/http'
-import { route } from '@izzyjs/route/client'
+import { urlFor } from '@adonisjs/core/services/url_builder'
 
 @inject()
 export default class ProjectController {
@@ -39,7 +39,7 @@ export default class ProjectController {
     await data.load('thumbnail')
 
     return inertia.render('dashboard/project/createEdit', {
-      data: new ProjectDto(data),
+      data: ProjectTransformer.transform(data),
     })
   }
 
@@ -50,7 +50,7 @@ export default class ProjectController {
     const dataQ = await this.projectSvc.index(q)
 
     return inertia.render('dashboard/project/list', {
-      data: ProjectDto.collect(dataQ.all()),
+      data: ProjectTransformer.transform(dataQ.all()),
       meta: dataQ.getMeta() as PaginationMeta,
     })
   }
@@ -87,7 +87,7 @@ export default class ProjectController {
       return response.status(200).json({
         status: 'success',
         message: `Successfully ${getMethodActName(request)} project.`,
-        redirect_to: route('project.index').path,
+        redirect_to: urlFor('project.index'),
       })
     } catch (error) {
       return returnError(response, error, `PROJECT_${request.method()}`, { logErrors: true })

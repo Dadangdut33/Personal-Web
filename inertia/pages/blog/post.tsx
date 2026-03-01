@@ -1,8 +1,5 @@
-import BlogPublicController from '#controllers/blog_public.controller'
-
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
-import { Head, Link } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
+import { Link } from '@adonisjs/inertia/react'
+import { Head } from '@inertiajs/react'
 import { useMantineColorScheme } from '@mantine/core'
 import dayjs from 'dayjs'
 import { ArrowLeft, ArrowUp, CalendarDays, Clock3, Pin } from 'lucide-react'
@@ -14,8 +11,19 @@ import PublicPageShell from '~/components/page-components/public/public-page-she
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import PublicLayout from '~/layouts/public'
+import { urlFor } from '~/lib/client'
+import { InertiaProps } from '~/types'
+import type { Data } from '~data'
 
-type PageProps = SharedProps & InferPageProps<BlogPublicController, 'viewPost'>
+type BlogPostExtraProps = {
+  giscus_host: string
+  giscus_repo: string
+  giscus_repo_id: string
+  giscus_category: string
+  giscus_category_id: string
+}
+
+type PageProps = InertiaProps<{ data: Data.Blog }> & BlogPostExtraProps
 
 export default function BlogPostPage(props: PageProps) {
   const { data } = props
@@ -84,14 +92,14 @@ export default function BlogPostPage(props: PageProps) {
         className="px-0 sm:px-5 pt-2 sm:pt-5 pb-10"
         breadCrumbsClassName="px-5 sm:px-0"
         breadcrumbs={[
-          { label: 'Home', href: route('home').path },
-          { label: 'Blog', href: route('blog').path },
+          { label: 'Home', href: urlFor('home') },
+          { label: 'Blog', href: urlFor('blog') },
           { label: data.title, current: true, className: 'max-w-[420px] truncate' },
         ]}
       >
         <div className="mb-4 px-5 sm:px-0">
           <Button asChild variant="neutral" size="sm">
-            <Link href={route('blog').path}>
+            <Link href={urlFor('blog')}>
               <ArrowLeft className="size-4" />
               Back to blog list
             </Link>
@@ -164,7 +172,7 @@ export default function BlogPostPage(props: PageProps) {
                         className="shrink-0"
                       >
                         <Link
-                          href={`${route('projects').path}?search=${encodeURIComponent(project.title)}`}
+                          href={`${urlFor('projects')}?search=${encodeURIComponent(project.title)}`}
                         >
                           {project.title}
                         </Link>

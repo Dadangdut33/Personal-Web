@@ -1,4 +1,4 @@
-import ActivityLog from '#models/activity_log'
+import type ActivityLog from '#models/activity_log'
 
 import { UserDto } from './user.dto.js'
 

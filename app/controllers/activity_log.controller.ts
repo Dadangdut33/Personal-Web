@@ -1,6 +1,6 @@
-import { ActivityLogDto } from '#dto/activity_log.dto'
 import { mapRequestToQueryParams } from '#lib/utils'
 import ActivityLogService from '#services/activity_log.service'
+import { ActivityLogTransformer } from '#transformers/activity_log.transformer'
 import { PaginationMeta } from '#types/app'
 
 import { inject } from '@adonisjs/core'
@@ -17,7 +17,7 @@ export default class ActivityLogController {
     const dataQ = await this.activityLogSvc.index(q)
 
     return inertia.render('dashboard/activityLog/list', {
-      data: ActivityLogDto.collect(dataQ.all()),
+      data: ActivityLogTransformer.transform(dataQ.all()),
       meta: dataQ.getMeta() as PaginationMeta,
     })
   }

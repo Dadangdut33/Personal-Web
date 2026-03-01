@@ -1,8 +1,7 @@
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
+import { InertiaProps } from '~/types'
 import type AuthController from '@app/controllers/auth.controller.ts'
 import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
 import { Box, Loader, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useInterval, useLocalStorage, useTimeout } from '@mantine/hooks'
@@ -17,12 +16,13 @@ import { Input } from '~/components/ui/input'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import { useIsReady } from '~/hooks/use_is_ready'
 import AuthLayout from '~/layouts/auth'
+import { urlFor } from '~/lib/client'
 import { TIMEOUT_NORMAL } from '~/lib/constants'
 import { checkFormWithCaptcha, cn } from '~/lib/utils'
 
 const maxWidth = 'max-w-md'
 export default function Page(
-  props: SharedProps & InferPageProps<AuthController, 'viewRequestResetPassword'>
+  props: InertiaProps<any>
 ) {
   const [isTimedOut, setIsTimedOut] = useLocalStorage({
     key: 'reset_password_request_timed_out',
@@ -61,7 +61,7 @@ export default function Page(
       cf_token: (value) => (value.length > 0 ? null : 'Captcha is required'),
     },
   })
-  const mutation = useGenericMutation('POST', route('auth.requestResetPassword.post').path, {
+  const mutation = useGenericMutation('POST', urlFor('auth.requestResetPassword.post'), {
     onError(error, _variables, _context) {
       if (error.response?.data.form_errors) {
         form.setErrors(error.response?.data.form_errors)
@@ -121,7 +121,7 @@ export default function Page(
         <Button
           disabled={mutation.isPending}
           onClick={() => {
-            router.visit(route('auth.login').path)
+            router.visit(urlFor('auth.login'))
           }}
         >
           {mutation.isPending ? <Loader size={16} color="black" /> : <IconArrowLeft stroke={2} />}

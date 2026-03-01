@@ -20,8 +20,8 @@ export default function render(page: any) {
     title: (title) => (title ? `${title} - ${appName}` : appName),
     render: ReactDOMServer.renderToString,
     resolve: (name) => {
-      const pages = import.meta.glob('../pages/**/*.tsx', { eager: true })
-      return pages[`../pages/${name}.tsx`]
+      const pages = import.meta.glob('./pages/**/*.tsx', { eager: true })
+      return pages[`./pages/${name}.tsx`]
     },
     setup: ({ App, props }) => {
       return (

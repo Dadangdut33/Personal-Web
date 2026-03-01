@@ -1,7 +1,6 @@
-import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
+import { InertiaProps } from '~/types'
 import type AuthController from '@app/controllers/auth.controller.ts'
 import { Head } from '@inertiajs/react'
-import { route } from '@izzyjs/route/client'
 import { Loader, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { Turnstile } from '@marsidev/react-turnstile'
@@ -18,11 +17,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/com
 import { Input } from '~/components/ui/input'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import AuthLayout from '~/layouts/auth'
+import { urlFor } from '~/lib/client'
 import { PASS_REGEX } from '~/lib/constants'
 import { checkFormWithCaptcha, cn } from '~/lib/utils'
 
 export default function Page(
-  props: SharedProps & InferPageProps<AuthController, 'viewResetPassword'>
+  props: InertiaProps<any>
 ) {
   const form = useForm({
     initialValues: {
@@ -45,7 +45,7 @@ export default function Page(
     },
   })
   const { ConfirmModal } = useModals()
-  const mutation = useGenericMutation('POST', route('auth.resetPassword.post').path, {
+  const mutation = useGenericMutation('POST', urlFor('auth.resetPassword.post'), {
     onError(error, _variables, _context) {
       if (error.response?.data.form_errors) {
         form.setErrors(error.response?.data.form_errors)

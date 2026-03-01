@@ -1,4 +1,3 @@
-// types/filters.ts
 export interface TableFilterProps {
   column: string
   label?: string

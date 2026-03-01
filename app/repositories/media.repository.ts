@@ -4,7 +4,6 @@ import TagRepository from '#repositories/tag.repository'
 import env from '#start/env'
 
 import { MultipartFile } from '@adonisjs/core/bodyparser'
-import { cuid } from '@adonisjs/core/helpers'
 import { Disk } from '@adonisjs/drive'
 import drive from '@adonisjs/drive/services/main'
 import db from '@adonisjs/lucid/services/db'
@@ -101,7 +100,7 @@ export default class MediaRepository extends BaseRepository<typeof Media> {
     }
 
     const now = new Date().getTime()
-    const key = keyPrefix + '/' + `${now}-${cuid()}.${file.extname}`
+    const key = keyPrefix + '/' + `${now}-${crypto.randomUUID()}.${file.extname}`
     await file.moveToDisk(key, {
       name: file.clientName,
     })

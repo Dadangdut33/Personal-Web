@@ -1,5 +1,5 @@
 import { signRteMediaUrlsForOutput } from '#lib/rte_media_url'
-import BlogVersion from '#models/blog_version'
+import type BlogVersion from '#models/blog_version'
 
 import { MediaDto } from './media.dto.js'
 import { TagDto } from './tag.dto.js'

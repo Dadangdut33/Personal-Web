@@ -1,4 +1,4 @@
-import { GlobalEvent } from '@inertiajs/core'
+import type { GlobalEvent } from '@inertiajs/core'
 import { router } from '@inertiajs/react'
 import { nprogress } from '@mantine/nprogress'
 import { isEmpty } from 'lodash-es'

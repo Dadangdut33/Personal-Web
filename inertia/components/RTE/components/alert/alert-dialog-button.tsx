@@ -129,7 +129,7 @@ export default function AlertDialogButton({ editor }: { editor: Editor | null })
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               placeholder="Alert message..."
-              minRows={4}
+              rows={4}
             />
           </div>
         </div>

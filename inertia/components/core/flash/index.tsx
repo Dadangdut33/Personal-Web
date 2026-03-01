@@ -1,4 +1,4 @@
-import { FlashAlertType } from '#types/app'
+import type { FlashAlertType } from '#types/app'
 
 import { Alert, AlertProps, MantineSpacing, Stack, StyleProp } from '@mantine/core'
 import { useTimeout } from '@mantine/hooks'
