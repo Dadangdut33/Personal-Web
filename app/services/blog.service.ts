@@ -72,6 +72,32 @@ export default class BlogService {
     return this.repo.paginate(q, { page, perPage })
   }
 
+  async publicSearchSuggestions({ search = '', limit = 8 }: { search?: string; limit?: number }) {
+    const keyword = search.trim()
+    if (!keyword) return []
+
+    const q = this.repo.query({
+      search: keyword,
+      filters: { is_active: true },
+      searchableCol: ['title', 'description', 'slug_id'],
+      select: ['id', 'title', 'slug_id', 'description', 'updated_at'],
+    })
+
+    q.orderBy('is_pinned', 'desc')
+      .orderBy('updated_at', 'desc')
+      .limit(Math.min(Math.max(limit, 1), 20))
+
+    const rows = await q
+    return rows.map((item) => ({
+      id: item.id,
+      title: item.title,
+      slug_id: item.slug_id,
+      description: item.description,
+      url_path: buildBlogUrlPath(item.title, item.slug_id),
+      updated_at: item.updated_at,
+    }))
+  }
+
   async publicFindBySegment(segment: string) {
     const normalized = segment.trim()
     if (!normalized) return null

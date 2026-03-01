@@ -93,6 +93,22 @@ export default class BlogPublicController {
     })
   }
 
+  async searchAPI({ request, response }: HttpContext) {
+    const search = String(request.input('q', '')).trim()
+    const limit = Math.min(Math.max(Number(request.input('limit', 8)) || 8, 1), 20)
+
+    const data = await this.blogSvc.publicSearchSuggestions({
+      search,
+      limit,
+    })
+
+    return response.ok({
+      status: 'success',
+      message: 'Blog search fetched',
+      data,
+    })
+  }
+
   async viewPost({ inertia, params, response }: HttpContext) {
     const segment = String(params.segment || '').trim()
     if (!segment) return throwNotFound()

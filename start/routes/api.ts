@@ -23,6 +23,14 @@ router
                   .as('api.v1.media.redirect') // this route need signed URL for access. use router
               })
               .prefix('/media')
+
+            router
+              .group(() => {
+                router
+                  .get('/search', [BlogPublicController, 'searchAPI'])
+                  .as('api.v1.public.blog.search')
+              })
+              .prefix('/blog')
           })
           .prefix('/public')
 

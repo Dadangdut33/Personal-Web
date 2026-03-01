@@ -601,6 +601,17 @@ export interface Registry {
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/media.controller').default['redirectMediaAPI']>>>
     }
   }
+  'api.v1.public.blog.search': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/public/blog/search'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog_public.controller').default['searchAPI']>>>
+    }
+  }
   'api.v1.me.avatar': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/me/avatar'

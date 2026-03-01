@@ -58,6 +58,7 @@ export type ScannedRoutes = {
     'blog.post': { paramsTuple: [ParamValue]; params: {'segment': ParamValue} }
     'projects': { paramsTuple?: []; params?: {} }
     'api.v1.media.redirect': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'api.v1.public.blog.search': { paramsTuple?: []; params?: {} }
     'api.v1.me.avatar': { paramsTuple?: []; params?: {} }
     'api.v1.media.list': { paramsTuple?: []; params?: {} }
     'api.v1.media.upload': { paramsTuple?: []; params?: {} }
@@ -106,6 +107,7 @@ export type ScannedRoutes = {
     'blog.post': { paramsTuple: [ParamValue]; params: {'segment': ParamValue} }
     'projects': { paramsTuple?: []; params?: {} }
     'api.v1.media.redirect': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'api.v1.public.blog.search': { paramsTuple?: []; params?: {} }
     'api.v1.me.avatar': { paramsTuple?: []; params?: {} }
     'api.v1.media.list': { paramsTuple?: []; params?: {} }
     'api.v1.blog.viewCount': { paramsTuple: [ParamValue]; params: {'slugId': ParamValue} }
@@ -146,6 +148,7 @@ export type ScannedRoutes = {
     'blog.post': { paramsTuple: [ParamValue]; params: {'segment': ParamValue} }
     'projects': { paramsTuple?: []; params?: {} }
     'api.v1.media.redirect': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'api.v1.public.blog.search': { paramsTuple?: []; params?: {} }
     'api.v1.me.avatar': { paramsTuple?: []; params?: {} }
     'api.v1.media.list': { paramsTuple?: []; params?: {} }
     'api.v1.blog.viewCount': { paramsTuple: [ParamValue]; params: {'slugId': ParamValue} }

@@ -84,6 +84,11 @@ export interface ApiDefinition {
         upload: typeof routes['api.v1.media.upload']
         destroy: typeof routes['api.v1.media.destroy']
       }
+      public: {
+        blog: {
+          search: typeof routes['api.v1.public.blog.search']
+        }
+      }
       me: {
         avatar: typeof routes['api.v1.me.avatar']
       }

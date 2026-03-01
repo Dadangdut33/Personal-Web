@@ -1,8 +1,12 @@
 'use client'
 
+import type { BaseAPIResponse } from '#types/api'
+
+import { Link } from '@adonisjs/inertia/react'
 import { router } from '@inertiajs/core'
+import { useDebouncedValue } from '@mantine/hooks'
 import { Search as SearchIcon } from 'lucide-react'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { Button } from '~/components/ui/button'
 import {
   CommandDialog,
@@ -13,17 +17,34 @@ import {
   CommandList,
   CommandSeparator,
 } from '~/components/ui/command'
+import { api } from '~/lib/axios'
+import { urlFor } from '~/lib/client'
 import { NAVIGATION_LINKS } from '~/lib/constants'
 
-export default function Search() {
-  const DOCS_LINKS = [
-    {
-      heading: 'Navigation',
-      links: [...NAVIGATION_LINKS],
-    },
-  ]
+type BlogSearchItem = {
+  id: string
+  title: string
+  slug_id: string
+  description: string | null
+  url_path: string
+}
 
+export default function Search() {
   const [open, setOpen] = useState(false)
+  const [query, setQuery] = useState('')
+  const [isSearching, setIsSearching] = useState(false)
+  const [blogResults, setBlogResults] = useState<BlogSearchItem[]>([])
+  const [debouncedQuery] = useDebouncedValue(query.trim(), 300)
+
+  const sections = useMemo(() => {
+    if (query.trim().length > 0) return []
+    return [
+      {
+        heading: 'Navigation',
+        links: [...NAVIGATION_LINKS.map((item) => ({ text: item.text, href: item.href }))],
+      },
+    ]
+  }, [query])
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -36,10 +57,40 @@ export default function Search() {
     return () => document.removeEventListener('keydown', down)
   }, [])
 
-  const runCommand = useCallback((command: () => unknown) => {
-    setOpen(false)
-    command()
-  }, [])
+  useEffect(() => {
+    if (!open) return
+
+    const keyword = debouncedQuery
+    if (keyword.length < 2) {
+      setBlogResults([])
+      setIsSearching(false)
+      return
+    }
+
+    const controller = new AbortController()
+    setIsSearching(true)
+
+    api
+      .get<BaseAPIResponse<BlogSearchItem[]>>(urlFor('api.v1.public.blog.search'), {
+        params: { q: keyword, limit: 8 },
+        signal: controller.signal,
+      })
+      .then((response) => {
+        setBlogResults(response.data.data || [])
+      })
+      .catch((error) => {
+        if (error?.code !== 'ERR_CANCELED') {
+          setBlogResults([])
+        }
+      })
+      .finally(() => {
+        setIsSearching(false)
+      })
+
+    return () => {
+      controller.abort()
+    }
+  }, [debouncedQuery, open])
 
   return (
     <>
@@ -56,29 +107,42 @@ export default function Search() {
           ⌘ K
         </span>
       </Button>
-      <CommandDialog title="Search navigation / blog post" open={open} onOpenChange={setOpen}>
-        <CommandInput placeholder="Search navigation / blog post..." />
+      <CommandDialog title="Search" open={open} onOpenChange={setOpen}>
+        <CommandInput placeholder="Search blog posts..." value={query} onValueChange={setQuery} />
         <CommandList className="command-scrollbar **:data-[slot=command-item]:py-1.5!">
-          <CommandEmpty>No results found.</CommandEmpty>
-          {DOCS_LINKS.map(({ heading, links }, i) => {
+          <CommandEmpty>
+            {query.trim().length > 0 ? 'No blog posts found.' : 'No results found.'}
+          </CommandEmpty>
+          {query.trim().length > 0 && (
+            <CommandGroup heading={isSearching ? 'Searching...' : 'Blog Posts'}>
+              {blogResults.map((item) => {
+                const subtitle = item.description?.trim() || item.url_path
+                return (
+                  <Link href={item.url_path} key={item.id}>
+                    <CommandItem value={`${item.title} ${subtitle}`}>
+                      <div className="min-w-0">
+                        <p className="truncate">{item.title}</p>
+                        <p className="text-muted-foreground text-xs truncate">{subtitle}</p>
+                      </div>
+                    </CommandItem>
+                  </Link>
+                )
+              })}
+            </CommandGroup>
+          )}
+          {sections.map(({ heading, links }, i) => {
             return (
               <React.Fragment key={heading}>
                 <CommandGroup heading={heading}>
                   {links.map(({ text, href }) => {
                     return (
-                      <CommandItem
-                        value={text}
-                        onSelect={() => {
-                          runCommand(() => router.push({ url: href }))
-                        }}
-                        key={href}
-                      >
-                        {text}
-                      </CommandItem>
+                      <Link href={href} key={href}>
+                        <CommandItem value={text}>{text}</CommandItem>
+                      </Link>
                     )
                   })}
                 </CommandGroup>
-                {i < 2 && <CommandSeparator />}
+                {i < sections.length - 1 && <CommandSeparator />}
               </React.Fragment>
             )
           })}

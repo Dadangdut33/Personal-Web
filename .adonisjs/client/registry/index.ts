@@ -330,6 +330,12 @@ const routes = {
     tokens: [{"old":"/api/v1/public/media/redirect/:id","type":0,"val":"api","end":""},{"old":"/api/v1/public/media/redirect/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/public/media/redirect/:id","type":0,"val":"public","end":""},{"old":"/api/v1/public/media/redirect/:id","type":0,"val":"media","end":""},{"old":"/api/v1/public/media/redirect/:id","type":0,"val":"redirect","end":""},{"old":"/api/v1/public/media/redirect/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['api.v1.media.redirect']['types'],
   },
+  'api.v1.public.blog.search': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/public/blog/search',
+    tokens: [{"old":"/api/v1/public/blog/search","type":0,"val":"api","end":""},{"old":"/api/v1/public/blog/search","type":0,"val":"v1","end":""},{"old":"/api/v1/public/blog/search","type":0,"val":"public","end":""},{"old":"/api/v1/public/blog/search","type":0,"val":"blog","end":""},{"old":"/api/v1/public/blog/search","type":0,"val":"search","end":""}],
+    types: placeholder as Registry['api.v1.public.blog.search']['types'],
+  },
   'api.v1.me.avatar': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/me/avatar',
