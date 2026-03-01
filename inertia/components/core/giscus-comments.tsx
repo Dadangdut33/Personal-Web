@@ -8,12 +8,9 @@ type GiscusCommentsProps = {
   repoId?: string
   category?: string
   categoryId?: string
-  mapping?: string
-  strict?: string
-  reactionsEnabled?: string
-  inputPosition?: string
   theme?: string
   lang?: string
+  termMapping: string
 }
 
 export default function GiscusComments({
@@ -22,10 +19,7 @@ export default function GiscusComments({
   repoId,
   category,
   categoryId,
-  mapping = 'pathname',
-  strict = '0',
-  reactionsEnabled = '1',
-  inputPosition = 'top',
+  termMapping,
   theme = 'preferred_color_scheme',
   lang = 'en',
 }: GiscusCommentsProps) {
@@ -41,30 +35,20 @@ export default function GiscusComments({
     script.src = `${normalizedHost}/client.js`
     script.async = true
     script.crossOrigin = 'anonymous'
+    script.setAttribute('data-term', termMapping)
+    script.setAttribute('data-mapping', 'specific')
+    script.setAttribute('data-reactions-enabled', '1')
+    script.setAttribute('data-emit-metadata', '1')
+    script.setAttribute('data-input-position', 'top')
+    script.setAttribute('data-strict', '0')
+    script.setAttribute('data-lang', lang)
     script.setAttribute('data-repo', repo)
     script.setAttribute('data-repo-id', repoId)
     script.setAttribute('data-category', category)
     script.setAttribute('data-category-id', categoryId)
-    script.setAttribute('data-mapping', mapping)
-    script.setAttribute('data-strict', strict)
-    script.setAttribute('data-reactions-enabled', reactionsEnabled)
-    script.setAttribute('data-input-position', inputPosition)
     script.setAttribute('data-theme', theme)
-    script.setAttribute('data-lang', lang)
     containerRef.current.appendChild(script)
-  }, [
-    host,
-    repo,
-    repoId,
-    category,
-    categoryId,
-    mapping,
-    strict,
-    reactionsEnabled,
-    inputPosition,
-    theme,
-    lang,
-  ])
+  }, [host, repo, repoId, category, categoryId, termMapping, theme, lang])
 
   if (!repo || !repoId || !category || !categoryId) return null
   return <div ref={containerRef} />

@@ -21,11 +21,6 @@ export default class BlogPublicController {
       giscus_category: env.get('GISCUS_CATEGORY'),
       giscus_category_id: env.get('GISCUS_CATEGORY_ID'),
       giscus_mapping: env.get('GISCUS_MAPPING'),
-      giscus_strict: env.get('GISCUS_STRICT'),
-      giscus_reactions_enabled: env.get('GISCUS_REACTIONS_ENABLED'),
-      giscus_input_position: env.get('GISCUS_INPUT_POSITION'),
-      giscus_theme: env.get('GISCUS_THEME'),
-      giscus_lang: env.get('GISCUS_LANG'),
     }
   }
 

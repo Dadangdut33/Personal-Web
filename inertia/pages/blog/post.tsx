@@ -3,6 +3,7 @@ import BlogPublicController from '#controllers/blog_public.controller'
 import { InferPageProps, SharedProps } from '@adonisjs/inertia/types'
 import { Head, Link } from '@inertiajs/react'
 import { route } from '@izzyjs/route/client'
+import { useMantineColorScheme } from '@mantine/core'
 import dayjs from 'dayjs'
 import { ArrowLeft, ArrowUp, CalendarDays, Clock3, Pin } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -21,6 +22,7 @@ export default function BlogPostPage(props: PageProps) {
   const articleRef = useRef<HTMLElement | null>(null)
   const [readProgress, setReadProgress] = useState(0)
   const [showScrollTop, setShowScrollTop] = useState(false)
+  const { colorScheme } = useMantineColorScheme()
 
   useEffect(() => {
     const updateProgress = () => {
@@ -187,12 +189,8 @@ export default function BlogPostPage(props: PageProps) {
             repoId={props.giscus_repo_id}
             category={props.giscus_category}
             categoryId={props.giscus_category_id}
-            mapping={props.giscus_mapping}
-            strict={props.giscus_strict}
-            reactionsEnabled={props.giscus_reactions_enabled}
-            inputPosition={props.giscus_input_position}
-            theme={props.giscus_theme}
-            lang={props.giscus_lang}
+            termMapping={data.slug_id}
+            theme={colorScheme === 'dark' ? 'dark' : 'light'}
           />
         </section>
       </PublicPageShell>
