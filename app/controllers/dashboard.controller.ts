@@ -5,7 +5,7 @@ import { inject } from '@adonisjs/core'
 import { HttpContext } from '@adonisjs/core/http'
 
 @inject()
-export default class HomeController {
+export default class DashboardController {
   constructor(protected dashboardSvc: DashboardService) {}
 
   async view({ inertia, bouncer, auth, request }: HttpContext) {

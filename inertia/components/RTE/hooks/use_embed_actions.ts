@@ -1,7 +1,7 @@
 import type { Editor } from '@tiptap/react'
-import axios from 'axios'
 import { NodeSelection } from 'prosemirror-state'
 import { useCallback, useEffect, useState } from 'react'
+import { api } from '~/lib/axios'
 import { urlFor } from '~/lib/client'
 
 type LinkMetadata = {
@@ -104,7 +104,7 @@ export default function useEmbedActions(editor: Editor | null) {
     setIsFetchingLinkMetadata(true)
     setLinkMetadataError(null)
     try {
-      const response = await axios.get(urlFor('api.v1.utils.link-metadata'), {
+      const response = await api.get(urlFor('api.v1.utils.link-metadata'), {
         params: { url: normalizedUrl },
       })
       const data = response.data?.data
@@ -143,7 +143,7 @@ export default function useEmbedActions(editor: Editor | null) {
     setIsFetchingYoutubeMetadata(true)
     setYoutubeMetadataError(null)
     try {
-      const { data } = await axios.get('https://noembed.com/embed', {
+      const { data } = await api.get('https://noembed.com/embed', {
         params: { url: normalizedUrl },
       })
       setYoutubeMetadata({

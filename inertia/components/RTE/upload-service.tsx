@@ -1,6 +1,7 @@
 import type { BaseAPIResponse } from '#types/api'
 
 import axios from 'axios'
+import { api } from '~/lib/axios'
 import type { Data } from '~data'
 
 export interface UploadedImage {
@@ -31,7 +32,7 @@ export const getMediaLibrary = async (params: {
   filter?: string
 }): Promise<BaseAPIResponse<Data.Media[]>> => {
   try {
-    const response = await axios.get(params.getURL, {
+    const response = await api.get(params.getURL, {
       params: {
         page: params.page,
         per_page: params.per_page,

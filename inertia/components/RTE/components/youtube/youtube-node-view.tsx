@@ -1,11 +1,11 @@
 import { type NodeViewProps, NodeViewWrapper } from '@tiptap/react'
-import axios from 'axios'
 import { Loader2, Pencil, RefreshCw, Save, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent } from '~/components/ui/card'
 import { Input } from '~/components/ui/input'
+import { api } from '~/lib/axios'
 import { cn } from '~/lib/utils'
 
 type Size = 'sm' | 'md' | 'lg'
@@ -190,7 +190,7 @@ export default function YoutubeNodeView({ node, editor, updateAttributes }: Node
     setIsFetching(true)
     setFetchError(null)
     try {
-      const { data } = await axios.get('https://noembed.com/embed', {
+      const { data } = await api.get('https://noembed.com/embed', {
         params: { url: normalizedUrl },
       })
       const nextTitle = typeof data.title === 'string' ? data.title : null
