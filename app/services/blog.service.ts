@@ -25,6 +25,8 @@ export default class BlogService {
     if (!preload.includes('tags')) preload.push('tags')
     if (!preload.includes('projects')) preload.push('projects')
     if (!preload.includes('thumbnail')) preload.push('thumbnail')
+    if (!preload.includes('author')) preload.push('author')
+    if (!preload.includes('editor')) preload.push('editor')
     const exclude = Array.from(new Set([...(queryParams.exclude || []), 'content']))
 
     const q = this.repo.query({
@@ -32,6 +34,8 @@ export default class BlogService {
       preload,
       exclude,
     })
+    q.preload('author', (authorQuery) => authorQuery.preload('profile'))
+    q.preload('editor', (editorQuery) => editorQuery.preload('profile'))
 
     return await this.repo.paginate(q, queryParams)
   }
@@ -59,6 +63,8 @@ export default class BlogService {
       searchRelations: [{ relation: 'tags', columns: ['name'] }],
       exclude: ['content'],
     })
+    q.preload('author', (authorQuery) => authorQuery.preload('profile'))
+    q.preload('editor', (editorQuery) => editorQuery.preload('profile'))
 
     // Always prioritize featured posts, then apply selected sort.
     q.orderBy('is_pinned', 'desc').orderBy(sortBy, sortDirection)
@@ -77,6 +83,8 @@ export default class BlogService {
       .preload('thumbnail')
       .preload('tags')
       .preload('projects')
+      .preload('author', (authorQuery) => authorQuery.preload('profile'))
+      .preload('editor', (editorQuery) => editorQuery.preload('profile'))
       .first()
 
     if (!blog) return null
@@ -92,9 +100,10 @@ export default class BlogService {
     }
   }
 
-  async createUpdate(data: BlogUpsertPayload) {
+  async createUpdate(data: BlogUpsertPayload, actorId?: string) {
     return this.repo.updateOrCreateBlog({
       ...data,
+      ...(actorId ? { actor_id: actorId } : {}),
       content: data.content ? normalizeRteMediaUrlsForSave(data.content) : data.content,
     })
   }
@@ -189,12 +198,17 @@ export default class BlogService {
     return enriched
   }
 
-  async revertToRevision(blogId: string, revisionId: string) {
-    return this.repo.revertToRevision(blogId, revisionId)
+  async revertToRevision(blogId: string, revisionId: string, actorId?: string) {
+    return this.repo.revertToRevision(blogId, revisionId, actorId)
   }
 
-  async revertFieldsToRevision(blogId: string, revisionId: string, fields: RevertableBlogField[]) {
-    return this.repo.revertFieldsToRevision(blogId, revisionId, fields)
+  async revertFieldsToRevision(
+    blogId: string,
+    revisionId: string,
+    fields: RevertableBlogField[],
+    actorId?: string
+  ) {
+    return this.repo.revertFieldsToRevision(blogId, revisionId, fields, actorId)
   }
 
   async deleteRevision(blogId: string, revisionId: string) {

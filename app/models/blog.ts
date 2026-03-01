@@ -18,6 +18,7 @@ import BlogVersion from './blog_version.js'
 import Media from './media.js'
 import Project from './project.js'
 import Tag from './tag.js'
+import User from './user.js'
 
 export default class Blog extends BaseModel {
   static namingStrategy = new SnakeCaseNamingStrategy()
@@ -44,6 +45,12 @@ export default class Blog extends BaseModel {
   @column()
   declare description: string | null
 
+  @column()
+  declare author_id: string | null
+
+  @column()
+  declare editor_id: string | null
+
   @column({
     prepare: (value) => (typeof value === 'string' ? value : JSON.stringify(value)),
     consume: (value) => {
@@ -59,6 +66,16 @@ export default class Blog extends BaseModel {
     foreignKey: 'thumbnail_id',
   })
   declare thumbnail: BelongsTo<typeof Media>
+
+  @belongsTo(() => User, {
+    foreignKey: 'author_id',
+  })
+  declare author: BelongsTo<typeof User>
+
+  @belongsTo(() => User, {
+    foreignKey: 'editor_id',
+  })
+  declare editor: BelongsTo<typeof User>
 
   @manyToMany(() => Project, {
     pivotTable: Tables.BLOGS_PROJECTS,

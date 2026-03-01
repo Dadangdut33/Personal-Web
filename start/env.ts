@@ -85,6 +85,7 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   // Postgres
   DB_POSTGRES_URL: Env.schema.string.optional(),
+  DB_POSTGRES_CA: Env.schema.string.optional(),
 
   // Turso
   DB_TURSO_URL: Env.schema.string.optional(),

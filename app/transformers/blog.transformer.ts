@@ -8,6 +8,7 @@ import { BlogVersionTransformer } from './blog_version.transformer.js'
 import { MediaTransformer } from './media.transformer.js'
 import { ProjectTransformer } from './project.transformer.js'
 import { TagTransformer } from './tag.transformer.js'
+import { UserShortTransformer } from './user_short.transformer.js'
 
 export class BlogTransformer extends BaseTransformer<Blog & { view_count?: number | null }> {
   toObject() {
@@ -22,6 +23,8 @@ export class BlogTransformer extends BaseTransformer<Blog & { view_count?: numbe
       is_active: this.resource.is_active,
       is_pinned: this.resource.is_pinned,
       thumbnail_id: this.resource.thumbnail_id,
+      author_id: this.resource.author_id,
+      editor_id: this.resource.editor_id,
       description: this.resource.description,
       content: signRteMediaUrlsForOutput(this.resource.content),
       tags: TagTransformer.transform(this.whenLoaded(this.resource.tags)),
@@ -30,6 +33,8 @@ export class BlogTransformer extends BaseTransformer<Blog & { view_count?: numbe
       thumbnail: MediaTransformer.transform(this.whenLoaded(this.resource.thumbnail)),
       projects: ProjectTransformer.transform(this.whenLoaded(this.resource.projects)),
       versions: BlogVersionTransformer.transform(this.whenLoaded(this.resource.versions)),
+      author: UserShortTransformer.transform(this.whenLoaded(this.resource.author)),
+      editor: UserShortTransformer.transform(this.whenLoaded(this.resource.editor)),
       view_count: this.resource.view_count ?? null,
     }
   }

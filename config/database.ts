@@ -9,12 +9,18 @@ const dbConfig = defineConfig({
       client: 'pg',
       connection: {
         connectionString: env.get('DB_POSTGRES_URL') ?? '', // e.g
+        ssl: {
+          ca: env.get('DB_POSTGRES_CA') ?? '',
+          rejectUnauthorized: false,
+        },
       },
       migrations: {
         naturalSort: true,
         paths: ['database/migrations'],
       },
     },
+
+    // if you use turso, you must setup redis or set the limiter to memory only
     turso: {
       client: 'libsql',
       connection: {

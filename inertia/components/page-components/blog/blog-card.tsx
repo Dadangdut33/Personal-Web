@@ -4,8 +4,10 @@ import { ArrowRight, CalendarDays, Clock3, Pin } from 'lucide-react'
 import HorizontalDragScroll from '~/components/core/horizontal-drag-scroll'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
+import { cn } from '~/lib/utils'
 import type { Data } from '~data'
 
+import BlogContributors from './blog-contributors'
 import BlogViewCount from './blog-view-count'
 
 type BlogCardProps = {
@@ -78,13 +80,16 @@ export default function BlogCard({ blog, variant = 'default' }: BlogCardProps) {
         </div>
 
         {!isCompact && (
-          <div className={`${isCompact ? 'mt-3' : 'mt-4'}`}>
+          <div className={cn('flex justify-between', `${isCompact ? 'mt-3' : 'mt-4'}`)}>
             <Button asChild size="sm">
               <div>
                 Read post
                 <ArrowRight className="blog-read-arrow size-4" />
               </div>
             </Button>
+            <div className="ms-auto">
+              <BlogContributors author={blog.author} editor={blog.editor} className={'mt-3'} />
+            </div>
           </div>
         )}
       </div>

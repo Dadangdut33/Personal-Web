@@ -1,12 +1,14 @@
 import { Link } from '@adonisjs/inertia/react'
 import { Head } from '@inertiajs/react'
-import { useMantineColorScheme } from '@mantine/core'
+import { Tooltip, useMantineColorScheme } from '@mantine/core'
 import dayjs from 'dayjs'
-import { ArrowLeft, ArrowUp, CalendarDays, Clock3, Pin } from 'lucide-react'
+import { ArrowLeft, ArrowUp, CalendarDays, Pin } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import TiptapEditor from '~/components/RTE'
 import GiscusComments from '~/components/core/giscus-comments'
 import HorizontalDragScroll from '~/components/core/horizontal-drag-scroll'
+import BlogContributors from '~/components/page-components/blog/blog-contributors'
+import BlogViewCount from '~/components/page-components/blog/blog-view-count'
 import PublicPageShell from '~/components/page-components/public/public-page-shell'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
@@ -134,14 +136,16 @@ export default function BlogPostPage(props: PageProps) {
             {data.description ? <p className="text-foreground/80">{data.description}</p> : null}
 
             <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-foreground/70">
-              <span className="inline-flex items-center gap-1">
-                <CalendarDays className="size-3.5" />
-                {data.created_at ? dayjs(data.created_at).format('YYYY-MM-DD') : '-'}
-              </span>
-              <span className="inline-flex items-center gap-1">
-                <Clock3 className="size-3.5" />
-                {data.updated_at ? dayjs(data.updated_at).format('YYYY-MM-DD') : '-'}
-              </span>
+              <BlogContributors author={data.author} editor={data.editor} />
+              <Tooltip
+                label={`Updated at: ${data.updated_at ? dayjs(data.updated_at).format('YYYY-MM-DD') : '-'}`}
+              >
+                <span className="inline-flex items-center gap-1">
+                  <CalendarDays className="size-3.5" />
+                  {data.created_at ? dayjs(data.created_at).format('YYYY-MM-DD') : '-'}
+                </span>
+              </Tooltip>
+              <BlogViewCount slugId={data.slug_id} urlPath={data.url_path} />
             </div>
 
             {data.tags?.length ? (

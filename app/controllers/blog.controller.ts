@@ -52,6 +52,8 @@ export default class BlogController {
     await data.load('tags')
     await data.load('projects')
     await data.load('thumbnail')
+    await data.load('author', (authorQuery) => authorQuery.preload('profile'))
+    await data.load('editor', (editorQuery) => editorQuery.preload('profile'))
     const versions = await this.blogSvc.versions(id)
     data.$setRelated('versions', versions)
 
@@ -85,7 +87,7 @@ export default class BlogController {
       if (request.method() === 'POST') {
         await bouncer.with('BlogPolicy').authorize('create', request)
 
-        const created = await this.blogSvc.createUpdate(payload)
+        const created = await this.blogSvc.createUpdate(payload, auth.user!.id)
         await this.activityLogSvc.log(
           auth.user!.id,
           'create_blog',
@@ -95,7 +97,7 @@ export default class BlogController {
       } else if (request.method() === 'PATCH') {
         await bouncer.with('BlogPolicy').authorize('update', request)
 
-        const updated = await this.blogSvc.createUpdate(payload)
+        const updated = await this.blogSvc.createUpdate(payload, auth.user!.id)
         await this.activityLogSvc.log(
           auth.user!.id,
           'update_blog',
@@ -176,7 +178,11 @@ export default class BlogController {
         return response.badRequest('Blog id and revision id are required')
       }
 
-      const updated = await this.blogSvc.revertToRevision(String(id), String(revisionId))
+      const updated = await this.blogSvc.revertToRevision(
+        String(id),
+        String(revisionId),
+        auth.user!.id
+      )
       await this.activityLogSvc.log(
         auth.user!.id,
         'rollback_blog_revision',
@@ -222,7 +228,8 @@ export default class BlogController {
       const updated = await this.blogSvc.revertFieldsToRevision(
         String(id),
         String(revisionId),
-        fields
+        fields,
+        auth.user!.id
       )
       await this.activityLogSvc.log(
         auth.user!.id,

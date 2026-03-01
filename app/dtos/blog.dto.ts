@@ -6,6 +6,7 @@ import { BlogVersionDto } from './blog_version.dto.js'
 import { MediaDto } from './media.dto.js'
 import { ProjectDto } from './project.dto.js'
 import { TagDto } from './tag.dto.js'
+import { UserShortDto } from './user_short.dto.js'
 
 export class BlogDto {
   readonly id: string
@@ -16,6 +17,8 @@ export class BlogDto {
   readonly is_active: boolean
   readonly is_pinned: boolean
   readonly thumbnail_id: string | null
+  readonly author_id: string | null
+  readonly editor_id: string | null
   readonly description: string | null
   readonly content: Record<string, any>
   readonly tags?: TagDto[]
@@ -24,6 +27,8 @@ export class BlogDto {
   readonly thumbnail?: MediaDto
   readonly projects?: ProjectDto[]
   readonly versions?: BlogVersionDto[]
+  readonly author?: UserShortDto
+  readonly editor?: UserShortDto
 
   constructor(blog: Blog) {
     const safeTitle = toSafeSlug(blog.title)
@@ -36,6 +41,8 @@ export class BlogDto {
     this.is_active = blog.is_active
     this.is_pinned = blog.is_pinned
     this.thumbnail_id = blog.thumbnail_id
+    this.author_id = blog.author_id
+    this.editor_id = blog.editor_id
     this.description = blog.description
     this.content = signRteMediaUrlsForOutput(blog.content)
     this.tags = blog.tags ? TagDto.collect(blog.tags) : undefined
@@ -44,6 +51,8 @@ export class BlogDto {
     this.thumbnail = blog.thumbnail ? new MediaDto(blog.thumbnail) : undefined
     this.projects = blog.projects ? ProjectDto.collect(blog.projects) : undefined
     this.versions = blog.versions ? BlogVersionDto.collect(blog.versions) : undefined
+    this.author = blog.author ? new UserShortDto(blog.author) : undefined
+    this.editor = blog.editor ? new UserShortDto(blog.editor) : undefined
   }
 
   static collect(blogs: Blog[]): BlogDto[] {

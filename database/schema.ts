@@ -78,7 +78,7 @@ export class BlogVersionTagSchema extends BaseModel {
 }
 
 export class BlogVersionSchema extends BaseModel {
-  static $columns = ['id', 'blogId', 'version', 'changeType', 'slugId', 'title', 'thumbnailId', 'description', 'content', 'changedFields', 'createdAt', 'updatedAt', 'isActive', 'isPinned'] as const
+  static $columns = ['id', 'blogId', 'version', 'changeType', 'slugId', 'title', 'thumbnailId', 'description', 'content', 'changedFields', 'createdAt', 'updatedAt', 'isActive', 'isPinned', 'authorId', 'editorId'] as const
   $columns = BlogVersionSchema.$columns
   @column({ isPrimary: true })
   declare id: string
@@ -108,10 +108,14 @@ export class BlogVersionSchema extends BaseModel {
   declare isActive: boolean
   @column()
   declare isPinned: boolean
+  @column()
+  declare authorId: string | null
+  @column()
+  declare editorId: string | null
 }
 
 export class BlogSchema extends BaseModel {
-  static $columns = ['id', 'slugId', 'title', 'thumbnailId', 'description', 'content', 'tags', 'createdAt', 'updatedAt', 'isActive', 'isPinned'] as const
+  static $columns = ['id', 'slugId', 'title', 'thumbnailId', 'description', 'content', 'tags', 'createdAt', 'updatedAt', 'isActive', 'isPinned', 'authorId', 'editorId'] as const
   $columns = BlogSchema.$columns
   @column({ isPrimary: true })
   declare id: string
@@ -135,6 +139,10 @@ export class BlogSchema extends BaseModel {
   declare isActive: boolean
   @column()
   declare isPinned: boolean
+  @column()
+  declare authorId: string | null
+  @column()
+  declare editorId: string | null
 }
 
 export class BlogsProjectSchema extends BaseModel {

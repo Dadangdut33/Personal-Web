@@ -8,7 +8,6 @@
 /// <reference path="../../config/cache.ts" />
 /// <reference path="../../config/drive.ts" />
 /// <reference path="../../config/hash.ts" />
-/// <reference path="../../config/izzyjs.ts" />
 /// <reference path="../../config/limiter.ts" />
 /// <reference path="../../config/logger.ts" />
 /// <reference path="../../config/mail.ts" />

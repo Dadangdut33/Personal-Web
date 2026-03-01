@@ -16,6 +16,7 @@ import type ProjectTransformer from '#transformers/project.transformer'
 import type RoleTransformer from '#transformers/role.transformer'
 import type TagTransformer from '#transformers/tag.transformer'
 import type TokenTransformer from '#transformers/token.transformer'
+import type UserShortTransformer from '#transformers/user_short.transformer'
 import type UserTransformer from '#transformers/user.transformer'
 import type InertiaMiddleware from '#middleware/inertia_middleware'
 
@@ -59,6 +60,10 @@ export namespace Data {
   export type Token = InferData<TokenTransformer>
   export namespace Token {
     export type Variants = InferVariants<TokenTransformer>
+  }
+  export type UserShort = InferData<UserShortTransformer>
+  export namespace UserShort {
+    export type Variants = InferVariants<UserShortTransformer>
   }
   export type User = InferData<UserTransformer>
   export namespace User {

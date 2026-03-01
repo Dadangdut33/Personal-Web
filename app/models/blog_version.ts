@@ -9,6 +9,7 @@ import SnakeCaseNamingStrategy from './_naming_strategy.js'
 import Blog from './blog.js'
 import Media from './media.js'
 import Tag from './tag.js'
+import User from './user.js'
 
 export default class BlogVersion extends BaseModel {
   static namingStrategy = new SnakeCaseNamingStrategy()
@@ -44,6 +45,12 @@ export default class BlogVersion extends BaseModel {
   @column()
   declare description: string | null
 
+  @column()
+  declare author_id: string | null
+
+  @column()
+  declare editor_id: string | null
+
   @column({
     prepare: (value) => (typeof value === 'string' ? value : JSON.stringify(value)),
     consume: (value) => {
@@ -75,6 +82,16 @@ export default class BlogVersion extends BaseModel {
     foreignKey: 'thumbnail_id',
   })
   declare thumbnail: BelongsTo<typeof Media>
+
+  @belongsTo(() => User, {
+    foreignKey: 'author_id',
+  })
+  declare author: BelongsTo<typeof User>
+
+  @belongsTo(() => User, {
+    foreignKey: 'editor_id',
+  })
+  declare editor: BelongsTo<typeof User>
 
   @manyToMany(() => Tag, {
     pivotTable: Tables.BLOG_VERSION_TAGS,

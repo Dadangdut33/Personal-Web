@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import Blog from '#models/blog'
-import BlogVersion from '#models/blog_version'
+import type BlogVersion from '#models/blog_version'
 import Tag from '#models/tag'
 import BlogVersionRepository from '#repositories/blog_version.repository'
 import TagRepository from '#repositories/tag.repository'
 
 import db from '@adonisjs/lucid/services/db'
-import { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 import BaseRepository from './_base_repository.js'
 
@@ -23,6 +24,7 @@ export type BlogUpsertPayload = {
   content?: Record<string, any>
   tags?: string[] | null
   projectIds?: string[] | null
+  actor_id?: string
 }
 
 export type RevertableBlogField =
@@ -149,6 +151,8 @@ export default class BlogRepository extends BaseRepository<typeof Blog> {
         is_pinned: blog.is_pinned,
         thumbnail_id: blog.thumbnail_id,
         description: blog.description,
+        author_id: blog.author_id,
+        editor_id: blog.editor_id,
         content: blog.content,
         changed_fields: changedFields,
       },
@@ -227,7 +231,7 @@ export default class BlogRepository extends BaseRepository<typeof Blog> {
   }
 
   async updateOrCreateBlog(data: BlogUpsertPayload) {
-    const { id, tags, projectIds, ...rest } = data
+    const { id, tags, projectIds, actor_id, ...rest } = data
     const normalizedTags = this.normalizeTags(tags)
     const normalizedProjectIds = this.normalizeProjectIds(projectIds)
     const trx = await db.transaction()
@@ -244,12 +248,16 @@ export default class BlogRepository extends BaseRepository<typeof Blog> {
 
       if (blog) {
         blog.useTransaction(trx)
-        blog.merge(rest)
+        blog.merge({
+          ...rest,
+          ...(actor_id ? { editor_id: actor_id } : {}),
+        })
         await blog.save()
       } else {
         const createPayload = {
           is_active: true,
           is_pinned: false,
+          ...(actor_id ? { author_id: actor_id, editor_id: actor_id } : {}),
           ...rest,
         }
         blog = new Blog()
@@ -270,6 +278,7 @@ export default class BlogRepository extends BaseRepository<typeof Blog> {
       const changedFields = isCreate
         ? [
             ...Object.keys(rest),
+            ...(actor_id ? ['author_id', 'editor_id'] : []),
             ...(normalizedTags !== undefined ? ['tags'] : []),
             ...(normalizedProjectIds !== undefined ? ['projects'] : []),
           ]
@@ -290,6 +299,11 @@ export default class BlogRepository extends BaseRepository<typeof Blog> {
                 ? ['projects']
                 : []
             )
+            .concat(
+              actor_id !== undefined && actor_id !== (originalValue as any)?.editor_id
+                ? ['editor_id']
+                : []
+            )
 
       await this.createVersionSnapshot(blog, isCreate, changedFields, trx)
       await this.tagRepo.cleanupUnusedTags(BLOG_TAG_TYPE, trx)
@@ -304,18 +318,24 @@ export default class BlogRepository extends BaseRepository<typeof Blog> {
     }
   }
 
-  async revertToRevision(blogId: string, revisionId: string) {
+  async revertToRevision(blogId: string, revisionId: string, actorId?: string) {
     const revision = await this.getRevisionOrFail(blogId, revisionId)
     const payload = this.mapRevisionToPayload(revision)
 
     // Goes through normal update pipeline so it creates a new revision entry.
     return this.updateOrCreateBlog({
       id: blogId,
+      ...(actorId ? { actor_id: actorId } : {}),
       ...payload,
     })
   }
 
-  async revertFieldsToRevision(blogId: string, revisionId: string, fields: RevertableBlogField[]) {
+  async revertFieldsToRevision(
+    blogId: string,
+    revisionId: string,
+    fields: RevertableBlogField[],
+    actorId?: string
+  ) {
     if (!fields || fields.length === 0) {
       const blog = await this.model.findOrFail(blogId)
       await blog.load('tags')
@@ -337,7 +357,10 @@ export default class BlogRepository extends BaseRepository<typeof Blog> {
     }
 
     // Reuses update flow so versioning, tags, and pruning stay consistent.
-    return this.updateOrCreateBlog(partialPayload)
+    return this.updateOrCreateBlog({
+      ...partialPayload,
+      ...(actorId ? { actor_id: actorId } : {}),
+    })
   }
 
   async deleteRevision(blogId: string, revisionId: string) {
@@ -367,6 +390,8 @@ export default class BlogRepository extends BaseRepository<typeof Blog> {
       .query()
       .where('blog_id', blogId)
       .preload('tags')
+      .preload('author', (authorQuery) => authorQuery.preload('profile'))
+      .preload('editor', (editorQuery) => editorQuery.preload('profile'))
       .orderBy('version', 'desc')
   }
 }
