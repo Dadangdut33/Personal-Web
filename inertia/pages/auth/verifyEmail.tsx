@@ -1,5 +1,3 @@
-import { InertiaProps } from '~/types'
-import type AuthController from '@app/controllers/auth.controller.ts'
 import { Head } from '@inertiajs/react'
 import { Alert, Group, Loader, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
@@ -25,10 +23,9 @@ import AuthLayout from '~/layouts/auth'
 import { urlFor } from '~/lib/client'
 import { TIMEOUT_SHORT } from '~/lib/constants'
 import { checkFormWithCaptcha, cn } from '~/lib/utils'
+import { InertiaProps } from '~/types'
 
-export default function Page(
-  props: InertiaProps<any>
-) {
+export default function Page(props: InertiaProps<AuthProps>) {
   const [isTimedOut, setIsTimedOut] = useLocalStorage({
     key: 'timeout_verify_email',
     defaultValue: false,

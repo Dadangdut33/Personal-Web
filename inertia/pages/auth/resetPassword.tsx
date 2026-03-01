@@ -1,5 +1,3 @@
-import { InertiaProps } from '~/types'
-import type AuthController from '@app/controllers/auth.controller.ts'
 import { Head } from '@inertiajs/react'
 import { Loader, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
@@ -20,10 +18,9 @@ import AuthLayout from '~/layouts/auth'
 import { urlFor } from '~/lib/client'
 import { PASS_REGEX } from '~/lib/constants'
 import { checkFormWithCaptcha, cn } from '~/lib/utils'
+import { InertiaProps } from '~/types'
 
-export default function Page(
-  props: InertiaProps<any>
-) {
+export default function Page(props: InertiaProps<AuthProps & { token: string; email: string }>) {
   const form = useForm({
     initialValues: {
       email: props.email,

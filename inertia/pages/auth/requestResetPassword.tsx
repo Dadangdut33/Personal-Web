@@ -1,5 +1,3 @@
-import { InertiaProps } from '~/types'
-import type AuthController from '@app/controllers/auth.controller.ts'
 import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
 import { Box, Loader, Text } from '@mantine/core'
@@ -19,11 +17,10 @@ import AuthLayout from '~/layouts/auth'
 import { urlFor } from '~/lib/client'
 import { TIMEOUT_NORMAL } from '~/lib/constants'
 import { checkFormWithCaptcha, cn } from '~/lib/utils'
+import { InertiaProps } from '~/types'
 
 const maxWidth = 'max-w-md'
-export default function Page(
-  props: InertiaProps<any>
-) {
+export default function Page(props: InertiaProps<AuthProps>) {
   const [isTimedOut, setIsTimedOut] = useLocalStorage({
     key: 'reset_password_request_timed_out',
     defaultValue: false,

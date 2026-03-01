@@ -18,7 +18,7 @@ import { InertiaProps } from '~/types'
 
 const maxWidth = 'max-w-md'
 
-export default function Page(props: InertiaProps<any>) {
+export default function Page(props: InertiaProps<AuthProps>) {
   const form = useForm({
     initialValues: {
       email: '',
@@ -32,13 +32,17 @@ export default function Page(props: InertiaProps<any>) {
     },
   })
 
-  const mutation = useGenericMutation('POST', urlFor('auth.login.post'), {
-    onError(error, _variables, _context) {
-      if (error.response?.data.form_errors) {
-        form.setErrors(error.response?.data.form_errors)
-      }
-    },
-  })
+  const mutation = useGenericMutation(
+    'POST',
+    { route: 'auth.login.post' },
+    {
+      onError(error, _variables, _context) {
+        if (error.response?.data.form_errors) {
+          form.setErrors(error.response?.data.form_errors)
+        }
+      },
+    }
+  )
 
   const doMutate = () => {
     if (!checkFormWithCaptcha(form, { bypass_captcha: props.bypass_captcha })) return

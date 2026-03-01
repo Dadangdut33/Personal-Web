@@ -1,5 +1,3 @@
-import { InertiaProps } from '~/types'
-import type AuthController from '@app/controllers/auth.controller.ts'
 import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
 import { Box, Loader, Text } from '@mantine/core'
@@ -23,9 +21,10 @@ import AuthLayout from '~/layouts/auth'
 import { urlFor } from '~/lib/client'
 import { PASS_REGEX } from '~/lib/constants'
 import { checkFormWithCaptcha, cn, transformFullName, transformUsername } from '~/lib/utils'
+import { InertiaProps } from '~/types'
 
 const maxWidth = 'max-w-md'
-export default function Page(props: InertiaProps<any>) {
+export default function Page(props: InertiaProps<AuthProps>) {
   const [_, setTimeoutVerifEmailStart] = useLocalStorage<null | number>({
     key: 'timeout_verify_email_start',
     defaultValue: null,
@@ -62,18 +61,22 @@ export default function Page(props: InertiaProps<any>) {
     },
   })
 
-  const mutation = useGenericMutation('POST', urlFor('auth.register.post'), {
-    onError(error, _variables, _context) {
-      if (error.response?.data.form_errors) {
-        form.setErrors(error.response?.data.form_errors)
-      }
-    },
-    onSuccess() {
-      setTimeoutVerifEmailStart(Date.now())
-      setIsTimedOutVerifEmail(true)
-      setIsNewlyRegistered(true)
-    },
-  })
+  const mutation = useGenericMutation(
+    'POST',
+    { route: 'auth.register.post' },
+    {
+      onError(error, _variables, _context) {
+        if (error.response?.data.form_errors) {
+          form.setErrors(error.response?.data.form_errors)
+        }
+      },
+      onSuccess() {
+        setTimeoutVerifEmailStart(Date.now())
+        setIsTimedOutVerifEmail(true)
+        setIsNewlyRegistered(true)
+      },
+    }
+  )
 
   const doMutate = () => {
     if (!checkFormWithCaptcha(form, { bypass_captcha: props.bypass_captcha })) return
