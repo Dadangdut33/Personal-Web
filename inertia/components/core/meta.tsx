@@ -24,7 +24,7 @@ const AppMeta: React.FC<MetaGenericProps> = ({
   canonicalUrl,
   ogTitle,
   ogDescription,
-  ogImage,
+  ogImage = '/media/logo.png',
   ogUrl,
   twitterCard = 'summary_large_image',
   twitterTitle,

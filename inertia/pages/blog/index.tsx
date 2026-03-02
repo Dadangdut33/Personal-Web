@@ -1,8 +1,9 @@
 import type { PaginationMeta } from '#types/app'
 
-import { Head, router } from '@inertiajs/react'
+import { router } from '@inertiajs/react'
 import { Search, Sparkles } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import AppMeta from '~/components/core/meta'
 import BlogCard from '~/components/page-components/blog/blog-card'
 import PublicPageShell from '~/components/page-components/public/public-page-shell'
 import { Badge } from '~/components/ui/badge'
@@ -81,8 +82,7 @@ export default function BlogPage(props: PageProps) {
 
   return (
     <PublicLayout>
-      <Head title="Blogs" />
-
+      <AppMeta title={'Blogs'} description={'I Write, sometimes.'} />
       <PublicPageShell
         breadcrumbs={[
           { label: 'Home', href: urlFor('home') },

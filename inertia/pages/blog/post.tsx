@@ -1,6 +1,5 @@
 import { Link } from '@adonisjs/inertia/react'
 import { router } from '@inertiajs/core'
-import { Head } from '@inertiajs/react'
 import { Tooltip, useMantineColorScheme } from '@mantine/core'
 import dayjs from 'dayjs'
 import { ArrowLeft, ArrowUp, CalendarDays, Pin } from 'lucide-react'
@@ -8,6 +7,7 @@ import { useEffect, useRef, useState } from 'react'
 import TiptapEditor from '~/components/RTE'
 import GiscusComments from '~/components/core/giscus-comments'
 import HorizontalDragScroll from '~/components/core/horizontal-drag-scroll'
+import AppMeta from '~/components/core/meta'
 import BlogContributors from '~/components/page-components/blog/blog-contributors'
 import BlogHeadingTOC from '~/components/page-components/blog/blog-heading-toc'
 import BlogViewCount from '~/components/page-components/blog/blog-view-count'
@@ -177,7 +177,11 @@ export default function BlogPostPage(props: PageProps) {
 
   return (
     <PublicLayout>
-      <Head title={data.title} />
+      <AppMeta
+        title={data.title}
+        description={data.description ?? undefined}
+        ogImage={data.thumbnail?.url ?? undefined}
+      />
 
       <div className="pointer-events-none fixed left-0 top-0 z-50 h-1 w-full bg-transparent">
         <div

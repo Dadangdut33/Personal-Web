@@ -1,6 +1,7 @@
 import { Link } from '@adonisjs/inertia/react'
 import { Stack } from '@mantine/core'
 import { ArrowRight } from 'lucide-react'
+import AppMeta from '~/components/core/meta'
 import Logo from '~/components/homepage/logo'
 import BlogCard from '~/components/page-components/blog/blog-card'
 import PublicPageShell from '~/components/page-components/public/public-page-shell'
@@ -15,6 +16,8 @@ type PageProps = InertiaProps<{ latestBlogs: Data.Blog[] }>
 export default function Home(props: PageProps) {
   return (
     <PublicLayout>
+      <AppMeta description={'A personal website.'} />
+
       <PublicPageShell className="pb-0">
         <Logo />
         <Stack>

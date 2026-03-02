@@ -1,8 +1,9 @@
 import type { PaginationMeta } from '#types/app'
 
-import { Head, router } from '@inertiajs/react'
+import { router } from '@inertiajs/react'
 import { Search, Sparkles } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
+import AppMeta from '~/components/core/meta'
 import ProjectCard from '~/components/page-components/project/project-card'
 import PublicPageShell from '~/components/page-components/public/public-page-shell'
 import { Badge } from '~/components/ui/badge'
@@ -63,7 +64,7 @@ export default function ProjectPage(props: PageProps) {
 
   return (
     <PublicLayout>
-      <Head title="Projects" />
+      <AppMeta title={'Projects'} description={'Some cool stuff that i have worked on.'} />
 
       <PublicPageShell
         breadcrumbs={[
