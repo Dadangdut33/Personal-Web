@@ -1,12 +1,19 @@
 import { SharedProps } from '@adonisjs/inertia/types'
 import { usePage } from '@inertiajs/react'
-import { isProd } from '~/lib/utils'
 
-export default function Analytics({ id, url }: { id?: string; url?: string }) {
+export default function Analytics({
+  id,
+  url,
+  isProd,
+}: {
+  id?: string
+  url?: string
+  isProd?: boolean
+}) {
   const { props } = usePage<SharedProps>()
   const currentPath = props.currentPath || ''
 
-  if (!isProd()) return null
+  if (!isProd) return null
   if (!url || !id) return null
   if (currentPath.startsWith('/dashboard')) return null
 

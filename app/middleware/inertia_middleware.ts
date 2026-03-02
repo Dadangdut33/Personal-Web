@@ -62,6 +62,7 @@ export default class InertiaMiddleware extends BaseInertiaMiddleware {
       },
       currentURL: ctx.inertia.always(ctx.request.completeUrl()),
       previousURL: ctx.inertia.always(ctx.request.header('referer')),
+      isProduction: ctx.inertia.always(env.get('NODE_ENV') === 'production'),
       umami_id: ctx.inertia.always(env.get('UMAMI_ID')),
       umami_script_url: ctx.inertia.always(env.get('UMAMI_SCRIPT_URL')),
       umami_share_url: ctx.inertia.always(env.get('UMAMI_SHARE_URL')),
