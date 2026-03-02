@@ -41,6 +41,11 @@ export default function BlogCard({ blog, variant = 'default' }: BlogCardProps) {
             </Badge>
           </div>
         ) : null}
+        {!blog.is_active ? (
+          <div className="absolute right-2 top-2">
+            <Badge variant="neutral">Draft</Badge>
+          </div>
+        ) : null}
       </div>
 
       <div className="flex flex-1 flex-col p-4">

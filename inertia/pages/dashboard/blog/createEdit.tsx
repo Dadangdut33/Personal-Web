@@ -2,7 +2,7 @@ import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
 import { Button, Group, Paper, Tabs } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { IconArrowLeft, IconCancel, IconDeviceFloppy } from '@tabler/icons-react'
+import { IconArrowLeft, IconCancel, IconDeviceFloppy, IconExternalLink } from '@tabler/icons-react'
 import type React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import MediaLibraryDialog from '~/components/RTE/media-library-dialog'
@@ -338,6 +338,21 @@ export default function Page(props: PageProps) {
             )}
           </Group>
         </Group>
+        {data?.url_path ? (
+          <Group justify="flex-end">
+            <Button
+              variant="outline"
+              color="teal"
+              component="a"
+              href={data.url_path}
+              target="_blank"
+              rel="noopener noreferrer"
+              leftSection={<IconExternalLink size={16} />}
+            >
+              Open Post Preview
+            </Button>
+          </Group>
+        ) : null}
 
         <Paper p="md" shadow="md" radius="md" withBorder>
           <Tabs value={activeTab} onChange={(value) => setActiveTab((value as any) || 'editor')}>

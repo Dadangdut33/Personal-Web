@@ -46,18 +46,20 @@ export default class BlogService {
     perPage = 12,
     sortBy = 'created_at',
     sortDirection = 'desc',
+    includeInactive = false,
   }: {
     search?: string
     page?: number
     perPage?: number
     sortBy?: 'created_at' | 'updated_at'
     sortDirection?: 'asc' | 'desc'
+    includeInactive?: boolean
   }) {
     const q = this.repo.query({
       page,
       perPage,
       search: search.trim(),
-      filters: { is_active: true },
+      filters: includeInactive ? undefined : { is_active: true },
       preload: ['thumbnail', 'tags'],
       searchableCol: ['title', 'description', 'slug_id'],
       searchRelations: [{ relation: 'tags', columns: ['name'] }],
@@ -72,13 +74,21 @@ export default class BlogService {
     return this.repo.paginate(q, { page, perPage })
   }
 
-  async publicSearchSuggestions({ search = '', limit = 8 }: { search?: string; limit?: number }) {
+  async publicSearchSuggestions({
+    search = '',
+    limit = 8,
+    includeInactive = false,
+  }: {
+    search?: string
+    limit?: number
+    includeInactive?: boolean
+  }) {
     const keyword = search.trim()
     if (!keyword) return []
 
     const q = this.repo.query({
       search: keyword,
-      filters: { is_active: true },
+      filters: includeInactive ? undefined : { is_active: true },
       searchableCol: ['title', 'description', 'slug_id'],
       select: ['id', 'title', 'slug_id', 'description', 'updated_at'],
     })
@@ -98,13 +108,14 @@ export default class BlogService {
     }))
   }
 
-  async publicFindBySegment(segment: string) {
+  async publicFindBySegment(segment: string, includeInactive = false) {
     const normalized = segment.trim()
     if (!normalized) return null
 
-    const blog = await this.repo.model
-      .query()
-      .where('is_active', true)
+    const query = this.repo.model.query()
+    if (!includeInactive) query.where('is_active', true)
+
+    const blog = await query
       .whereRaw("? LIKE '%' || slug_id", [normalized])
       .preload('thumbnail')
       .preload('tags')

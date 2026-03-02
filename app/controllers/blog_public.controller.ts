@@ -1,5 +1,6 @@
 import { throwNotFound } from '#lib/utils'
 import BlogService from '#services/blog.service'
+import PermissionCheckService from '#services/permission_check.service'
 import env from '#start/env'
 import { BlogTransformer } from '#transformers/blog.transformer'
 import { PaginationMeta } from '#types/app'
@@ -11,7 +12,21 @@ type BlogSort = 'created_desc' | 'created_asc' | 'updated_desc' | 'updated_asc'
 
 @inject()
 export default class BlogPublicController {
-  constructor(protected blogSvc: BlogService) {}
+  constructor(
+    protected blogSvc: BlogService,
+    protected permCheckSvc: PermissionCheckService
+  ) {}
+
+  private async canPreviewInactive(auth: HttpContext['auth']) {
+    if (!(await auth.check())) return false
+    const user = auth.user
+    if (!user) return false
+
+    return (
+      (await this.permCheckSvc.check(user, 'blog.create')) ||
+      (await this.permCheckSvc.check(user, 'blog.update'))
+    )
+  }
 
   private getGiscusConfig() {
     return {
@@ -44,7 +59,7 @@ export default class BlogPublicController {
     }
   }
 
-  async view({ inertia, request }: HttpContext) {
+  async view({ inertia, request, auth }: HttpContext) {
     const search = String(request.input('search', '')).trim()
     const page = Math.max(Number(request.input('page', 1)) || 1, 1)
     const requestedPerPage = Number(request.input('per_page', 12)) || 12
@@ -52,12 +67,15 @@ export default class BlogPublicController {
     const sortInput = String(request.input('sort', 'created_desc'))
     const { sort, sortBy, sortDirection } = this.resolveSort(sortInput)
 
+    const includeInactive = await this.canPreviewInactive(auth)
+
     const data = await this.blogSvc.publicIndex({
       search,
       page,
       perPage,
       sortBy,
       sortDirection,
+      includeInactive,
     })
 
     return inertia.render('blog/index', {
@@ -93,13 +111,15 @@ export default class BlogPublicController {
     })
   }
 
-  async searchAPI({ request, response }: HttpContext) {
+  async searchAPI({ request, response, auth }: HttpContext) {
     const search = String(request.input('q', '')).trim()
     const limit = Math.min(Math.max(Number(request.input('limit', 8)) || 8, 1), 20)
+    const includeInactive = await this.canPreviewInactive(auth)
 
     const data = await this.blogSvc.publicSearchSuggestions({
       search,
       limit,
+      includeInactive,
     })
 
     return response.ok({
@@ -109,11 +129,12 @@ export default class BlogPublicController {
     })
   }
 
-  async viewPost({ inertia, params, response }: HttpContext) {
+  async viewPost({ inertia, params, response, auth }: HttpContext) {
     const segment = String(params.segment || '').trim()
     if (!segment) return throwNotFound()
 
-    const detail = await this.blogSvc.publicFindBySegment(segment)
+    const includeInactive = await this.canPreviewInactive(auth)
+    const detail = await this.blogSvc.publicFindBySegment(segment, includeInactive)
     if (!detail) return throwNotFound()
 
     if (!detail.isCanonical) {

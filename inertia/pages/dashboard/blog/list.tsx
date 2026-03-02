@@ -18,6 +18,7 @@ import {
   IconAlertCircle,
   IconDotsVertical,
   IconEdit,
+  IconExternalLink,
   IconHistory,
   IconTrash,
 } from '@tabler/icons-react'
@@ -69,6 +70,7 @@ export default function Page(props: PageProps) {
   const canAdd = props.user?.permissions.includes(`${basePerm}.create`)
   const canEdit = props.user?.permissions.includes(`${basePerm}.update`)
   const canDelete = props.user?.permissions.includes(`${basePerm}.delete`)
+  const canPreviewInactive = canAdd || canEdit
 
   const searchFilter = useSearchFilter(`${baseRoute}.index`)
   const [selected, setSelected] = useState<DataType>()
@@ -360,6 +362,20 @@ export default function Page(props: PageProps) {
                   Rollback
                 </Menu.Item>
               </TooltipIfTrue>
+              <Menu.Item
+                fw={600}
+                fz="sm"
+                color="teal"
+                variant="filled"
+                component="a"
+                leftSection={<IconExternalLink size={16} />}
+                href={record.url_path}
+                target="_blank"
+                rel="noopener noreferrer"
+                disabled={!record.is_active && !canPreviewInactive}
+              >
+                View Post
+              </Menu.Item>
 
               <TooltipIfTrue isTrue={!canDelete} label="You don't have permission to delete blog">
                 <Menu.Item

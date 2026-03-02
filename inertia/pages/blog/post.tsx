@@ -239,13 +239,22 @@ export default function BlogPostPage(props: PageProps) {
           <header className="border-b-2 border-border p-4 sm:p-5">
             <div className="mb-2 flex items-start justify-between gap-3">
               <h1 className="text-2xl font-heading sm:text-3xl">{data.title}</h1>
-              {data.is_pinned ? (
-                <Badge>
-                  <Pin className="size-3" />
-                  Featured
-                </Badge>
-              ) : null}
+              <div className="flex items-center gap-2">
+                {!data.is_active ? <Badge variant="neutral">Draft Preview</Badge> : null}
+                {data.is_pinned ? (
+                  <Badge>
+                    <Pin className="size-3" />
+                    Featured
+                  </Badge>
+                ) : null}
+              </div>
             </div>
+
+            {!data.is_active ? (
+              <p className="mb-3 text-xs font-medium text-foreground/70">
+                This post is inactive and visible because your account has blog editor access.
+              </p>
+            ) : null}
 
             {data.description ? <p className="text-foreground/80">{data.description}</p> : null}
 
