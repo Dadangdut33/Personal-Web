@@ -31,7 +31,7 @@ export default function PublicPageShell({
   children,
   breadcrumbs = [],
   widthClassName = 'w-[1300px]',
-  fontClassName = 'font-geistmono',
+  fontClassName = 'font-geist',
   paddingClassName = 'px-2 md:px-5 pt-5 pb-10',
   breadCrumbsClassName,
   className,
@@ -47,7 +47,7 @@ export default function PublicPageShell({
       )}
     >
       {breadcrumbs.length > 0 ? (
-        <Breadcrumb className={cn('mb-3', breadCrumbsClassName)}>
+        <Breadcrumb className={cn('mb-3 font-geistmono', breadCrumbsClassName)}>
           <BreadcrumbList>
             {breadcrumbs.map((item, index) => {
               const isLast = index === breadcrumbs.length - 1

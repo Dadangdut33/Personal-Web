@@ -89,7 +89,7 @@ export default function BlogPage(props: PageProps) {
           { label: 'Blog', current: true },
         ]}
       >
-        <section className="rounded-base border-2 border-border bg-main dark:bg-secondary-background p-5 shadow-shadow">
+        <section className="font-geistmono rounded-base border-2 border-border bg-main dark:bg-secondary-background p-5 shadow-shadow">
           <div className="flex items-start justify-between gap-3 flex-wrap">
             <div>
               <div className="mb-2 inline-flex items-center gap-2 rounded-base border-2 border-border px-2 py-1 text-xs font-heading dark:bg-main bg-secondary-background text-foreground dark:text-main-foreground">
@@ -147,14 +147,14 @@ export default function BlogPage(props: PageProps) {
         </section>
 
         {data.length === 0 ? (
-          <section className="mt-6 rounded-base border-2 border-border bg-secondary-background p-8 text-center shadow-shadow">
+          <section className="font-geistmono mt-6 rounded-base border-2 border-border bg-secondary-background p-8 text-center shadow-shadow">
             <p className="text-lg font-heading">No blogs found</p>
             <p className="mt-1 text-sm text-foreground/70">Try another keyword or sort option.</p>
           </section>
         ) : null}
 
         {meta.last_page > 1 ? (
-          <section className="mt-6 flex items-center justify-center gap-2">
+          <section className="font-geistmono mt-6 flex items-center justify-center gap-2">
             <Button
               variant="neutral"
               disabled={meta.current_page <= 1}

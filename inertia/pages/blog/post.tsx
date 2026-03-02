@@ -1,6 +1,6 @@
 import { Link } from '@adonisjs/inertia/react'
 import { router } from '@inertiajs/core'
-import { Tooltip, useMantineColorScheme } from '@mantine/core'
+import { Image, Tooltip, useMantineColorScheme } from '@mantine/core'
 import dayjs from 'dayjs'
 import { ArrowLeft, ArrowUp, CalendarDays, Pin } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
@@ -213,7 +213,7 @@ export default function BlogPostPage(props: PageProps) {
           { label: data.title, current: true, className: 'max-w-[420px] truncate' },
         ]}
       >
-        <div className="mb-4 px-5 sm:px-0">
+        <div className="mb-4 px-5 sm:px-0 font-geistmono">
           <Button asChild variant="neutral" size="sm">
             <Link href={urlFor('blog')}>
               <ArrowLeft className="size-4" />
@@ -228,7 +228,7 @@ export default function BlogPostPage(props: PageProps) {
         >
           {data.thumbnail?.url ? (
             <div className="overflow-hidden border-b-2 border-border">
-              <img
+              <Image
                 src={data.thumbnail.url}
                 alt={data.title}
                 className="max-h-[450px] w-full object-cover"
@@ -237,7 +237,7 @@ export default function BlogPostPage(props: PageProps) {
           ) : null}
 
           <header className="border-b-2 border-border p-4 sm:p-5">
-            <div className="mb-2 flex items-start justify-between gap-3">
+            <div className="mb-2 flex items-start justify-between gap-3 font-geistmono">
               <h1 className="text-2xl font-heading sm:text-3xl">{data.title}</h1>
               <div className="flex items-center gap-2">
                 {!data.is_active ? <Badge variant="neutral">Draft Preview</Badge> : null}
@@ -250,20 +250,16 @@ export default function BlogPostPage(props: PageProps) {
               </div>
             </div>
 
-            {!data.is_active ? (
-              <p className="mb-3 text-xs font-medium text-foreground/70">
-                This post is inactive and visible because your account has blog editor access.
-              </p>
+            {data.description ? (
+              <p className="text-foreground/80 mb-6">{data.description}</p>
             ) : null}
-
-            {data.description ? <p className="text-foreground/80">{data.description}</p> : null}
 
             <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-foreground/70">
               <BlogContributors author={data.author} editor={data.editor} />
               <Tooltip
                 label={`Updated at: ${data.updated_at ? dayjs(data.updated_at).format('YYYY-MM-DD') : '-'}`}
               >
-                <span className="inline-flex items-center gap-1">
+                <span className="inline-flex items-center gap-1 font-geistmono">
                   <CalendarDays className="size-3.5" />
                   {data.created_at ? dayjs(data.created_at).format('YYYY-MM-DD') : '-'}
                 </span>
@@ -272,7 +268,7 @@ export default function BlogPostPage(props: PageProps) {
             </div>
 
             {data.tags?.length ? (
-              <HorizontalDragScroll className="mt-3 pb-1">
+              <HorizontalDragScroll className="mt-3 pb-1 font-geistmono">
                 <div className="inline-flex gap-1.5">
                   {data.tags.map((tag) => (
                     <Badge key={tag.id} variant="neutral" className="shrink-0">
@@ -284,7 +280,7 @@ export default function BlogPostPage(props: PageProps) {
             ) : null}
 
             {data.projects?.length ? (
-              <div className="mt-4">
+              <div className="mt-4 font-geistmono">
                 <p className="mb-2 text-xs font-heading uppercase tracking-wide text-foreground/70">
                   Related Projects
                 </p>

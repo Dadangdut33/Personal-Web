@@ -1,4 +1,5 @@
 import { Link } from '@adonisjs/inertia/react'
+import { Image } from '@mantine/core'
 import dayjs from 'dayjs'
 import { ArrowRight, CalendarDays, Clock3, Pin } from 'lucide-react'
 import HorizontalDragScroll from '~/components/core/horizontal-drag-scroll'
@@ -23,33 +24,35 @@ export default function BlogCard({ blog, variant = 'default' }: BlogCardProps) {
         className={`relative overflow-hidden border-b-2 border-border ${isCompact ? 'h-36' : 'h-48'}`}
       >
         {blog.thumbnail?.url ? (
-          <img
+          <Image
             src={blog.thumbnail.url}
             alt={blog.title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
           />
         ) : (
-          <div className="grid h-full place-items-center bg-background text-sm text-foreground/70">
+          <div className="font-geistmono grid h-full place-items-center bg-background text-sm text-foreground/70">
             No thumbnail
           </div>
         )}
-        {blog.is_pinned ? (
-          <div className="absolute left-2 top-2">
+        {blog.is_pinned && (
+          <div className="font-geistmono absolute left-2 top-2">
             <Badge>
               <Pin className="size-3" />
               Featured
             </Badge>
           </div>
-        ) : null}
-        {!blog.is_active ? (
-          <div className="absolute right-2 top-2">
+        )}
+        {!blog.is_active && (
+          <div className="font-geistmono absolute right-2 top-2">
             <Badge variant="neutral">Draft</Badge>
           </div>
-        ) : null}
+        )}
       </div>
 
       <div className="flex flex-1 flex-col p-4">
-        <h2 className={`line-clamp-2 font-heading ${isCompact ? 'text-base' : 'text-lg'}`}>
+        <h2
+          className={`font-geistmono line-clamp-2 font-heading ${isCompact ? 'text-base' : 'text-lg'}`}
+        >
           {blog.title}
         </h2>
         {!isCompact ? (
@@ -59,7 +62,7 @@ export default function BlogCard({ blog, variant = 'default' }: BlogCardProps) {
         ) : null}
 
         {blog.tags?.length ? (
-          <HorizontalDragScroll className={`${isCompact ? 'mt-2' : 'mt-3'} pb-1`}>
+          <HorizontalDragScroll className={`${isCompact ? 'mt-2' : 'mt-3'} pb-1 font-geistmono`}>
             <div className="inline-flex gap-1.5">
               {blog.tags.map((tag: Data.Tag) => (
                 <Badge key={tag.id} variant="neutral" className="shrink-0">
@@ -71,7 +74,7 @@ export default function BlogCard({ blog, variant = 'default' }: BlogCardProps) {
         ) : null}
 
         <div
-          className={`${isCompact ? 'mt-2' : 'mt-4'} flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-foreground/70`}
+          className={`${isCompact ? 'mt-2' : 'mt-4'} flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-foreground/70 font-geistmono`}
         >
           <span className="inline-flex items-center gap-1">
             <CalendarDays className="size-3.5" />
@@ -86,7 +89,7 @@ export default function BlogCard({ blog, variant = 'default' }: BlogCardProps) {
 
         {!isCompact && (
           <div className={cn('flex justify-between', `${isCompact ? 'mt-3' : 'mt-4'}`)}>
-            <Button asChild size="sm">
+            <Button asChild size="sm" className="font-geistmono">
               <div>
                 Read post
                 <ArrowRight className="blog-read-arrow size-4" />

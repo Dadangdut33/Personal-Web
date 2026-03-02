@@ -22,13 +22,13 @@ export default function Home(props: PageProps) {
         <Logo />
         <Stack>
           <h1 className="text-4xl font-extrabold text-center font-geist">Dadangdut33</h1>
-          <p className="text-xl text-neutral-500 dark:text-white/80 text-center">
+          <p className="text-xl text-neutral-500 dark:text-white/80 text-center font-geistmono">
             Code, Create, Contribute—One Commit at a Time.
           </p>
         </Stack>
 
         {props.latestBlogs?.length > 0 && (
-          <section className="mt-10 space-y-4">
+          <section className="mt-10 space-y-4 font-geistmono">
             <div className="flex items-center gap-3">
               <h2 className="text-2xl font-heading">Latest Blog Posts</h2>
             </div>

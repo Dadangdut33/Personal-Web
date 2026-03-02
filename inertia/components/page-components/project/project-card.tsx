@@ -36,11 +36,11 @@ export default function ProjectCard({ project }: { project: Data.Project }) {
       </div>
 
       <div className="flex flex-1 flex-col p-4">
-        <h2 className="line-clamp-1 text-lg font-heading">{project.title}</h2>
+        <h2 className="line-clamp-1 text-lg font-heading font-geistmono">{project.title}</h2>
         <p className="mt-2 line-clamp-3 text-sm text-foreground/80">{project.description}</p>
 
         {(project.tags || []).length > 0 ? (
-          <HorizontalDragScroll className="mt-3 pb-1">
+          <HorizontalDragScroll className="mt-3 pb-1 font-geistmono">
             <div className="inline-flex gap-1.5">
               {(project.tags || []).map((tag) => (
                 <Badge key={`${project.id}-${tag}`} variant="neutral" className="shrink-0">
@@ -52,7 +52,7 @@ export default function ProjectCard({ project }: { project: Data.Project }) {
         ) : null}
 
         {links.length > 0 && (
-          <HorizontalDragScroll className="mt-2 pb-1">
+          <HorizontalDragScroll className="mt-2 pb-1 font-geistmono">
             <div className="inline-flex gap-1.5">
               {links.map((link) => {
                 const LinkIcon = getProjectLinkIcon(link.icon)
@@ -76,7 +76,7 @@ export default function ProjectCard({ project }: { project: Data.Project }) {
           </HorizontalDragScroll>
         )}
 
-        <div className="mt-4 border-t-2 border-dashed border-border pt-3">
+        <div className="mt-4 border-t-2 border-dashed border-border pt-3 font-geistmono">
           <p className="mb-2 text-xs font-heading">Related Blogs</p>
           {relatedBlogs.length === 0 ? (
             <p className="text-sm text-foreground/70">
@@ -98,7 +98,7 @@ export default function ProjectCard({ project }: { project: Data.Project }) {
           )}
         </div>
 
-        <p className="mt-3 text-xs text-foreground/70">
+        <p className="mt-3 text-xs text-foreground/70 font-geistmono">
           Updated {project.updated_at ? dayjs(project.updated_at).format('YYYY-MM-DD') : '-'}
         </p>
       </div>
