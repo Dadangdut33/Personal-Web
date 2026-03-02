@@ -164,7 +164,7 @@ export default function BlogHeadingTOC({
                 onSelect(node.id)
                 if (closeOnSelect) setOpen(false)
               }}
-              className="min-w-0 flex-1 text-left"
+              className="min-w-0 flex-1 text-left pr-2 line-clamp-1"
               title={node.text}
             >
               <span className="truncate">{node.text}</span>
