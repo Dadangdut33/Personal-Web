@@ -1,13 +1,14 @@
 # https://docs.adonisjs.com/deployment#dockerfile
 FROM node:24-alpine AS base
+RUN corepack enable
 
 # ----------------------------
 # Stage 1: Install all dependencies
 # ----------------------------
 FROM base AS deps
 WORKDIR /app
-COPY package*.json ./
-RUN npm ci
+COPY package.json pnpm-lock.yaml ./
+RUN pnpm install --frozen-lockfile
 
 # ----------------------------
 # Stage 2: Build the application
@@ -25,7 +26,8 @@ WORKDIR /app
 ENV NODE_ENV=production
 
 COPY --from=build /app/build ./
-RUN npm ci --omit=dev
+COPY --from=build /app/pnpm-lock.yaml ./pnpm-lock.yaml
+RUN pnpm install --prod --frozen-lockfile
 
 EXPOSE 3333
 CMD ["node", "bin/server.js"]
