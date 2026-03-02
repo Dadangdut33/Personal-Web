@@ -151,11 +151,9 @@ export default function TextBubbleMenu({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()}
+            onClick={() => editor.chain().focus().setHeading({ level: 1 }).run()}
             className={editor.isActive('heading', { level: 1 }) ? 'bg-muted' : ''}
-            disabled={
-              !isEditable || !editor.can().chain().focus().toggleHeading({ level: 1 }).run()
-            }
+            disabled={!isEditable || !editor.can().chain().focus().setHeading({ level: 1 }).run()}
           >
             <Heading1 className="h-4 w-4" />
           </Button>
@@ -168,11 +166,9 @@ export default function TextBubbleMenu({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
+            onClick={() => editor.chain().focus().setHeading({ level: 2 }).run()}
             className={editor.isActive('heading', { level: 2 }) ? 'bg-muted' : ''}
-            disabled={
-              !isEditable || !editor.can().chain().focus().toggleHeading({ level: 2 }).run()
-            }
+            disabled={!isEditable || !editor.can().chain().focus().setHeading({ level: 2 }).run()}
           >
             <Heading2 className="h-4 w-4" />
           </Button>
@@ -185,11 +181,9 @@ export default function TextBubbleMenu({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
+            onClick={() => editor.chain().focus().setHeading({ level: 3 }).run()}
             className={editor.isActive('heading', { level: 3 }) ? 'bg-muted' : ''}
-            disabled={
-              !isEditable || !editor.can().chain().focus().toggleHeading({ level: 3 }).run()
-            }
+            disabled={!isEditable || !editor.can().chain().focus().setHeading({ level: 3 }).run()}
           >
             <Heading3 className="h-4 w-4" />
           </Button>
@@ -202,11 +196,9 @@ export default function TextBubbleMenu({
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => editor.chain().focus().toggleHeading({ level: 4 }).run()}
+            onClick={() => editor.chain().focus().setHeading({ level: 4 }).run()}
             className={editor.isActive('heading', { level: 4 }) ? 'bg-muted' : ''}
-            disabled={
-              !isEditable || !editor.can().chain().focus().toggleHeading({ level: 4 }).run()
-            }
+            disabled={!isEditable || !editor.can().chain().focus().setHeading({ level: 4 }).run()}
           >
             <Heading4 className="h-4 w-4" />
           </Button>

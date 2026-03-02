@@ -1,4 +1,5 @@
 import { Link } from '@adonisjs/inertia/react'
+import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
 import { Tooltip, useMantineColorScheme } from '@mantine/core'
 import dayjs from 'dayjs'
@@ -8,6 +9,7 @@ import TiptapEditor from '~/components/RTE'
 import GiscusComments from '~/components/core/giscus-comments'
 import HorizontalDragScroll from '~/components/core/horizontal-drag-scroll'
 import BlogContributors from '~/components/page-components/blog/blog-contributors'
+import BlogHeadingTOC from '~/components/page-components/blog/blog-heading-toc'
 import BlogViewCount from '~/components/page-components/blog/blog-view-count'
 import PublicPageShell from '~/components/page-components/public/public-page-shell'
 import { Badge } from '~/components/ui/badge'
@@ -27,11 +29,33 @@ type BlogPostExtraProps = {
 
 type PageProps = InertiaProps<{ data: Data.Blog }> & BlogPostExtraProps
 
+type HeadingItem = {
+  id: string
+  text: string
+  level: number
+}
+
+const slugifyHeading = (text: string, index: number) => {
+  const safe = text
+    .toLowerCase()
+    .trim()
+    .replace(/[^\w\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
+
+  return safe ? `${safe}-${index}` : `section-${index}`
+}
+
 export default function BlogPostPage(props: PageProps) {
   const { data } = props
   const articleRef = useRef<HTMLElement | null>(null)
+  const contentRef = useRef<HTMLDivElement | null>(null)
+  const [rteRenderedTick, setRteRenderedTick] = useState(0)
   const [readProgress, setReadProgress] = useState(0)
   const [showScrollTop, setShowScrollTop] = useState(false)
+  const [headings, setHeadings] = useState<HeadingItem[]>([])
+  const [activeHeadingId, setActiveHeadingId] = useState<string | null>(null)
   const { colorScheme } = useMantineColorScheme()
 
   useEffect(() => {
@@ -66,9 +90,95 @@ export default function BlogPostPage(props: PageProps) {
     }
   }, [])
 
+  const scrollToHeading = (id: string) => {
+    const target = document.getElementById(id)
+    if (!target) return
+
+    const nextUrl = `${window.location.pathname}${window.location.search}#${id}`
+    router.push({ url: nextUrl, preserveScroll: true, preserveState: true })
+    target.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }
+
+  useEffect(() => {
+    const container = contentRef.current
+    if (!container) return
+
+    const headingElements = Array.from(
+      container.querySelectorAll<HTMLHeadingElement>('h1, h2, h3, h4, h5, h6')
+    )
+
+    const mapped: HeadingItem[] = headingElements
+      .map((element, index) => {
+        const oldAnchor = element.querySelector<HTMLElement>('.blog-heading-anchor-link')
+        oldAnchor?.remove()
+
+        const text = element.textContent?.trim() || ''
+        if (!text) return null
+
+        const level = Number(element.tagName.replace('H', '')) || 2
+        const id = element.id || slugifyHeading(text, index + 1)
+
+        element.id = id
+        element.classList.add('group/heading', 'scroll-mt-24')
+
+        const anchor = document.createElement('a')
+        anchor.type = 'button'
+        anchor.className =
+          'blog-heading-anchor-link ml-2 align-middle text-foreground/40 no-underline opacity-0 transition hover:text-foreground group-hover/heading:opacity-100 focus-visible:opacity-100'
+        anchor.setAttribute('aria-label', `Go to section link: ${text}`)
+        anchor.href = `#${id}`
+        anchor.textContent = '#'
+        anchor.onclick = () => scrollToHeading(id)
+        element.appendChild(anchor)
+
+        return { id, text, level }
+      })
+      .filter((item): item is HeadingItem => item !== null)
+
+    setHeadings(mapped)
+    if (mapped.length > 0) {
+      setActiveHeadingId((prev) =>
+        prev && mapped.some((item) => item.id === prev) ? prev : mapped[0].id
+      )
+    } else {
+      setActiveHeadingId(null)
+    }
+  }, [data.content, rteRenderedTick])
+
+  useEffect(() => {
+    if (headings.length === 0) return
+
+    const headingElements = headings
+      .map((heading) => document.getElementById(heading.id))
+      .filter((item): item is HTMLElement => !!item)
+
+    if (headingElements.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries
+          .filter((entry) => entry.isIntersecting)
+          .sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top)
+
+        if (visible.length > 0) {
+          setActiveHeadingId(visible[0].target.id)
+        }
+      },
+      {
+        root: null,
+        rootMargin: '-20% 0px -70% 0px',
+        threshold: [0, 0.2, 1],
+      }
+    )
+
+    headingElements.forEach((element) => observer.observe(element))
+    return () => observer.disconnect()
+  }, [headings])
+
   return (
     <PublicLayout>
       <Head title={data.title} />
+
       <div className="pointer-events-none fixed left-0 top-0 z-50 h-1 w-full bg-transparent">
         <div
           className="h-full bg-main transition-[width] duration-150 ease-out dark:bg-main"
@@ -188,12 +298,17 @@ export default function BlogPostPage(props: PageProps) {
             ) : null}
           </header>
 
-          <div className="blog-post-content p-4 sm:p-5">
-            <TiptapEditor content={data.content} readOnly ssr />
+          <div ref={contentRef} className="blog-post-content p-4 sm:p-5">
+            <TiptapEditor
+              content={data.content}
+              readOnly
+              ssr
+              onRendered={() => setRteRenderedTick((prev) => prev + 1)}
+            />
           </div>
         </article>
 
-        <section className="mx-2 sm:mx-0 mt-8 rounded-base border-2 border-border bg-secondary-background p-5 shadow-shadow">
+        <section className="mx-2 mt-8 rounded-base border-2 border-border bg-secondary-background p-5 shadow-shadow sm:mx-0">
           <h2 className="mb-4 text-xl font-heading">Comments</h2>
           <GiscusComments
             host={props.giscus_host}
@@ -205,6 +320,12 @@ export default function BlogPostPage(props: PageProps) {
             theme={colorScheme === 'dark' ? 'dark' : 'light'}
           />
         </section>
+
+        <BlogHeadingTOC
+          headings={headings}
+          activeHeadingId={activeHeadingId}
+          onSelect={scrollToHeading}
+        />
       </PublicPageShell>
     </PublicLayout>
   )

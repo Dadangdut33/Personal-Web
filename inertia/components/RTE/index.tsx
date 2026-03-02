@@ -77,6 +77,7 @@ export interface TiptapEditorProps {
   uploadMediaURL?: string // URL to upload images
   deleteMediaURL?: string // URL to delete images
   ssr?: boolean // Server-side rendering support
+  onRendered?: (container: HTMLDivElement | null) => void
 }
 
 export default function TiptapEditor({
@@ -94,6 +95,7 @@ export default function TiptapEditor({
   deleteMediaURL,
   ssr: SSR = true, // Server-side rendering support
   imageTags = [],
+  onRendered,
 }: TiptapEditorProps) {
   const [error, setError] = useState<string | null>(null)
   const [imageUrl, setImageUrl] = useState('')
@@ -112,6 +114,7 @@ export default function TiptapEditor({
   const toolbarRef = useRef<HTMLDivElement>(null)
   const editorContainerRef = useRef<HTMLDivElement>(null)
   const editorContentRef = useRef<HTMLDivElement>(null)
+  const hasNotifiedRenderedRef = useRef(false)
   const isResizingRef = useRef(false)
   const [resizePopoverOpen, setResizePopoverOpen] = useState(false)
 
@@ -137,6 +140,9 @@ export default function TiptapEditor({
     extensions: [
       StarterKit.configure({
         codeBlock: false,
+        heading: {
+          levels: [1, 2, 3, 4, 5, 6],
+        },
       }),
       LinkCard,
       YoutubeEmbed,
@@ -424,6 +430,21 @@ export default function TiptapEditor({
       }
     }
   }, [editor, onError])
+
+  useEffect(() => {
+    hasNotifiedRenderedRef.current = false
+  }, [content])
+
+  useEffect(() => {
+    if (!editor || isLoading || !onRendered || hasNotifiedRenderedRef.current) return
+
+    hasNotifiedRenderedRef.current = true
+    const raf = window.requestAnimationFrame(() => {
+      onRendered(editorContentRef.current)
+    })
+
+    return () => window.cancelAnimationFrame(raf)
+  }, [editor, isLoading, onRendered, content])
 
   // Handle saving content
   const saveContent = useCallback(() => {

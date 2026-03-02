@@ -42,10 +42,13 @@ const buttonVariants = cva(
         none: '',
       },
       size: {
-        default: 'h-10 px-4 py-2',
-        sm: 'h-9 px-3',
-        lg: 'h-11 px-8',
-        icon: 'size-10',
+        'default': 'h-10 px-4 py-2',
+        'sm': 'h-9 px-3',
+        'lg': 'h-11 px-8',
+        'xl': 'h-12 px-10',
+        '2xl': 'h-14 px-12',
+        '3xl': 'h-16 px-14',
+        'icon': 'size-10',
       },
     },
     defaultVariants: {

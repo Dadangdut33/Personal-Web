@@ -115,6 +115,10 @@ export default function Page(props: PageProps) {
     data ? 'PATCH' : 'POST',
     urlFor(`${baseRoute}.${data ? 'update' : 'store'}`),
     {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
       onSuccess: () => {
         form.reset()
       },
