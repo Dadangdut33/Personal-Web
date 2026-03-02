@@ -225,6 +225,8 @@ export default function Page(props: PageProps) {
 
   const selectedRevision = data?.versions?.find((version) => version.id === selectedRevisionId)
   const currentTagsText = form.values.tags.join(', ')
+  const currentContent = content
+  const revisionContent = selectedRevision?.content || { type: 'doc', content: [] }
   const contentCurrentText = JSON.stringify(content, null, 2)
   const contentRevisionText = JSON.stringify(selectedRevision?.content || {}, null, 2)
   const revisionSelectData =
@@ -392,6 +394,8 @@ export default function Page(props: PageProps) {
                   currentIsPinned={form.values.is_pinned}
                   currentDescription={form.values.description || ''}
                   currentTagsText={currentTagsText}
+                  currentContent={currentContent}
+                  revisionContent={revisionContent}
                   contentCurrentText={contentCurrentText}
                   contentRevisionText={contentRevisionText}
                   revisionSelectData={revisionSelectData}

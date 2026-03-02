@@ -1,4 +1,6 @@
-import { Badge, Button, Checkbox, Divider, Group, Paper, Select, Stack, Text, Textarea } from '@mantine/core'
+import { Badge, Button, Checkbox, Divider, Group, Paper, Select, Stack, Switch, Text, Textarea } from '@mantine/core'
+import { useState } from 'react'
+import TiptapEditor from '~/components/RTE'
 
 type BlogTag = { id: string; name: string }
 type BlogVersion = {
@@ -33,6 +35,8 @@ type Props = {
   currentIsPinned: boolean
   currentDescription: string
   currentTagsText: string
+  currentContent: Record<string, any>
+  revisionContent: Record<string, any>
   contentCurrentText: string
   contentRevisionText: string
   revisionSelectData: { value: string; label: string }[]
@@ -63,6 +67,8 @@ export default function BlogRollbackTab({
   currentIsPinned,
   currentDescription,
   currentTagsText,
+  currentContent,
+  revisionContent,
   contentCurrentText,
   contentRevisionText,
   revisionSelectData,
@@ -73,6 +79,7 @@ export default function BlogRollbackTab({
   onRollbackFull,
   onRollbackFields,
 }: Props) {
+  const [showRenderedContent, setShowRenderedContent] = useState(false)
   const selectedRevisionTagsText = selectedRevision?.tags?.map((tag) => tag.name).join(', ') || ''
 
   return (
@@ -167,6 +174,17 @@ export default function BlogRollbackTab({
             <Text size="sm" fw={500}>
               Difference Preview
             </Text>
+
+            <Group justify="space-between" align="center">
+              <Text size="xs" c="dimmed">
+                Toggle content preview mode
+              </Text>
+              <Switch
+                label="Rendered Content"
+                checked={showRenderedContent}
+                onChange={(event) => setShowRenderedContent(event.currentTarget.checked)}
+              />
+            </Group>
 
             <Group grow align="flex-start">
               <Stack>
@@ -267,20 +285,51 @@ export default function BlogRollbackTab({
               </Stack>
             </Group>
 
-            <Group grow align="flex-start">
-              <Stack>
-                <Text size="xs" fw={600}>
-                  Content JSON (Current)
-                </Text>
-                <Textarea value={contentCurrentText} readOnly autosize minRows={6} maxRows={12} />
-              </Stack>
-              <Stack>
-                <Text size="xs" fw={600}>
-                  Content JSON (Revision)
-                </Text>
-                <Textarea value={contentRevisionText} readOnly autosize minRows={6} maxRows={12} />
-              </Stack>
-            </Group>
+            {showRenderedContent ? (
+              <Group grow align="flex-start">
+                <Stack>
+                  <Text size="xs" fw={600}>
+                    Content Preview (Current)
+                  </Text>
+                  <Paper withBorder radius="md" p="sm">
+                    <TiptapEditor
+                      key={`rollback-current-${contentCurrentText.length}`}
+                      content={currentContent || { type: 'doc', content: [] }}
+                      readOnly
+                      ssr
+                    />
+                  </Paper>
+                </Stack>
+                <Stack>
+                  <Text size="xs" fw={600}>
+                    Content Preview (Revision)
+                  </Text>
+                  <Paper withBorder radius="md" p="sm">
+                    <TiptapEditor
+                      key={`rollback-revision-${selectedRevision?.id || 'none'}-${contentRevisionText.length}`}
+                      content={revisionContent || { type: 'doc', content: [] }}
+                      readOnly
+                      ssr
+                    />
+                  </Paper>
+                </Stack>
+              </Group>
+            ) : (
+              <Group grow align="flex-start">
+                <Stack>
+                  <Text size="xs" fw={600}>
+                    Content JSON (Current)
+                  </Text>
+                  <Textarea value={contentCurrentText} readOnly autosize minRows={6} maxRows={12} />
+                </Stack>
+                <Stack>
+                  <Text size="xs" fw={600}>
+                    Content JSON (Revision)
+                  </Text>
+                  <Textarea value={contentRevisionText} readOnly autosize minRows={6} maxRows={12} />
+                </Stack>
+              </Group>
+            )}
           </>
         ) : (
           <Text size="sm" c="dimmed">

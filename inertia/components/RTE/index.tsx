@@ -338,6 +338,7 @@ export default function TiptapEditor({
     isUploading,
     uploadProgress,
     fileInputRef,
+    handleFileUpload,
     handleFileInputChange,
     handleDrop,
     handleDragOver,
@@ -349,6 +350,31 @@ export default function TiptapEditor({
     imageTags,
     readOnly: !editor?.isEditable,
   })
+
+  const handlePaste = useCallback(
+    (e: React.ClipboardEvent<HTMLDivElement>) => {
+      if (readOnly || !editor?.isEditable) return
+
+      const fileImages = Array.from(e.clipboardData?.files || []).filter((file) =>
+        file.type.startsWith('image/')
+      )
+
+      let imageFile = fileImages[0]
+      if (!imageFile) {
+        const imageItem = Array.from(e.clipboardData?.items || []).find((item) =>
+          item.type.startsWith('image/')
+        )
+        // @ts-ignore
+        imageFile = imageItem?.getAsFile() || undefined
+      }
+
+      if (!imageFile) return
+
+      e.preventDefault()
+      handleFileUpload(imageFile)
+    },
+    [editor, handleFileUpload, readOnly]
+  )
 
   const {
     isUploadingFile,
@@ -623,6 +649,7 @@ export default function TiptapEditor({
       className={cn(!readOnly ? 'border rounded-md relative' : '', className)}
       onDrop={handleDrop}
       onDragOver={handleDragOver}
+      onPaste={handlePaste}
       ref={editorContainerRef}
     >
       {error && (
