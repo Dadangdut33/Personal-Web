@@ -1,15 +1,17 @@
+import type { SharedProps } from '@adonisjs/inertia/types'
 import type { GlobalEvent } from '@inertiajs/core'
-import { router } from '@inertiajs/react'
+import { router, usePage } from '@inertiajs/react'
 import { nprogress } from '@mantine/nprogress'
 import { isEmpty } from 'lodash-es'
 import { useEffect, useState } from 'react'
 
 const useProgressWhenRendering = () => {
+  const { props } = usePage<SharedProps>()
   const [isRendering, setIsRendering] = useState(false)
-  const [currentUrl, setCurrentUrl] = useState<string | null>(window.location.href)
+  const [currentUrl, setCurrentUrl] = useState<string | null>(null)
 
   useEffect(() => {
-    setCurrentUrl(window.location.href)
+    setCurrentUrl(props.currentURL)
 
     const verifyOnlyVisit = (event: GlobalEvent<'start'> | GlobalEvent<'finish'>) => {
       if (event.detail.visit.url.searchParams.size !== 0) return false

@@ -1,4 +1,5 @@
-import { Head } from '@inertiajs/react'
+import { SharedProps } from '@adonisjs/inertia/types'
+import { Head, usePage } from '@inertiajs/react'
 import React from 'react'
 
 interface MetaGenericProps {
@@ -32,12 +33,14 @@ const AppMeta: React.FC<MetaGenericProps> = ({
   twitterImage,
   children,
 }) => {
+  const { props } = usePage<SharedProps>()
+
   twitterTitle = twitterTitle || ogTitle || title
   twitterDescription = twitterDescription || ogDescription || description
   twitterImage = twitterImage || ogImage
   ogTitle = ogTitle || title
   ogDescription = ogDescription || description
-  ogUrl = ogUrl || canonicalUrl || window.location.href
+  ogUrl = ogUrl || canonicalUrl || props.currentURL
   ogImage = ogImage || twitterImage
 
   return (
