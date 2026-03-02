@@ -2,9 +2,9 @@ import { Head } from '@inertiajs/react'
 import { Alert, Group, Loader, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useInterval, useLocalStorage, useTimeout } from '@mantine/hooks'
-import { Turnstile } from '@marsidev/react-turnstile'
+import { Turnstile, TurnstileInstance } from '@marsidev/react-turnstile'
 import { IconMessageCircle, IconTimeDuration30 } from '@tabler/icons-react'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyError } from '~/components/core/notify'
 import { Button } from '~/components/ui/button'
@@ -26,6 +26,7 @@ import { checkFormWithCaptcha, cn } from '~/lib/utils'
 import { InertiaProps } from '~/types'
 
 export default function Page(props: InertiaProps<AuthProps>) {
+  const turnstileRef = useRef<TurnstileInstance | null>(null)
   const [isTimedOut, setIsTimedOut] = useLocalStorage({
     key: 'timeout_verify_email',
     defaultValue: false,
@@ -71,10 +72,19 @@ export default function Page(props: InertiaProps<AuthProps>) {
       cf_token: (value) => (value.length > 0 ? null : 'Captcha is required'),
     },
   })
+
+  const resetCaptcha = () => {
+    form.setFieldValue('cf_token', '')
+    turnstileRef.current?.reset()
+  }
+
   const mutation = useGenericMutation('POST', urlFor('auth.verifyEmail.request'), {
     onError(error, _variables, _context) {
       if (error.response?.data.form_errors) {
         form.setErrors(error.response?.data.form_errors)
+      }
+      if (props.site_key && !props.bypass_captcha) {
+        resetCaptcha()
       }
       clearTimeout()
     },
@@ -176,6 +186,7 @@ export default function Page(props: InertiaProps<AuthProps>) {
               {props.site_key && !props.bypass_captcha && (
                 <>
                   <Turnstile
+                    ref={turnstileRef}
                     className="mx-auto"
                     siteKey={props.site_key}
                     onSuccess={(cf_token) => form.setFieldValue('cf_token', cf_token)}

@@ -3,8 +3,9 @@ import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
 import { Box, Loader, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { Turnstile } from '@marsidev/react-turnstile'
+import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
 import { IconArrowLeft } from '@tabler/icons-react'
+import { useRef } from 'react'
 import { NotifyError } from '~/components/core/notify'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/card'
@@ -19,6 +20,7 @@ import { InertiaProps } from '~/types'
 const maxWidth = 'max-w-md'
 
 export default function Page(props: InertiaProps<AuthProps>) {
+  const turnstileRef = useRef<TurnstileInstance | null>(null)
   const form = useForm({
     initialValues: {
       email: '',
@@ -32,10 +34,18 @@ export default function Page(props: InertiaProps<AuthProps>) {
     },
   })
 
+  const resetCaptcha = () => {
+    form.setFieldValue('cf_token', '')
+    turnstileRef.current?.reset()
+  }
+
   const mutation = useGenericMutation('POST', urlFor('auth.login.post'), {
     onError(error, _variables, _context) {
       if (error.response?.data.form_errors) {
         form.setErrors(error.response?.data.form_errors)
+      }
+      if (props.site_key && !props.bypass_captcha) {
+        resetCaptcha()
       }
     },
   })
@@ -108,11 +118,12 @@ export default function Page(props: InertiaProps<AuthProps>) {
               {props.site_key && !props.bypass_captcha && (
                 <>
                   <Turnstile
+                    ref={turnstileRef}
                     className="mx-auto"
                     siteKey={props.site_key}
                     onSuccess={(cf_token) => form.setFieldValue('cf_token', cf_token)}
                     onExpire={() => {
-                      form.setFieldValue('cf_token', '')
+                      resetCaptcha()
                     }}
                     onError={() => NotifyError('Error', 'Failed to load captcha')}
                   />

@@ -3,9 +3,9 @@ import { Head } from '@inertiajs/react'
 import { Box, Loader, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { useLocalStorage } from '@mantine/hooks'
-import { Turnstile } from '@marsidev/react-turnstile'
+import { Turnstile, TurnstileInstance } from '@marsidev/react-turnstile'
 import { IconArrowLeft } from '@tabler/icons-react'
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import {
   PasswordPopover,
   PasswordStrengthDropdown,
@@ -25,6 +25,7 @@ import { InertiaProps } from '~/types'
 
 const maxWidth = 'max-w-md'
 export default function Page(props: InertiaProps<AuthProps>) {
+  const turnstileRef = useRef<TurnstileInstance | null>(null)
   const [_, setTimeoutVerifEmailStart] = useLocalStorage<null | number>({
     key: 'timeout_verify_email_start',
     defaultValue: null,
@@ -61,22 +62,26 @@ export default function Page(props: InertiaProps<AuthProps>) {
     },
   })
 
-  const mutation = useGenericMutation(
-    'POST',
-    { route: 'auth.register.post' },
-    {
-      onError(error, _variables, _context) {
-        if (error.response?.data.form_errors) {
-          form.setErrors(error.response?.data.form_errors)
-        }
-      },
-      onSuccess() {
-        setTimeoutVerifEmailStart(Date.now())
-        setIsTimedOutVerifEmail(true)
-        setIsNewlyRegistered(true)
-      },
-    }
-  )
+  const resetCaptcha = () => {
+    form.setFieldValue('cf_token', '')
+    turnstileRef.current?.reset()
+  }
+
+  const mutation = useGenericMutation('POST', urlFor('auth.register.post'), {
+    onError(error, _variables, _context) {
+      if (error.response?.data.form_errors) {
+        form.setErrors(error.response?.data.form_errors)
+      }
+      if (props.site_key && !props.bypass_captcha) {
+        resetCaptcha()
+      }
+    },
+    onSuccess() {
+      setTimeoutVerifEmailStart(Date.now())
+      setIsTimedOutVerifEmail(true)
+      setIsNewlyRegistered(true)
+    },
+  })
 
   const doMutate = () => {
     if (!checkFormWithCaptcha(form, { bypass_captcha: props.bypass_captcha })) return
@@ -219,6 +224,7 @@ export default function Page(props: InertiaProps<AuthProps>) {
               {props.site_key && !props.bypass_captcha && (
                 <>
                   <Turnstile
+                    ref={turnstileRef}
                     className="mx-auto"
                     siteKey={props.site_key}
                     onSuccess={(cf_token) => form.setFieldValue('cf_token', cf_token)}
