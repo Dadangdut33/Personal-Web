@@ -8,10 +8,10 @@ const dbConfig = defineConfig({
     postgres: {
       client: 'pg',
       connection: {
-        connectionString: env.get('DB_POSTGRES_URL') ?? '', // e.g
+        // if got ssl error, remove ?sslmode=require
+        connectionString: env.get('DB_POSTGRES_URL') ?? '',
         ssl: {
           ca: env.get('DB_POSTGRES_CA') ?? '',
-          rejectUnauthorized: false,
         },
       },
       migrations: {
