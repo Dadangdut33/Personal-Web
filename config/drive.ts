@@ -26,6 +26,8 @@ const driveConfig = defineConfig({
       bucket: env.get('S3_BUCKET') ?? '',
       endpoint: env.get('S3_ENDPOINT'),
       visibility: env.get('S3_VISIBILITY'),
+      forcePathStyle: true,
+      requestChecksumCalculation: 'WHEN_REQUIRED',
     }),
   },
 })
