@@ -309,6 +309,24 @@ main,
 /* ------------------------------------------- */
 /* Tiptap Editor */
 /* ------------------------------------------- */
+.ProseMirror strong,
+.ProseMirror em,
+.ProseMirror u,
+.ProseMirror s,
+.ProseMirror mark,
+.ProseMirror a,
+.ProseMirror span[data-color],
+.ProseMirror span[style*='color'] {
+  display: inline;
+  margin: 0;
+  padding: 0;
+  line-height: inherit;
+  letter-spacing: inherit;
+  word-spacing: inherit;
+  vertical-align: baseline;
+  white-space: inherit;
+}
+
 .ProseMirror ul {
   list-style-type: disc;
   padding-left: 1.5rem;
