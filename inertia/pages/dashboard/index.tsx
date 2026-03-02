@@ -92,6 +92,7 @@ function ContentRecentList({
     title: string
     is_active: boolean
     is_pinned: boolean
+    links_count?: number
     updated_at: string
   }[]
 }) {
@@ -117,6 +118,11 @@ function ContentRecentList({
                   <Badge size="xs" variant="light" color={item.is_pinned ? 'yellow' : 'gray'}>
                     {item.is_pinned ? 'Pinned' : 'Not pinned'}
                   </Badge>
+                  {typeof item.links_count === 'number' ? (
+                    <Badge size="xs" variant="outline">
+                      {item.links_count} links
+                    </Badge>
+                  ) : null}
                 </Group>
               </Stack>
               <Text fz="xs" c="dimmed">

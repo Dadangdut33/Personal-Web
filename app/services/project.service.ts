@@ -47,7 +47,7 @@ export default class ProjectService {
       search: search.trim(),
       filters: { is_active: true },
       preload: ['thumbnail', 'blogs'],
-      searchableCol: ['title', 'description', 'tags'],
+      searchableCol: ['title', 'description', 'tags', 'links'],
       searchRelations: [{ relation: 'blogs', columns: ['title'] }],
       sortBy: 'is_pinned',
       sortDirection: 'desc',

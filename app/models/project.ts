@@ -9,6 +9,13 @@ import SnakeCaseNamingStrategy from './_naming_strategy.js'
 import Blog from './blog.js'
 import Media from './media.js'
 
+export type ProjectLinkIcon = string
+export type ProjectLink = {
+  label: string
+  url: string
+  icon?: ProjectLinkIcon
+}
+
 export default class Project extends BaseModel {
   static namingStrategy = new SnakeCaseNamingStrategy()
   static table = Tables.PROJECTS
@@ -41,6 +48,17 @@ export default class Project extends BaseModel {
     },
   })
   declare tags: string[] | null
+
+  @column({
+    prepare: (value) => (typeof value === 'string' ? value : JSON.stringify(value)),
+    consume: (value) => {
+      if (value === null || value === undefined) return null
+      if (typeof value === 'string') return JSON.parse(value)
+      if (Array.isArray(value)) return value
+      return null
+    },
+  })
+  declare links: ProjectLink[] | null
 
   @belongsTo(() => Media, {
     foreignKey: 'thumbnail_id',

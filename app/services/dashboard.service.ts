@@ -86,6 +86,7 @@ export type DashboardOverview = {
       title: string
       is_active: boolean
       is_pinned: boolean
+      links_count: number
       updated_at: string
     }[]
     activityLogs: {
@@ -626,7 +627,7 @@ export default class DashboardService {
 
       canViewProjects
         ? Project.query()
-            .select(['id', 'title', 'is_active', 'is_pinned', 'updated_at'])
+            .select(['id', 'title', 'is_active', 'is_pinned', 'links', 'updated_at'])
             .orderBy('updated_at', 'desc')
             .limit(5)
         : Promise.resolve([]),
@@ -717,6 +718,7 @@ export default class DashboardService {
           title: item.title,
           is_active: item.is_active,
           is_pinned: item.is_pinned,
+          links_count: Array.isArray(item.links) ? item.links.length : 0,
           updated_at: item.updated_at ? item.updated_at.toISO() || '' : '',
         })),
         activityLogs: recentActivityLogs.map((item) => ({

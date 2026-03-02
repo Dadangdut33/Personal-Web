@@ -1,9 +1,11 @@
 import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
 import {
+  ActionIcon,
   Alert,
   Button,
   Checkbox,
+  Divider,
   Group,
   Image,
   Paper,
@@ -20,6 +22,7 @@ import {
   IconDeviceFloppy,
   IconPhoto,
   IconPhotoPlus,
+  IconPlus,
   IconTrash,
   IconUpload,
 } from '@tabler/icons-react'
@@ -29,26 +32,18 @@ import MediaLibraryDialog from '~/components/RTE/media-library-dialog'
 import { uploadImage } from '~/components/RTE/upload-service'
 import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyInfo } from '~/components/core/notify'
+import { IconPicker } from '~/components/page-components/project/icon-picker'
 import { Data } from '~/generated/data'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import DashboardLayout from '~/layouts/dashboard'
 import { urlFor } from '~/lib/client'
+import { type ProjectLinkIconValue } from '~/lib/project_link_icons'
 import { checkForm } from '~/lib/utils'
 import { InertiaProps } from '~/types'
 
 const baseRoute = 'project'
 const basePerm = 'project'
 const title = 'Project'
-
-type ProjectFormValues = {
-  id: string
-  is_active: boolean
-  is_pinned: boolean
-  title: string
-  thumbnail_id: string
-  description: string
-  tags: string[]
-}
 
 function extractMediaIdFromRedirectUrl(value: string): string | null {
   if (!value) return null
@@ -91,7 +86,7 @@ export default function Page(props: PageProps) {
 
   const { ConfirmAddModal, ConfirmModal, ConfirmResetModal } = useModals()
 
-  const form = useForm<ProjectFormValues>({
+  const form = useForm({
     initialValues: {
       id: data?.id || '',
       is_active: data?.is_active ?? true,
@@ -100,6 +95,11 @@ export default function Page(props: PageProps) {
       thumbnail_id: data?.thumbnail_id || '',
       description: data?.description || '',
       tags: data?.tags || [],
+      links: (data?.links || []).map((link) => ({
+        label: link.label || '',
+        url: link.url || '',
+        icon: (link.icon as ProjectLinkIconValue) || 'IconLink',
+      })),
     },
     validate: {
       title: (value) => (value.trim().length > 0 ? null : 'Title is required'),
@@ -110,6 +110,10 @@ export default function Page(props: PageProps) {
     data ? 'PATCH' : 'POST',
     urlFor(`${baseRoute}.${data ? 'update' : 'store'}`),
     {
+      headers: {
+        'Content-Type': 'application/json',
+        'X-Requested-With': 'XMLHttpRequest',
+      },
       onSuccess: () => {
         if (!data) {
           form.reset()
@@ -134,6 +138,13 @@ export default function Page(props: PageProps) {
         tags: Array.from(
           new Set(form.values.tags.map((tag) => tag.trim()).filter((tag) => tag.length > 0))
         ),
+        links: form.values.links
+          .map((link) => ({
+            label: link.label.trim(),
+            url: link.url.trim(),
+            icon: link.icon,
+          }))
+          .filter((link) => link.label.length > 0 && link.url.length > 0),
       })
     },
   })
@@ -148,6 +159,11 @@ export default function Page(props: PageProps) {
         thumbnail_id: data?.thumbnail_id || '',
         description: data?.description || '',
         tags: data?.tags || [],
+        links: (data?.links || []).map((link) => ({
+          label: link.label || '',
+          url: link.url || '',
+          icon: (link.icon as ProjectLinkIconValue) || 'IconLink',
+        })),
       })
       setThumbnailPreviewUrl(data?.thumbnail?.url || '')
       setThumbnailUploadError(null)
@@ -370,6 +386,76 @@ export default function Page(props: PageProps) {
               disabled={mutation.isPending}
               onChange={(value) => form.setFieldValue('tags', value)}
             />
+
+            <Stack gap={8}>
+              <Group justify="space-between" align="center">
+                <Text size="sm" fw={500}>
+                  Project Links
+                </Text>
+                <Button
+                  variant="light"
+                  size="xs"
+                  leftSection={<IconPlus size={14} />}
+                  disabled={mutation.isPending}
+                  onClick={() =>
+                    form.insertListItem('links', {
+                      label: '',
+                      url: '',
+                      icon: 'IconLink',
+                    })
+                  }
+                >
+                  Add Link
+                </Button>
+              </Group>
+
+              {form.values.links.length === 0 ? (
+                <Text size="xs" c="dimmed">
+                  No links yet. Add repository, website, demo, docs, etc.
+                </Text>
+              ) : null}
+
+              {form.values.links.map((link, index) => (
+                <Paper key={`link-${index}`} withBorder p="sm" radius="md">
+                  <Group grow align="flex-end">
+                    <TextInput
+                      label="Label"
+                      placeholder="Link label"
+                      value={link.label}
+                      disabled={mutation.isPending}
+                      onChange={(event) =>
+                        form.setFieldValue(`links.${index}.label`, event.target.value)
+                      }
+                    />
+                    <TextInput
+                      label="URL"
+                      placeholder="https://..."
+                      value={link.url}
+                      disabled={mutation.isPending}
+                      onChange={(event) =>
+                        form.setFieldValue(`links.${index}.url`, event.target.value)
+                      }
+                    />
+                    <IconPicker
+                      value={link.icon}
+                      onChange={(value) =>
+                        form.setFieldValue(`links.${index}.icon`, value as ProjectLinkIconValue)
+                      }
+                    />
+                    <ActionIcon
+                      variant="light"
+                      color="red"
+                      size={'input-sm'}
+                      disabled={mutation.isPending}
+                      onClick={() => form.removeListItem('links', index)}
+                    >
+                      <IconTrash size={16} />
+                    </ActionIcon>
+                  </Group>
+                </Paper>
+              ))}
+              <Divider />
+            </Stack>
           </Stack>
         </Paper>
       </div>

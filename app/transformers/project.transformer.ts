@@ -26,6 +26,7 @@ export class ProjectTransformer extends BaseTransformer<Project> {
       thumbnail_id: this.resource.thumbnail_id,
       description: this.resource.description,
       tags: this.resource.tags,
+      links: this.resource.links,
       created_at: this.resource.created_at ? this.resource.created_at.toString() : '',
       updated_at: this.resource.updated_at ? this.resource.updated_at.toString() : '',
       thumbnail: MediaTransformer.transform(this.whenLoaded(this.resource.thumbnail)),

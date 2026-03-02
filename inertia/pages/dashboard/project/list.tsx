@@ -15,6 +15,7 @@ import {
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { IconAlertCircle, IconDotsVertical, IconEdit, IconTrash } from '@tabler/icons-react'
+import { IconExternalLink } from '@tabler/icons-react'
 import dayjs from 'dayjs'
 import { Trash2 } from 'lucide-react'
 import {
@@ -35,6 +36,7 @@ import { useDeleteGeneric } from '~/hooks/use_generic_delete'
 import useSearchFilter from '~/hooks/use_search_filter'
 import DashboardLayout from '~/layouts/dashboard'
 import { urlFor } from '~/lib/client'
+import { getProjectLinkIcon } from '~/lib/project_link_icons'
 import { InertiaProps } from '~/types'
 
 const baseRoute = 'project'
@@ -208,6 +210,46 @@ export default function Page(props: PageProps) {
                 {tag}
               </Badge>
             ))
+          ) : (
+            <Text fz="xs" c="dimmed">
+              -
+            </Text>
+          )}
+        </Group>
+      ),
+    },
+    {
+      accessor: 'links',
+      title: 'Links',
+      sortable: false,
+      width: 220,
+      render: (record) => (
+        <Group gap={6}>
+          {(record.links || []).length > 0 ? (
+            <>
+              {(record.links || []).slice(0, 2).map((link) => {
+                const LinkIcon = getProjectLinkIcon((link as any).icon)
+                return (
+                  <a
+                    key={`${record.id}-${link.url}`}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <Badge
+                      variant="outline"
+                      leftSection={<LinkIcon size={10} />}
+                      rightSection={<IconExternalLink size={10} />}
+                    >
+                      {link.label}
+                    </Badge>
+                  </a>
+                )
+              })}
+              {(record.links || []).length > 2 ? (
+                <Badge variant="light">+{(record.links || []).length - 2}</Badge>
+              ) : null}
+            </>
           ) : (
             <Text fz="xs" c="dimmed">
               -

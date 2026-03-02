@@ -212,7 +212,7 @@ export class PermissionSchema extends BaseModel {
 }
 
 export class ProjectSchema extends BaseModel {
-  static $columns = ['id', 'isActive', 'isPinned', 'title', 'thumbnailId', 'description', 'tags', 'createdAt', 'updatedAt'] as const
+  static $columns = ['id', 'isActive', 'isPinned', 'title', 'thumbnailId', 'description', 'tags', 'createdAt', 'updatedAt', 'links'] as const
   $columns = ProjectSchema.$columns
   @column({ isPrimary: true })
   declare id: string
@@ -232,6 +232,8 @@ export class ProjectSchema extends BaseModel {
   declare createdAt: DateTime | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+  @column()
+  declare links: any | null
 }
 
 export class RateLimitSchema extends BaseModel {

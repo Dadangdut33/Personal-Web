@@ -2869,8 +2869,8 @@ packages:
     peerDependencies:
       react: '>= 16'
 
-  '@tabler/icons@3.36.1':
-    resolution: {integrity: sha512-f4Jg3Fof/Vru5ioix/UO4GX+sdDsF9wQo47FbtvG+utIYYVQ/QVAC0QYgcBbAjQGfbdOh2CCf0BgiFOF9Ixtjw==}
+  '@tabler/icons@3.38.0':
+    resolution: {integrity: sha512-FdETQSpQ3lN7BEjEUzjKhsfTDCamrvMDops4HEMphTm3DmkIFpThoODn8XXZ8Q9MhjshIvphIYVHHB7zpq167w==}
 
   '@tailwindcss/node@4.2.0':
     resolution: {integrity: sha512-Yv+fn/o2OmL5fh/Ir62VXItdShnUxfpkMA4Y7jdeC8O81WPB8Kf6TT6GSHvnqgSwDzlB5iT7kDpeXxLsUS0T6Q==}
@@ -8774,10 +8774,10 @@ snapshots:
 
   '@tabler/icons-react@3.36.1(react@19.2.4)':
     dependencies:
-      '@tabler/icons': 3.36.1
+      '@tabler/icons': 3.38.0
       react: 19.2.4
 
-  '@tabler/icons@3.36.1': {}
+  '@tabler/icons@3.38.0': {}
 
   '@tailwindcss/node@4.2.0':
     dependencies:

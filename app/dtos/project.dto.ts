@@ -1,4 +1,5 @@
 import Project from '#models/project'
+import type { ProjectLink } from '#models/project'
 
 import { BlogDto } from './blog.dto.js'
 import { MediaDto } from './media.dto.js'
@@ -11,6 +12,7 @@ export class ProjectDto {
   readonly thumbnail_id: string | null
   readonly description: string | null
   readonly tags: string[] | null
+  readonly links: ProjectLink[] | null
   readonly created_at: string
   readonly updated_at: string
   readonly thumbnail?: MediaDto
@@ -24,6 +26,7 @@ export class ProjectDto {
     this.thumbnail_id = project.thumbnail_id
     this.description = project.description
     this.tags = project.tags
+    this.links = project.links
     this.created_at = project.created_at ? project.created_at.toString() : ''
     this.updated_at = project.updated_at ? project.updated_at.toString() : ''
     this.thumbnail = project.thumbnail ? new MediaDto(project.thumbnail) : undefined

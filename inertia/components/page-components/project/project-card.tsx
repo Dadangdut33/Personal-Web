@@ -1,28 +1,15 @@
 import { Link } from '@adonisjs/inertia/react'
 import dayjs from 'dayjs'
-import { ArrowRight, Pin } from 'lucide-react'
+import { ArrowRight, ExternalLink, Pin } from 'lucide-react'
 import HorizontalDragScroll from '~/components/core/horizontal-drag-scroll'
 import { Badge } from '~/components/ui/badge'
+import { Button } from '~/components/ui/button'
+import { Data } from '~/generated/data'
+import { getProjectLinkIcon } from '~/lib/project_link_icons'
 
-type ProjectCardProps = {
-  project: {
-    id: string
-    title: string
-    description: string | null
-    is_pinned: boolean
-    tags: string[] | null
-    updated_at: string
-    thumbnail?: { url?: string } | null
-    related_blogs?: {
-      id: string
-      title: string
-      url_path: string
-    }[]
-  }
-}
-
-export default function ProjectCard({ project }: ProjectCardProps) {
+export default function ProjectCard({ project }: { project: Data.Project }) {
   const relatedBlogs = project.related_blogs || []
+  const links = project.links || []
 
   return (
     <article className="flex h-full flex-col rounded-base border-2 border-border bg-secondary-background shadow-shadow">
@@ -63,6 +50,31 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             </div>
           </HorizontalDragScroll>
         ) : null}
+
+        {links.length > 0 && (
+          <HorizontalDragScroll className="mt-2 pb-1">
+            <div className="inline-flex gap-1.5">
+              {links.map((link) => {
+                const LinkIcon = getProjectLinkIcon(link.icon)
+                return (
+                  <Button
+                    key={`${project.id}-${link.url}`}
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="shrink-0"
+                  >
+                    <a href={link.url} target="_blank" rel="noopener noreferrer">
+                      <LinkIcon className="size-3" />
+                      {link.label}
+                      <ExternalLink className="size-3" />
+                    </a>
+                  </Button>
+                )
+              })}
+            </div>
+          </HorizontalDragScroll>
+        )}
 
         <div className="mt-4 border-t-2 border-dashed border-border pt-3">
           <p className="mb-2 text-xs font-heading">Related Blogs</p>
