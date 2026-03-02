@@ -140,6 +140,32 @@ export default class DashboardService {
     })
   }
 
+  private toISODateKey(raw: unknown): string | null {
+    if (!raw) return null
+
+    if (raw instanceof Date) {
+      const iso = DateTime.fromJSDate(raw).toISODate()
+      return iso || null
+    }
+
+    if (typeof raw === 'number') {
+      const iso = DateTime.fromMillis(raw).toISODate()
+      return iso || null
+    }
+
+    if (typeof raw === 'string') {
+      if (/^\d+$/.test(raw)) {
+        const iso = DateTime.fromMillis(Number(raw)).toISODate()
+        return iso || null
+      }
+
+      const iso = DateTime.fromISO(raw).toISODate()
+      return iso || null
+    }
+
+    return null
+  }
+
   private resolveRange(range: DashboardRange) {
     if (range === '14d') return { days: 14, unit: 'day' as const, label: 'Last 14 days' }
     if (range === '30d') return { days: 30, unit: 'day' as const, label: 'Last 30 days' }
@@ -175,7 +201,12 @@ export default class DashboardService {
       .groupByRaw(`DATE(${dateColumn})`)
       .orderBy('day', 'asc')) as Array<{ day: string; total: string | number }>
 
-    const map = new Map(rows.map((row) => [String(row.day), Number(row.total || 0)]))
+    const map = new Map<string, number>()
+    for (const row of rows) {
+      const key = this.toISODateKey((row as any).day)
+      if (!key) continue
+      map.set(key, Number(row.total || 0))
+    }
 
     return this.buildEmptyTrend(days).map((item) => ({
       date: item.date,
@@ -196,9 +227,18 @@ export default class DashboardService {
 
     if (rows.length === 0) return []
 
-    const firstMonth = String(rows[0].month)
+    const normalizedRows = rows
+      .map((row) => ({
+        month: this.toISODateKey((row as any).month),
+        total: Number(row.total || 0),
+      }))
+      .filter((row): row is { month: string; total: number } => !!row.month)
+
+    if (normalizedRows.length === 0) return []
+
+    const firstMonth = normalizedRows[0].month
     const lastMonth = DateTime.now().startOf('month').toISODate() || firstMonth
-    const map = new Map(rows.map((row) => [String(row.month), Number(row.total || 0)]))
+    const map = new Map(normalizedRows.map((row) => [row.month, row.total]))
 
     return this.buildEmptyMonthlyTrend(firstMonth, lastMonth).map((item) => ({
       date: item.date,

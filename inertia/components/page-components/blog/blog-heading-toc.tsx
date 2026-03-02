@@ -1,6 +1,6 @@
 import { VisuallyHidden } from '@mantine/core'
 import * as SheetPrimitive from '@radix-ui/react-dialog'
-import { ChevronDown, ChevronRight, Circle, FileText, ListTree, X } from 'lucide-react'
+import { ChevronDown, ChevronRight, FileText, ListTree, X } from 'lucide-react'
 import { type ReactNode, useEffect, useMemo, useState } from 'react'
 import { Button } from '~/components/ui/button'
 import {
