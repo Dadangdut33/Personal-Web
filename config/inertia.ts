@@ -5,6 +5,7 @@ const inertiaConfig = defineConfig({
   encryptHistory: true,
   ssr: {
     enabled: true,
+    entrypoint: 'inertia/ssr.tsx',
   },
 })
 

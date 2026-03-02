@@ -10,9 +10,11 @@ const dbConfig = defineConfig({
       connection: {
         // if got ssl error, remove ?sslmode=require
         connectionString: env.get('DB_POSTGRES_URL') ?? '',
-        ssl: {
-          ca: env.get('DB_POSTGRES_CA') ?? '',
-        },
+        ssl: env.get('DB_POSTGRES_CA')
+          ? {
+              ca: env.get('DB_POSTGRES_CA'),
+            }
+          : undefined,
       },
       migrations: {
         naturalSort: true,
