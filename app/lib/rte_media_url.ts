@@ -42,6 +42,60 @@ const cloneValue = <T>(value: T): T => {
   }
 }
 
+const isWordLikeChar = (value: string) => /[A-Za-z0-9]/.test(value)
+
+/**
+ * ProseMirror stores marks by splitting text into adjacent text nodes.
+ * During editing, users can end up with boundaries like:
+ *   "after" + {strong}"procrastinating"
+ * which serialize without a space in HTML output.
+ *
+ * This pass inserts a single space at text-node boundaries when both sides
+ * look like word characters and no whitespace already exists.
+ */
+const normalizeInlineTextSpacing = (value: unknown): unknown => {
+  if (Array.isArray(value)) {
+    const normalizedChildren = value.map((item) => normalizeInlineTextSpacing(item))
+
+    for (let index = 0; index < normalizedChildren.length - 1; index++) {
+      const current = normalizedChildren[index] as Record<string, unknown> | null
+      const next = normalizedChildren[index + 1] as Record<string, unknown> | null
+
+      if (!current || !next || typeof current !== 'object' || typeof next !== 'object') continue
+      if (current.type !== 'text' || next.type !== 'text') continue
+
+      const currentText = typeof current.text === 'string' ? current.text : ''
+      const nextText = typeof next.text === 'string' ? next.text : ''
+      if (!currentText || !nextText) continue
+
+      const currentLastChar = currentText[currentText.length - 1]
+      const nextFirstChar = nextText[0]
+      const hasWhitespaceBoundary = /\s$/.test(currentText) || /^\s/.test(nextText)
+
+      if (
+        !hasWhitespaceBoundary &&
+        isWordLikeChar(currentLastChar) &&
+        isWordLikeChar(nextFirstChar)
+      ) {
+        next.text = ` ${nextText}`
+      }
+    }
+
+    return normalizedChildren
+  }
+
+  if (!value || typeof value !== 'object') {
+    return value
+  }
+
+  const result: Record<string, unknown> = {}
+  for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+    result[key] = normalizeInlineTextSpacing(child)
+  }
+
+  return result
+}
+
 const walkAndTransform = (value: unknown, mode: 'normalize' | 'sign'): unknown => {
   if (Array.isArray(value)) {
     return value.map((item) => walkAndTransform(item, mode))
@@ -84,7 +138,8 @@ const walkAndTransform = (value: unknown, mode: 'normalize' | 'sign'): unknown =
 export const normalizeRteMediaUrlsForSave = <T>(content: T): T => {
   if (!content) return content
   const cloned = cloneValue(content)
-  return walkAndTransform(cloned, 'normalize') as T
+  const withSpacing = normalizeInlineTextSpacing(cloned)
+  return walkAndTransform(withSpacing, 'normalize') as T
 }
 
 export const signRteMediaUrlsForOutput = <T>(content: T): T => {

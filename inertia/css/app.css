@@ -703,6 +703,10 @@ main,
   text-align: left;
 }
 
+.ProseMirror [data-text-align='justify'] {
+  text-align: justify;
+}
+
 /* Image styles */
 .ProseMirror img {
   max-width: 100%;

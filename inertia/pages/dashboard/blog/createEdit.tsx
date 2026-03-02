@@ -290,6 +290,21 @@ export default function Page(props: PageProps) {
             Back
           </Button>
           <Group ms={'auto'} justify="flex-end">
+            {data?.url_path && (
+              <Group justify="flex-end">
+                <Button
+                  variant="outline"
+                  color="teal"
+                  component="a"
+                  href={data.url_path}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  leftSection={<IconExternalLink size={16} />}
+                >
+                  Open Post Preview
+                </Button>
+              </Group>
+            )}
             {activeTab === 'editor' ? (
               <>
                 <Button
@@ -338,21 +353,6 @@ export default function Page(props: PageProps) {
             )}
           </Group>
         </Group>
-        {data?.url_path ? (
-          <Group justify="flex-end">
-            <Button
-              variant="outline"
-              color="teal"
-              component="a"
-              href={data.url_path}
-              target="_blank"
-              rel="noopener noreferrer"
-              leftSection={<IconExternalLink size={16} />}
-            >
-              Open Post Preview
-            </Button>
-          </Group>
-        ) : null}
 
         <Paper p="md" shadow="md" radius="md" withBorder>
           <Tabs value={activeTab} onChange={(value) => setActiveTab((value as any) || 'editor')}>

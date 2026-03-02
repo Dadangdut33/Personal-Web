@@ -1,5 +1,5 @@
 import { Editor } from '@tiptap/react'
-import { AlignCenter, AlignLeft, AlignRight, Redo, Undo } from 'lucide-react'
+import { AlignCenter, AlignJustify, AlignLeft, AlignRight, Redo, Undo } from 'lucide-react'
 import { Button } from '~/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 
@@ -71,6 +71,25 @@ export default function UtilsBubbleMenu({ editor }: { editor: Editor | null }) {
           </Button>
         </TooltipTrigger>
         <TooltipContent>Align Right</TooltipContent>
+      </Tooltip>
+
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon"
+            onClick={() => {
+              if (!editor.isActive('image')) {
+                editor.chain().focus().setTextAlign('justify').run()
+              }
+            }}
+            className={editor.isActive({ textAlign: 'justify' }) ? 'bg-muted' : ''}
+            disabled={!isEditable || editor.isActive('image')}
+          >
+            <AlignJustify className="h-4 w-4" />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>Justify</TooltipContent>
       </Tooltip>
 
       <div className="border-l mx-1 h-8"></div>

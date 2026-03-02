@@ -1,11 +1,21 @@
 import { type NodeViewProps, NodeViewWrapper } from '@tiptap/react'
-import { AlertCircle, AlertTriangle, CheckCircle2, Info, Pencil, Save, X } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import DOMPurify from 'dompurify'
+import {
+  AlertCircle,
+  AlertTriangle,
+  Bold,
+  CheckCircle2,
+  Info,
+  Italic,
+  Pencil,
+  Save,
+  Underline,
+  X,
+} from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent } from '~/components/ui/card'
-import { Input } from '~/components/ui/input'
-import { Textarea } from '~/components/ui/textarea'
 import { cn } from '~/lib/utils'
 
 type AlertType = 'info' | 'success' | 'warning' | 'error'
@@ -35,6 +45,77 @@ const attrsToForm = (attrs: AlertBlockAttrs): FormState => ({
   cardSize: attrs.cardSize || 'md',
   position: attrs.position || 'center',
 })
+
+const escapeHtml = (value: string) =>
+  value
+    .replaceAll('&', '&amp;')
+    .replaceAll('<', '&lt;')
+    .replaceAll('>', '&gt;')
+    .replaceAll('"', '&quot;')
+    .replaceAll("'", '&#39;')
+
+const looksLikeHtml = (value: string) => /<\/?[a-z][\s\S]*>/i.test(value)
+
+const normalizeRichText = (value: string | undefined, fallback = '', allowMultiline = false) => {
+  const source = (value ?? '').trim() || fallback
+  if (!source) return ''
+  if (looksLikeHtml(source)) return source
+  const escaped = escapeHtml(source)
+  return allowMultiline ? escaped.replace(/\n/g, '<br />') : escaped
+}
+
+const htmlToPlainText = (value: string) => {
+  return value
+    .replace(/<br\s*\/?>/gi, '\n')
+    .replace(/<[^>]+>/g, '')
+    .replace(/&nbsp;/g, ' ')
+    .trim()
+}
+
+function RichEditable({
+  value,
+  className,
+  onFocus,
+  onBlur,
+  onChange,
+}: {
+  value: string
+  className: string
+  onFocus?: () => void
+  onBlur?: () => void
+  onChange: (html: string) => void
+}) {
+  const ref = useRef<HTMLDivElement | null>(null)
+  const [isFocused, setIsFocused] = useState(false)
+
+  useEffect(() => {
+    if (!ref.current || isFocused) return
+    const sanitized = DOMPurify.sanitize(value || '')
+    if (ref.current.innerHTML !== sanitized) {
+      ref.current.innerHTML = sanitized
+    }
+  }, [value, isFocused])
+
+  return (
+    <div
+      ref={ref}
+      contentEditable
+      suppressContentEditableWarning
+      className={className}
+      onFocus={() => {
+        setIsFocused(true)
+        onFocus?.()
+      }}
+      onBlur={() => {
+        setIsFocused(false)
+        onBlur?.()
+      }}
+      onInput={(e) => {
+        onChange((e.currentTarget as HTMLDivElement).innerHTML)
+      }}
+    />
+  )
+}
 
 const getAlertStyles = (alertType: AlertType) => {
   if (alertType === 'success')
@@ -74,6 +155,7 @@ export default function AlertBlockNodeView({ node, editor, updateAttributes }: N
   const [isEditable, setIsEditable] = useState(!!editor?.isEditable)
   const [isEditing, setIsEditing] = useState(false)
   const [form, setForm] = useState<FormState>(() => attrsToForm(attrs))
+  const [activeField, setActiveField] = useState<'title' | 'message' | null>(null)
 
   useEffect(() => {
     const syncEditable = () => setIsEditable(!!editor?.isEditable)
@@ -96,8 +178,8 @@ export default function AlertBlockNodeView({ node, editor, updateAttributes }: N
   }, [attrs.alertType, attrs.title, attrs.message, attrs.cardSize, attrs.position, isEditing])
 
   const alertType = isEditing ? form.alertType : attrs.alertType || 'info'
-  const title = isEditing ? form.title : attrs.title || 'Info'
-  const message = isEditing ? form.message : attrs.message || ''
+  const title = isEditing ? form.title : normalizeRichText(attrs.title, 'Info')
+  const message = isEditing ? form.message : normalizeRichText(attrs.message, '', true)
   const cardSize = isEditing ? form.cardSize : attrs.cardSize || 'md'
   const position = isEditing ? form.position : attrs.position || 'center'
 
@@ -117,12 +199,20 @@ export default function AlertBlockNodeView({ node, editor, updateAttributes }: N
     setForm((prev) => ({ ...prev, [key]: value }))
   }
 
+  const applyInlineFormat = (command: 'bold' | 'italic' | 'underline') => {
+    if (!isEditable || !activeField) return
+    document.execCommand(command, false)
+  }
+
   const saveManualEdit = () => {
     if (!isEditable) return
+    const plainTitle = htmlToPlainText(form.title)
+    const plainMessage = htmlToPlainText(form.message)
+
     updateAttributes({
       alertType: form.alertType,
-      title: form.title.trim() || 'Info',
-      message: form.message.trim(),
+      title: plainTitle.length > 0 ? form.title.trim() : 'Info',
+      message: plainMessage.length > 0 ? form.message.trim() : '',
       cardSize: form.cardSize,
       position: form.position,
     })
@@ -142,8 +232,14 @@ export default function AlertBlockNodeView({ node, editor, updateAttributes }: N
             <AlertIcon className={cn('h-5 w-5', styles.iconClass)} />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-sm font-heading text-foreground">{title}</p>
-            <p className="mt-1 whitespace-pre-wrap text-xs text-muted-foreground">{message}</p>
+            <p
+              className="truncate text-sm font-heading text-foreground"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(title || 'Info') }}
+            />
+            <p
+              className="mt-1 text-xs text-muted-foreground"
+              dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(message || '') }}
+            />
           </div>
           <Badge className={cn('capitalize', styles.badgeClass)}>{alertType}</Badge>
         </div>
@@ -213,16 +309,48 @@ export default function AlertBlockNodeView({ node, editor, updateAttributes }: N
               <option value="right">Right</option>
             </select>
           </div>
-          <Input
-            value={form.title}
-            onChange={(e) => updateField('title', e.target.value)}
-            placeholder="Alert title"
+          <div className="flex flex-wrap gap-1">
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => applyInlineFormat('bold')}
+            >
+              <Bold className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => applyInlineFormat('italic')}
+            >
+              <Italic className="h-4 w-4" />
+            </Button>
+            <Button
+              type="button"
+              size="sm"
+              variant="outline"
+              onMouseDown={(e) => e.preventDefault()}
+              onClick={() => applyInlineFormat('underline')}
+            >
+              <Underline className="h-4 w-4" />
+            </Button>
+          </div>
+          <RichEditable
+            value={form.title || ''}
+            className="min-h-9 rounded-base border-2 border-border bg-secondary-background px-3 py-2 text-sm font-heading"
+            onFocus={() => setActiveField('title')}
+            onBlur={() => setActiveField((prev) => (prev === 'title' ? null : prev))}
+            onChange={(html) => updateField('title', html)}
           />
-          <Textarea
-            value={form.message}
-            onChange={(e) => updateField('message', e.target.value)}
-            placeholder="Alert message"
-            rows={3}
+          <RichEditable
+            value={form.message || ''}
+            className="min-h-24 rounded-base border-2 border-border bg-secondary-background px-3 py-2 text-sm"
+            onFocus={() => setActiveField('message')}
+            onBlur={() => setActiveField((prev) => (prev === 'message' ? null : prev))}
+            onChange={(html) => updateField('message', html)}
           />
         </div>
       ) : null}

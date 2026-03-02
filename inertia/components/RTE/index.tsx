@@ -190,7 +190,7 @@ export default function TiptapEditor({
       }),
       TextAlign.configure({
         types: ['heading', 'paragraph'], // Remove image from types
-        alignments: ['left', 'center', 'right'],
+        alignments: ['left', 'center', 'right', 'justify'],
         defaultAlignment: 'left',
       }),
     ],
