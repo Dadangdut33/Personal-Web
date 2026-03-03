@@ -50,6 +50,7 @@ type Props = {
   tagSuggestions: string[]
   projects: ProjectOption[]
   content: Record<string, any>
+  editorContentVersion: number
   onContentChange: (value: Record<string, any>) => void
   onOpenMediaLibrary: () => void
   onThumbnailFileChange: (event: ChangeEvent<HTMLInputElement>) => void
@@ -68,6 +69,7 @@ export default function BlogEditorTab({
   tagSuggestions,
   projects,
   content,
+  editorContentVersion,
   onContentChange,
   onOpenMediaLibrary,
   onThumbnailFileChange,
@@ -234,6 +236,7 @@ export default function BlogEditorTab({
           Content
         </Text>
         <TiptapEditor
+          key={`blog-editor-content-${editorContentVersion}`}
           content={content}
           onSave={onContentChange}
           getMediaURL={urlFor('api.v1.media.list')}

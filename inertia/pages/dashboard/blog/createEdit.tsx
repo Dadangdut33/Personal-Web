@@ -4,16 +4,18 @@ import { Button, Group, Paper, Tabs } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { IconArrowLeft, IconCancel, IconDeviceFloppy, IconExternalLink } from '@tabler/icons-react'
 import type React from 'react'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import MediaLibraryDialog from '~/components/RTE/media-library-dialog'
 import { uploadImage } from '~/components/RTE/upload-service'
 import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyInfo } from '~/components/core/notify'
+import DraftRestoreModal from '~/components/page-components/blog/draft-restore-modal'
 import BlogEditorTab from '~/components/page-components/blog/editor-tab'
 import BlogRollbackTab from '~/components/page-components/blog/rollback-tab'
 import { Data } from '~/generated/data'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
 import DashboardLayout from '~/layouts/dashboard'
+import { getBlogDraftStorageKey, useBlogEditorDraftStore } from '~/lib/blog_editor_draft'
 import { urlFor } from '~/lib/client'
 import { checkForm } from '~/lib/utils'
 import { InertiaProps } from '~/types'
@@ -31,6 +33,58 @@ type BlogFormValues = {
   description: string
   tags: string[]
   projectIds: string[]
+}
+
+type BlogEditorSnapshot = {
+  form: BlogFormValues
+  content: Record<string, any>
+  thumbnailPreviewUrl: string
+}
+
+const normalizeSnapshot = (state: BlogEditorSnapshot): BlogEditorSnapshot => ({
+  form: {
+    ...state.form,
+    tags: [...(state.form.tags || [])],
+    projectIds: [...(state.form.projectIds || [])],
+  },
+  content: state.content || { type: 'doc', content: [] },
+  thumbnailPreviewUrl: state.thumbnailPreviewUrl || '',
+})
+
+const serializeSnapshot = (state: BlogEditorSnapshot) => JSON.stringify(normalizeSnapshot(state))
+
+const buildServerSnapshot = (
+  data: Data.Blog | null,
+  defaultContent: Record<string, any>
+): BlogEditorSnapshot => ({
+  form: {
+    id: data?.id || '',
+    title: data?.title || '',
+    is_active: data?.is_active ?? true,
+    is_pinned: data?.is_pinned ?? false,
+    thumbnail_id: data?.thumbnail_id || '',
+    description: data?.description || '',
+    tags: data?.tags?.map((tag) => tag.name) || [],
+    projectIds: data?.projects?.map((project) => project.id) || [],
+  },
+  content: data?.content || defaultContent,
+  thumbnailPreviewUrl: data?.thumbnail?.url || '',
+})
+
+const changedFieldsBetween = (server: BlogEditorSnapshot, local: BlogEditorSnapshot): string[] => {
+  const changed: string[] = []
+
+  if (server.form.title !== local.form.title) changed.push('title')
+  if (server.form.description !== local.form.description) changed.push('description')
+  if (server.form.is_active !== local.form.is_active) changed.push('is_active')
+  if (server.form.is_pinned !== local.form.is_pinned) changed.push('is_pinned')
+  if (server.form.thumbnail_id !== local.form.thumbnail_id) changed.push('thumbnail_id')
+  if (JSON.stringify(server.form.tags) !== JSON.stringify(local.form.tags)) changed.push('tags')
+  if (JSON.stringify(server.form.projectIds) !== JSON.stringify(local.form.projectIds))
+    changed.push('projectIds')
+  if (JSON.stringify(server.content) !== JSON.stringify(local.content)) changed.push('content')
+
+  return changed
 }
 
 function formSafeTitle(value: string) {
@@ -75,8 +129,23 @@ export default function Page(props: PageProps) {
     data?.versions?.[0]?.id || null
   )
   const [selectedRollbackFields, setSelectedRollbackFields] = useState<string[]>([])
+  const [editorContentVersion, setEditorContentVersion] = useState(0)
   const thumbnailInputRef = useRef<HTMLInputElement>(null)
   const tagSuggestions = (availableTags || []).map((tag) => tag.name)
+  const draftKey = data?.id ? `blog:${data.id}` : `blog:new:${props.currentPath}`
+  const draftStorageKey = getBlogDraftStorageKey(`user:${props.user?.id ?? 'guest'}:blog-editor`)
+  const { getDraft, setDraft, clearDraft } = useBlogEditorDraftStore({
+    storageKey: draftStorageKey,
+  })
+  const [isDirty, setIsDirty] = useState(false)
+  const [restoreDraftModalOpen, setRestoreDraftModalOpen] = useState(false)
+  const [draftServerSnapshot, setDraftServerSnapshot] = useState<BlogEditorSnapshot | null>(null)
+  const [draftLocalSnapshot, setDraftLocalSnapshot] = useState<BlogEditorSnapshot | null>(null)
+  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null)
+  const syncedSerializedRef = useRef('')
+  const currentSerializedRef = useRef('')
+  const hydratingRef = useRef(true)
+  const bypassLeaveGuardRef = useRef(false)
 
   const breadcrumbs = [
     {
@@ -120,6 +189,9 @@ export default function Page(props: PageProps) {
         'X-Requested-With': 'XMLHttpRequest',
       },
       onSuccess: () => {
+        clearDraft(draftKey)
+        syncedSerializedRef.current = currentSerializedRef.current
+        setIsDirty(false)
         form.reset()
       },
     }
@@ -167,10 +239,11 @@ export default function Page(props: PageProps) {
 
   const onReset = ConfirmResetModal({
     onConfirm: () => {
-      form.reset()
-      setContent(data?.content || defaultContent)
-      setThumbnailPreviewUrl(data?.thumbnail?.url || '')
-      setThumbnailUploadError(null)
+      const serverSnapshot = buildServerSnapshot(data, defaultContent)
+      applySnapshot(serverSnapshot)
+      clearDraft(draftKey)
+      syncedSerializedRef.current = serializeSnapshot(serverSnapshot)
+      setIsDirty(false)
       NotifyInfo('Form Reseted', 'Form has been reseted successfully')
     },
     name: 'Form',
@@ -178,6 +251,7 @@ export default function Page(props: PageProps) {
 
   const onBack = ConfirmModal({
     onConfirm: () => {
+      bypassLeaveGuardRef.current = true
       router.visit(urlFor(`${baseRoute}.index`))
     },
     message: 'Are you sure you want to go back?',
@@ -223,6 +297,59 @@ export default function Page(props: PageProps) {
     }
   }
 
+  const currentSnapshot = useMemo<BlogEditorSnapshot>(
+    () => ({
+      form: {
+        ...form.values,
+        tags: [...form.values.tags],
+        projectIds: [...form.values.projectIds],
+      },
+      content,
+      thumbnailPreviewUrl,
+    }),
+    [form.values, content, thumbnailPreviewUrl]
+  )
+
+  const currentSerialized = useMemo(() => serializeSnapshot(currentSnapshot), [currentSnapshot])
+  currentSerializedRef.current = currentSerialized
+
+  const applySnapshot = (snapshot: BlogEditorSnapshot) => {
+    const normalized = normalizeSnapshot(snapshot)
+    form.setValues(normalized.form)
+    setContent(normalized.content)
+    setThumbnailPreviewUrl(normalized.thumbnailPreviewUrl)
+    setThumbnailUploadError(null)
+    setEditorContentVersion((version) => version + 1)
+  }
+
+  const hasPendingMutation =
+    mutation.isPending || rollbackMutation.isPending || rollbackFieldsMutation.isPending
+
+  const draftChangedFields = useMemo(() => {
+    if (!draftServerSnapshot || !draftLocalSnapshot) return []
+    return changedFieldsBetween(draftServerSnapshot, draftLocalSnapshot)
+  }, [draftServerSnapshot, draftLocalSnapshot])
+
+  const keepLocalDraft = () => {
+    if (!draftLocalSnapshot || !draftServerSnapshot) return
+    hydratingRef.current = true
+    applySnapshot(draftLocalSnapshot)
+    const serverSerialized = serializeSnapshot(draftServerSnapshot)
+    syncedSerializedRef.current = serverSerialized
+    setIsDirty(serializeSnapshot(draftLocalSnapshot) !== serverSerialized)
+    setRestoreDraftModalOpen(false)
+    setTimeout(() => {
+      hydratingRef.current = false
+    }, 0)
+  }
+
+  const keepServerVersion = () => {
+    clearDraft(draftKey)
+    setDraftLocalSnapshot(null)
+    setDraftSavedAt(null)
+    setRestoreDraftModalOpen(false)
+  }
+
   const selectedRevision = data?.versions?.find((version) => version.id === selectedRevisionId)
   const currentTagsText = form.values.tags.join(', ')
   const currentContent = content
@@ -255,24 +382,97 @@ export default function Page(props: PageProps) {
   }
 
   useEffect(() => {
-    if (!data) return
+    hydratingRef.current = true
+    bypassLeaveGuardRef.current = false
 
-    form.setValues({
-      id: data.id,
-      title: data.title,
-      is_active: data.is_active,
-      is_pinned: data.is_pinned,
-      thumbnail_id: data.thumbnail_id || '',
-      description: data.description || '',
-      tags: data.tags?.map((tag) => tag.name) || [],
-      projectIds: data.projects?.map((project) => project.id) || [],
-    })
-    setContent(data.content || defaultContent)
-    setThumbnailPreviewUrl(data.thumbnail?.url || '')
+    const serverSnapshot = buildServerSnapshot(data, defaultContent)
+    applySnapshot(serverSnapshot)
+    syncedSerializedRef.current = serializeSnapshot(serverSnapshot)
+    currentSerializedRef.current = syncedSerializedRef.current
+    setIsDirty(false)
+
     setThumbnailUploadError(null)
-    setSelectedRevisionId(data.versions?.[0]?.id || null)
+    setSelectedRevisionId(data?.versions?.[0]?.id || null)
     setSelectedRollbackFields([])
-  }, [data?.updated_at])
+
+    const draft = getDraft(draftKey)
+    if (draft) {
+      const localSnapshot = normalizeSnapshot(draft.state)
+      const localSerialized = serializeSnapshot(localSnapshot)
+
+      if (localSerialized !== syncedSerializedRef.current) {
+        setDraftServerSnapshot(serverSnapshot)
+        setDraftLocalSnapshot(localSnapshot)
+        setDraftSavedAt(draft.savedAt)
+        setRestoreDraftModalOpen(true)
+      } else {
+        clearDraft(draftKey)
+        setDraftServerSnapshot(null)
+        setDraftLocalSnapshot(null)
+        setDraftSavedAt(null)
+        setRestoreDraftModalOpen(false)
+      }
+    } else {
+      setDraftServerSnapshot(null)
+      setDraftLocalSnapshot(null)
+      setDraftSavedAt(null)
+      setRestoreDraftModalOpen(false)
+    }
+
+    setTimeout(() => {
+      hydratingRef.current = false
+    }, 0)
+  }, [data?.id, data?.updated_at, draftKey])
+
+  useEffect(() => {
+    if (hydratingRef.current) return
+    setIsDirty(currentSerialized !== syncedSerializedRef.current)
+  }, [currentSerialized])
+
+  useEffect(() => {
+    if (hydratingRef.current) return
+    if (!draftKey) return
+    if (restoreDraftModalOpen) return
+
+    if (!isDirty) {
+      clearDraft(draftKey)
+      return
+    }
+
+    const timer = window.setTimeout(() => {
+      setDraft(draftKey, currentSnapshot)
+    }, 1000)
+
+    return () => window.clearTimeout(timer)
+  }, [draftKey, isDirty, currentSerialized, currentSnapshot, restoreDraftModalOpen])
+
+  useEffect(() => {
+    const shouldBlockLeave = () =>
+      isDirty && !hasPendingMutation && !bypassLeaveGuardRef.current && !restoreDraftModalOpen
+
+    const handleBeforeUnload = (event: BeforeUnloadEvent) => {
+      if (!shouldBlockLeave()) return
+      event.preventDefault()
+      event.returnValue = ''
+    }
+
+    const removeBefore = router.on('before', () => {
+      if (!shouldBlockLeave()) return
+      const confirmed = window.confirm(
+        'You have unsaved changes. Are you sure you want to leave this page?'
+      )
+      if (!confirmed) return false
+      bypassLeaveGuardRef.current = true
+      return
+    })
+
+    window.addEventListener('beforeunload', handleBeforeUnload)
+
+    return () => {
+      removeBefore()
+      window.removeEventListener('beforeunload', handleBeforeUnload)
+    }
+  }, [isDirty, hasPendingMutation, restoreDraftModalOpen])
 
   return (
     <DashboardLayout breadcrumbs={breadcrumbs}>
@@ -375,6 +575,7 @@ export default function Page(props: PageProps) {
                 tagSuggestions={tagSuggestions}
                 projects={projects}
                 content={content}
+                editorContentVersion={editorContentVersion}
                 onContentChange={setContent}
                 onOpenMediaLibrary={() => setMediaLibraryOpen(true)}
                 onThumbnailFileChange={handleThumbnailFileChange}
@@ -411,6 +612,16 @@ export default function Page(props: PageProps) {
           </Tabs>
         </Paper>
       </div>
+
+      <DraftRestoreModal
+        opened={restoreDraftModalOpen}
+        serverSnapshot={draftServerSnapshot}
+        localSnapshot={draftLocalSnapshot}
+        localSavedAt={draftSavedAt}
+        changedFields={draftChangedFields}
+        onKeepServerVersion={keepServerVersion}
+        onKeepLocalDraft={keepLocalDraft}
+      />
 
       <MediaLibraryDialog
         open={mediaLibraryOpen}
