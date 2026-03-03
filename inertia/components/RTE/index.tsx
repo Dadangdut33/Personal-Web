@@ -17,7 +17,8 @@ import { isString } from 'lodash-es'
 import { AlertCircle, Check, Eye, EyeOff, Loader, X } from 'lucide-react'
 import { NodeSelection, type Selection } from 'prosemirror-state'
 import type React from 'react'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { Toolbar, ToolbarGroup } from '~/components/tiptap-ui-primitive/toolbar'
 import { Alert, AlertDescription } from '~/components/ui/alert'
 import { Button } from '~/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
@@ -106,6 +107,10 @@ export default function TiptapEditor({
   const [mediaLibrarySelectType, setMediaLibrarySelectType] = useState<
     'image' | 'file' | 'audio' | 'video'
   >('image')
+  const [stickyToolbarLayout, setStickyToolbarLayout] = useState<{
+    left: number
+    width: number
+  } | null>(null)
   const [selectedImage, setSelectedImage] = useState<SelectedImageType>(null)
   const [maintainAspectRatio, setMaintainAspectRatio] = useState(true)
   const [aspectRatio, setAspectRatio] = useState(1)
@@ -429,6 +434,44 @@ export default function TiptapEditor({
     editorContentRef,
   })
 
+  useEffect(() => {
+    if (!isToolbarSticky || !editorContainerRef.current) {
+      setStickyToolbarLayout(null)
+      return
+    }
+
+    const syncStickyLayout = () => {
+      const container = editorContainerRef.current
+      if (!container) return
+      const rect = container.getBoundingClientRect()
+      setStickyToolbarLayout({
+        left: rect.left,
+        width: rect.width,
+      })
+    }
+
+    const resizeObserver = new ResizeObserver(syncStickyLayout)
+    resizeObserver.observe(editorContainerRef.current)
+
+    syncStickyLayout()
+    window.addEventListener('resize', syncStickyLayout)
+    window.addEventListener('scroll', syncStickyLayout, { passive: true })
+
+    return () => {
+      resizeObserver.disconnect()
+      window.removeEventListener('resize', syncStickyLayout)
+      window.removeEventListener('scroll', syncStickyLayout)
+    }
+  }, [isToolbarSticky])
+
+  const stickyToolbarStyle = useMemo(() => {
+    if (!isToolbarSticky || !stickyToolbarLayout) return undefined
+    return {
+      left: `${stickyToolbarLayout.left}px`,
+      width: `${stickyToolbarLayout.width}px`,
+    }
+  }, [isToolbarSticky, stickyToolbarLayout])
+
   // Load initial content
   useEffect(() => {
     if (editor && content) {
@@ -659,191 +702,193 @@ export default function TiptapEditor({
         </Alert>
       )}
 
-      {/*
-        Readonly is set from upper, we dont check editor.isEditable for toolbar menu
-        because when its in readonly it means that its for render data.
-      */}
       {/* The toolbar menu, same component as bubble mostly */}
       {!readOnly && (
-        <div
+        <Toolbar
+          variant={isToolbarSticky ? 'floating' : 'fixed'}
           ref={toolbarRef}
+          style={stickyToolbarStyle}
           className={cn(
-            'px-3 flex flex-wrap gap-1 p-2 border-b bg-muted/50 z-50 transition-all duration-200',
-            isToolbarSticky && 'fixed top-0  shadow-md border-t border-x rounded-t-none',
-            isToolbarSticky &&
-              editorContainerRef.current && {
-                width: `${editorContainerRef.current.offsetWidth}px`,
-                transform: `translateX(${editorContainerRef.current.getBoundingClientRect().left}px)`,
-              },
+            'relative z-50 transition-all duration-200',
+            isToolbarSticky && 'dark:!bg-black/90 !bg-white/90',
+            isToolbarSticky && 'fixed top-0 shadow-md border-t border-x rounded-md',
             toolbarClassName
           )}
         >
-          <TextBubbleMenu editor={editor} />
-          <ImageBubbleMenu
-            editor={editor}
-            selectedImage={selectedImage}
-            renderImagePopover={renderImagePopover}
-            enableImagePopover={true}
-          />
+          <ToolbarGroup>
+            <TextBubbleMenu editor={editor} />
+          </ToolbarGroup>
+          <ToolbarGroup>
+            <ImageBubbleMenu
+              editor={editor}
+              selectedImage={selectedImage}
+              renderImagePopover={renderImagePopover}
+              enableImagePopover={true}
+            />
 
-          <LinkDialogButton
-            editor={editor}
-            linkUrl={linkUrl}
-            setLinkUrl={setLinkUrl}
-            onAddLink={setLink}
-            onFetchMetadata={fetchLinkMetadata}
-            linkMetadata={linkMetadata}
-            isFetchingMetadata={isFetchingLinkMetadata}
-            linkMetadataError={linkMetadataError}
-          />
+            <LinkDialogButton
+              editor={editor}
+              linkUrl={linkUrl}
+              setLinkUrl={setLinkUrl}
+              onAddLink={setLink}
+              onFetchMetadata={fetchLinkMetadata}
+              linkMetadata={linkMetadata}
+              isFetchingMetadata={isFetchingLinkMetadata}
+              linkMetadataError={linkMetadataError}
+            />
 
-          <YoutubeDialogButton
-            editor={editor}
-            youtubeUrl={youtubeUrl}
-            setYoutubeUrl={setYoutubeUrl}
-            onAddYoutube={addYoutubeEmbed}
-            onFetchYoutubeMetadata={fetchYoutubeMetadata}
-            youtubeMetadata={youtubeMetadata}
-            isFetchingYoutubeMetadata={isFetchingYoutubeMetadata}
-            youtubeMetadataError={youtubeMetadataError}
-          />
+            <YoutubeDialogButton
+              editor={editor}
+              youtubeUrl={youtubeUrl}
+              setYoutubeUrl={setYoutubeUrl}
+              onAddYoutube={addYoutubeEmbed}
+              onFetchYoutubeMetadata={fetchYoutubeMetadata}
+              youtubeMetadata={youtubeMetadata}
+              isFetchingYoutubeMetadata={isFetchingYoutubeMetadata}
+              youtubeMetadataError={youtubeMetadataError}
+            />
 
-          <ImageDialogButton
-            editor={editor}
-            imageUrl={imageUrl}
-            setImageUrl={setImageUrl}
-            onAddImage={addImage}
-            onOpenLibrary={() => {
-              setMediaLibrarySelectType('image')
-              setMediaLibraryOpen(true)
-            }}
-            isUploading={isUploading}
-            uploadProgress={uploadProgress}
-            fileInputRef={fileInputRef}
-            onFileInputChange={handleFileInputChange}
-          />
+            <ImageDialogButton
+              editor={editor}
+              imageUrl={imageUrl}
+              setImageUrl={setImageUrl}
+              onAddImage={addImage}
+              onOpenLibrary={() => {
+                setMediaLibrarySelectType('image')
+                setMediaLibraryOpen(true)
+              }}
+              isUploading={isUploading}
+              uploadProgress={uploadProgress}
+              fileInputRef={fileInputRef}
+              onFileInputChange={handleFileInputChange}
+            />
 
-          <FileDialogButton
-            editor={editor}
-            isUploadingFile={isUploadingFile}
-            fileUploadProgress={fileUploadProgress}
-            fileInputRef={fileUploadInputRef}
-            onFileInputChange={handleFileUploadInputChange}
-            onFileDrop={handleGenericFileUpload}
-            onInsertFromUrl={handleInsertFileFromUrl}
-            onOpenLibrary={() => {
-              setMediaLibrarySelectType('file')
-              setMediaLibraryOpen(true)
-            }}
-          />
+            <FileDialogButton
+              editor={editor}
+              isUploadingFile={isUploadingFile}
+              fileUploadProgress={fileUploadProgress}
+              fileInputRef={fileUploadInputRef}
+              onFileInputChange={handleFileUploadInputChange}
+              onFileDrop={handleGenericFileUpload}
+              onInsertFromUrl={handleInsertFileFromUrl}
+              onOpenLibrary={() => {
+                setMediaLibrarySelectType('file')
+                setMediaLibraryOpen(true)
+              }}
+            />
 
-          <AudioDialogButton
-            editor={editor}
-            isUploadingAudio={isUploadingAudio}
-            audioUploadProgress={audioUploadProgress}
-            audioInputRef={audioInputRef}
-            onAudioInputChange={handleAudioInputChange}
-            onAudioDrop={handleAudioUpload}
-            onInsertFromUrl={handleInsertAudioFromUrl}
-            onOpenLibrary={() => {
-              setMediaLibrarySelectType('audio')
-              setMediaLibraryOpen(true)
-            }}
-          />
+            <AudioDialogButton
+              editor={editor}
+              isUploadingAudio={isUploadingAudio}
+              audioUploadProgress={audioUploadProgress}
+              audioInputRef={audioInputRef}
+              onAudioInputChange={handleAudioInputChange}
+              onAudioDrop={handleAudioUpload}
+              onInsertFromUrl={handleInsertAudioFromUrl}
+              onOpenLibrary={() => {
+                setMediaLibrarySelectType('audio')
+                setMediaLibraryOpen(true)
+              }}
+            />
 
-          <VideoDialogButton
-            editor={editor}
-            isUploadingVideo={isUploadingVideo}
-            videoUploadProgress={videoUploadProgress}
-            videoInputRef={videoInputRef}
-            onVideoInputChange={handleVideoInputChange}
-            onVideoDrop={handleVideoUpload}
-            onInsertFromUrl={handleInsertVideoFromUrl}
-            onOpenLibrary={() => {
-              setMediaLibrarySelectType('video')
-              setMediaLibraryOpen(true)
-            }}
-          />
+            <VideoDialogButton
+              editor={editor}
+              isUploadingVideo={isUploadingVideo}
+              videoUploadProgress={videoUploadProgress}
+              videoInputRef={videoInputRef}
+              onVideoInputChange={handleVideoInputChange}
+              onVideoDrop={handleVideoUpload}
+              onInsertFromUrl={handleInsertVideoFromUrl}
+              onOpenLibrary={() => {
+                setMediaLibrarySelectType('video')
+                setMediaLibraryOpen(true)
+              }}
+            />
 
-          <AlertDialogButton editor={editor} />
-          <GridDialogButton editor={editor} />
+            <AlertDialogButton editor={editor} />
+            <GridDialogButton editor={editor} />
 
-          <TableInsertDialogButton
-            editor={editor}
-            open={tableDialogOpen}
-            onOpenChange={setTableDialogOpen}
-            rows={rows}
-            cols={cols}
-            withHeaderRow={withHeaderRow}
-            setRows={setRows}
-            setCols={setCols}
-            setWithHeaderRow={setWithHeaderRow}
-            onInsert={insertTable}
-          />
+            <TableInsertDialogButton
+              editor={editor}
+              open={tableDialogOpen}
+              onOpenChange={setTableDialogOpen}
+              rows={rows}
+              cols={cols}
+              withHeaderRow={withHeaderRow}
+              setRows={setRows}
+              setCols={setCols}
+              setWithHeaderRow={setWithHeaderRow}
+              onInsert={insertTable}
+            />
 
-          <TableOperationsDropdown
-            editor={editor}
-            onAddColumnBefore={addColumnBefore}
-            onAddColumnAfter={addColumnAfter}
-            onDeleteColumn={deleteColumn}
-            onAddRowBefore={addRowBefore}
-            onAddRowAfter={addRowAfter}
-            onDeleteRow={deleteRow}
-            onMergeOrSplitCells={mergeOrSplitCells}
-            onDeleteTable={deleteTable}
-          />
+            <TableOperationsDropdown
+              editor={editor}
+              onAddColumnBefore={addColumnBefore}
+              onAddColumnAfter={addColumnAfter}
+              onDeleteColumn={deleteColumn}
+              onAddRowBefore={addRowBefore}
+              onAddRowAfter={addRowAfter}
+              onDeleteRow={deleteRow}
+              onMergeOrSplitCells={mergeOrSplitCells}
+              onDeleteTable={deleteTable}
+            />
+          </ToolbarGroup>
 
-          <UtilsBubbleMenu editor={editor} />
+          <ToolbarGroup>
+            <UtilsBubbleMenu editor={editor} />
+          </ToolbarGroup>
 
           <div className="flex-1"></div>
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant={isPreviewMode ? 'default' : 'outline'}
-                size="sm"
-                onClick={() => setIsPreviewMode((prev) => !prev)}
-                className="ml-auto"
-              >
-                {isPreviewMode ? (
-                  <>
-                    <EyeOff className="h-4 w-4" />
-                    Edit
-                  </>
-                ) : (
-                  <>
-                    <Eye className="h-4 w-4" />
-                    Preview
-                  </>
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>
-              {isPreviewMode ? 'Switch to Edit Mode' : 'Switch to Preview Mode'}
-            </TooltipContent>
-          </Tooltip>
+          <ToolbarGroup>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant={isPreviewMode ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setIsPreviewMode((prev) => !prev)}
+                  className="ml-auto"
+                >
+                  {isPreviewMode ? (
+                    <>
+                      <EyeOff className="h-4 w-4" />
+                      Edit
+                    </>
+                  ) : (
+                    <>
+                      <Eye className="h-4 w-4" />
+                      Preview
+                    </>
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                {isPreviewMode ? 'Switch to Edit Mode' : 'Switch to Preview Mode'}
+              </TooltipContent>
+            </Tooltip>
 
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={saveContent}
-                disabled={isSaving || !editor?.isEditable}
-              >
-                {isSaving ? (
-                  <Loader className="h-4 w-4 animate-spin" />
-                ) : error ? (
-                  <>
-                    <X className="h-4 w-4" />
-                  </>
-                ) : (
-                  <Check className="h-4 w-4" />
-                )}
-              </Button>
-            </TooltipTrigger>
-            <TooltipContent>Local Status</TooltipContent>
-          </Tooltip>
-        </div>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={saveContent}
+                  disabled={isSaving || !editor?.isEditable}
+                >
+                  {isSaving ? (
+                    <Loader className="h-4 w-4 animate-spin" />
+                  ) : error ? (
+                    <>
+                      <X className="h-4 w-4" />
+                    </>
+                  ) : (
+                    <Check className="h-4 w-4" />
+                  )}
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>Local Status</TooltipContent>
+            </Tooltip>
+          </ToolbarGroup>
+        </Toolbar>
       )}
 
       {/* Bubble Menu for quick formatting */}

@@ -1,8 +1,8 @@
 import { Editor } from '@tiptap/react'
 import {
   Bold,
-  Droplet,
   Code,
+  Droplet,
   Heading1,
   Heading2,
   Heading3,
@@ -19,11 +19,7 @@ import { Input } from '~/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '~/components/ui/popover'
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 
-export default function TextBubbleMenu({
-  editor,
-}: {
-  editor: Editor | null
-}) {
+export default function TextBubbleMenu({ editor }: { editor: Editor | null }) {
   if (!editor) return null
   const isEditable = !!editor.isEditable
   const activeColor = (editor.getAttributes('textColor')?.color as string | undefined) || ''
@@ -94,7 +90,13 @@ export default function TextBubbleMenu({
               onChange={(event) => applyColor(event.target.value)}
               className="h-9 w-full cursor-pointer"
             />
-            <Button type="button" variant="outline" size="sm" className="w-full" onClick={clearColor}>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={clearColor}
+            >
               Clear Color
             </Button>
           </div>
