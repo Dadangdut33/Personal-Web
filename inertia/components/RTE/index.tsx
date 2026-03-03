@@ -27,6 +27,7 @@ import { cn } from '~/lib/utils'
 import { lowlight } from './code_languages'
 import AlertDialogButton from './components/alert/alert-dialog-button'
 import AudioDialogButton from './components/audio/audio-dialog-button'
+import ExcalidrawDialogButton from './components/excalidraw/excalidraw-dialog-button'
 import FileDialogButton from './components/file/file-dialog-button'
 import GridDialogButton from './components/grid/grid-dialog-button'
 import ImageBubbleMenu from './components/image/image-bubble-menu'
@@ -43,6 +44,7 @@ import YoutubeDialogButton from './components/youtube/youtube-dialog-button'
 import AlertBlock from './extensions/alert-block'
 import AudioAttachment from './extensions/audio-attachment'
 import CustomCodeBlockLowlight from './extensions/code-block-lowlight'
+import ExcalidrawBlock from './extensions/excalidraw-block'
 import FileAttachment from './extensions/file-attachment'
 import GridBlock from './extensions/grid-block'
 import LinkCard from './extensions/link-card'
@@ -145,6 +147,7 @@ export default function TiptapEditor({
     extensions: [
       StarterKit.configure({
         codeBlock: false,
+        link: false,
         heading: {
           levels: [1, 2, 3, 4, 5, 6],
         },
@@ -153,6 +156,7 @@ export default function TiptapEditor({
       YoutubeEmbed,
       AlertBlock,
       GridBlock,
+      ExcalidrawBlock,
       TextColor,
       AudioAttachment,
       VideoAttachment,
@@ -807,6 +811,7 @@ export default function TiptapEditor({
 
             <AlertDialogButton editor={editor} />
             <GridDialogButton editor={editor} />
+            <ExcalidrawDialogButton editor={editor} />
 
             <TableInsertDialogButton
               editor={editor}
