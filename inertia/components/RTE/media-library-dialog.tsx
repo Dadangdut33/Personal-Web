@@ -38,6 +38,7 @@ import { Skeleton } from '~/components/ui/skeleton'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs'
 import type { Data } from '~data'
 
+import ImageWithLoader from '../core/image'
 import { deleteMedia, getMediaLibrary } from './upload-service'
 
 interface MediaLibraryDialogProps {
@@ -300,14 +301,10 @@ export default function MediaLibraryDialog({
                     className="h-full w-full"
                     onClick={() => handleSelectMedia(media)}
                   >
-                    <img
+                    <ImageWithLoader
                       src={media.url}
                       alt={media.name}
                       className="w-full h-full object-cover cursor-pointer hover:scale-105 transition-transform"
-                      onError={(e) => {
-                        ;(e.target as HTMLImageElement).src =
-                          '/placeholder.svg?height=200&width=200'
-                      }}
                     />
                   </button>
                 ) : isVideoMime(media.mime_type) ? (
@@ -397,13 +394,10 @@ export default function MediaLibraryDialog({
           >
             <div className="w-16 h-16 rounded-md overflow-hidden bg-muted flex-shrink-0">
               {isImageMime(media.mime_type) ? (
-                <img
+                <ImageWithLoader
                   src={media.url}
                   alt={media.name}
                   className="w-full h-full object-cover"
-                  onError={(e) => {
-                    ;(e.target as HTMLImageElement).src = '/placeholder.svg?height=64&width=64'
-                  }}
                 />
               ) : isVideoMime(media.mime_type) ? (
                 <video
@@ -631,14 +625,10 @@ export default function MediaLibraryDialog({
                   <p className="text-sm font-medium mb-2">Preview:</p>
                   {pickerType === 'image' ? (
                     <div className="aspect-video bg-muted rounded-md overflow-hidden">
-                      <img
+                      <ImageWithLoader
                         src={externalUrl || '/placeholder.svg'}
                         alt="Preview"
                         className="w-full h-full object-contain"
-                        onError={(e) => {
-                          ;(e.target as HTMLImageElement).src =
-                            '/placeholder.svg?height=200&width=400'
-                        }}
                       />
                     </div>
                   ) : (

@@ -38,6 +38,7 @@ import TableBubbleMenu from './components/table/tabble-bubble-menu'
 import TableInsertDialogButton from './components/table/table-insert-dialog-button'
 import TableOperationsDropdown from './components/table/table-operations-dropdown'
 import TextBubbleMenu from './components/text/text-bubble-menu'
+import UploadStatusPanel, { type UploadTask } from './components/upload/upload-status-panel'
 import UtilsBubbleMenu from './components/utils-bubble-menu'
 import VideoDialogButton from './components/video/video-dialog-button'
 import YoutubeDialogButton from './components/youtube/youtube-dialog-button'
@@ -476,6 +477,24 @@ export default function TiptapEditor({
     }
   }, [isToolbarSticky, stickyToolbarLayout])
 
+  const activeUploads = useMemo<UploadTask[]>(() => {
+    const tasks: UploadTask[] = []
+    if (isUploading) tasks.push({ id: 'image', progress: uploadProgress })
+    if (isUploadingFile) tasks.push({ id: 'file', progress: fileUploadProgress })
+    if (isUploadingAudio) tasks.push({ id: 'audio', progress: audioUploadProgress })
+    if (isUploadingVideo) tasks.push({ id: 'video', progress: videoUploadProgress })
+    return tasks
+  }, [
+    isUploading,
+    uploadProgress,
+    isUploadingFile,
+    fileUploadProgress,
+    isUploadingAudio,
+    audioUploadProgress,
+    isUploadingVideo,
+    videoUploadProgress,
+  ])
+
   // Load initial content
   useEffect(() => {
     if (editor && content) {
@@ -705,6 +724,8 @@ export default function TiptapEditor({
           <AlertDescription>{error}</AlertDescription>
         </Alert>
       )}
+
+      {!readOnly && <UploadStatusPanel tasks={activeUploads} />}
 
       {/* The toolbar menu, same component as bubble mostly */}
       {!readOnly && (

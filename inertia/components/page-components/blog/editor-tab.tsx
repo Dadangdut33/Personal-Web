@@ -3,7 +3,6 @@ import {
   Button,
   Checkbox,
   Group,
-  Image,
   MultiSelect,
   Paper,
   Stack,
@@ -16,6 +15,7 @@ import { UseFormReturnType } from '@mantine/form'
 import { IconPhoto, IconPhotoPlus, IconTrash, IconUpload } from '@tabler/icons-react'
 import type { ChangeEvent, RefObject } from 'react'
 import TiptapEditor from '~/components/RTE'
+import ImageWithLoader from '~/components/core/image'
 import { urlFor } from '~/lib/client'
 
 type BlogFormValues = {
@@ -121,11 +121,12 @@ export default function BlogEditorTab({
         </Text>
 
         {thumbnailPreviewUrl ? (
-          <Image
+          <ImageWithLoader
             src={thumbnailPreviewUrl}
             alt="Blog thumbnail preview"
             radius="md"
             h={220}
+            height={220}
             fit="cover"
             fallbackSrc="https://placehold.co/800x400?text=Thumbnail"
           />

@@ -7,7 +7,6 @@ import {
   Checkbox,
   Divider,
   Group,
-  Image,
   Paper,
   Stack,
   TagsInput,
@@ -30,6 +29,7 @@ import type React from 'react'
 import { useRef, useState } from 'react'
 import MediaLibraryDialog from '~/components/RTE/media-library-dialog'
 import { uploadImage } from '~/components/RTE/upload-service'
+import ImageWithLoader from '~/components/core/image'
 import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyInfo } from '~/components/core/notify'
 import { IconPicker } from '~/components/page-components/project/icon-picker'
@@ -292,11 +292,12 @@ export default function Page(props: PageProps) {
               </Text>
 
               {thumbnailPreviewUrl ? (
-                <Image
+                <ImageWithLoader
                   src={thumbnailPreviewUrl}
                   alt="Project thumbnail preview"
                   radius="md"
                   h={220}
+                  height={220}
                   fit="cover"
                   fallbackSrc="https://placehold.co/800x400?text=Thumbnail"
                 />

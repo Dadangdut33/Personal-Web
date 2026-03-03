@@ -1,8 +1,8 @@
 'use client'
 
-import { Image } from '@mantine/core'
 import { animate, motion, useMotionValue, useTransform } from 'framer-motion'
 import { useEffect } from 'react'
+import ImageWithLoader from '~/components/core/image'
 import DotPattern from '~/components/ui/dot-pattern'
 
 export default function Logo({
@@ -75,7 +75,7 @@ export default function Logo({
           transition={{ velocity: 0 }}
           className="mx-auto w-container max-w-full px-5 text-center"
         >
-          <Image
+          <ImageWithLoader
             src={'/media/logo-transparent.png'}
             alt="Logo"
             className={imgClassname || 'w-[300px]'}

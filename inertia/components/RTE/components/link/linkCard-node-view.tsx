@@ -1,6 +1,7 @@
 import { type NodeViewProps, NodeViewWrapper } from '@tiptap/react'
 import { Loader2, Pencil, RefreshCw, Save, X } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
+import ImageWithLoader from '~/components/core/image'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent } from '~/components/ui/card'
@@ -198,7 +199,7 @@ export default function LinkCardNodeView({ node, editor, updateAttributes }: Nod
     <Card className={cn('group gap-0 overflow-hidden', widthClass, wrapperPositionClass)}>
       {resolvedImageUrl ? (
         <div className="h-40 overflow-hidden border-b-2 border-border bg-muted">
-          <img
+          <ImageWithLoader
             src={resolvedImageUrl}
             alt={resolvedTitle}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"

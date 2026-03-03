@@ -3,6 +3,8 @@ import { Badge } from '~/components/ui/badge'
 import { Card, CardContent } from '~/components/ui/card'
 import { cn, limitString } from '~/lib/utils'
 
+import ImageWithLoader from './image'
+
 type LinkCardPreviewProps = {
   url: string
   title?: string | null
@@ -55,7 +57,7 @@ export default function LinkCardPreview({
       >
         {imageUrl ? (
           <div className="h-40 w-full overflow-hidden border-b-2 border-border bg-muted">
-            <img
+            <ImageWithLoader
               src={imageUrl}
               alt={resolvedTitle}
               className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
@@ -78,7 +80,9 @@ export default function LinkCardPreview({
 
           <h4 className="line-clamp-2 break-words text-sm font-heading">{resolvedTitle}</h4>
           <p className="line-clamp-2 text-xs text-muted-foreground">{resolvedDescription}</p>
-          <p className="break-all text-xs text-muted-foreground/80">{limitString(displayUrl, 70)}</p>
+          <p className="break-all text-xs text-muted-foreground/80">
+            {limitString(displayUrl, 70)}
+          </p>
         </CardContent>
       </Card>
     </a>

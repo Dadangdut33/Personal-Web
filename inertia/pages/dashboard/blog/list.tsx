@@ -7,7 +7,6 @@ import {
   Alert,
   Badge,
   Group,
-  Image,
   Tooltip as MantineTooltip,
   Menu,
   Paper,
@@ -34,6 +33,7 @@ import { useState } from 'react'
 import { DashboardSearchPanel } from '~/components/core/dashboard/search-panel'
 import { DashboardTableButtons } from '~/components/core/dashboard/table-buttons'
 import { GenericBulkDeleteDescription, GenericDeleteTitle } from '~/components/core/delete-helper'
+import ImageWithLoader from '~/components/core/image'
 import { FilterDate } from '~/components/core/table-filter/date-filter'
 import { FilterText } from '~/components/core/table-filter/text-filter'
 import { TooltipIfTrue } from '~/components/core/tooltipper'
@@ -132,11 +132,12 @@ export default function Page(props: PageProps) {
       width: 200,
       render: (record) =>
         record.thumbnail?.url ? (
-          <Image
+          <ImageWithLoader
             src={record.thumbnail.url}
             alt={record.title}
             w={200}
             h={120}
+            height={120}
             radius="sm"
             fit="cover"
             fallbackSrc="https://placehold.co/200x200?text=No+Image"

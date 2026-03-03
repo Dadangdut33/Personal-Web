@@ -2,6 +2,7 @@ import { Link } from '@adonisjs/inertia/react'
 import dayjs from 'dayjs'
 import { ArrowRight, ExternalLink, Pin } from 'lucide-react'
 import HorizontalDragScroll from '~/components/core/horizontal-drag-scroll'
+import ImageWithLoader from '~/components/core/image'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { Data } from '~/generated/data'
@@ -15,7 +16,7 @@ export default function ProjectCard({ project }: { project: Data.Project }) {
     <article className="flex h-full flex-col rounded-base border-2 border-border bg-secondary-background shadow-shadow">
       <div className="relative h-48 overflow-hidden border-b-2 border-border">
         {project.thumbnail?.url ? (
-          <img
+          <ImageWithLoader
             src={project.thumbnail.url}
             alt={project.title}
             className="h-full w-full object-cover"

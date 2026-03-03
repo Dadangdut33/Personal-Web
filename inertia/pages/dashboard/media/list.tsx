@@ -12,7 +12,6 @@ import {
   Code,
   CopyButton,
   Group,
-  Image,
   Tooltip as MantineTooltip,
   Paper,
   SegmentedControl,
@@ -49,6 +48,7 @@ import { useState } from 'react'
 import { DashboardSearchPanel } from '~/components/core/dashboard/search-panel'
 import { DashboardTableButtons } from '~/components/core/dashboard/table-buttons'
 import { GenericBulkDeleteDescription, GenericDeleteTitle } from '~/components/core/delete-helper'
+import ImageWithLoader from '~/components/core/image'
 import { useModals } from '~/components/core/modal/modal-hooks'
 import { FilterDate } from '~/components/core/table-filter/date-filter'
 import { FilterText } from '~/components/core/table-filter/text-filter'
@@ -116,9 +116,10 @@ function previewItem(
             Image
           </Badge>
         </div>
-        <Image
+        <ImageWithLoader
           src={record.url}
           fit="cover"
+          alt={record.name}
           w={width ?? '100%'}
           h={height ?? '100%'}
           fallbackSrc="https://placehold.co/200x200?text=Err"

@@ -1,6 +1,7 @@
 import { type NodeViewProps, NodeViewWrapper } from '@tiptap/react'
 import { Loader2, Pencil, RefreshCw, Save, X } from 'lucide-react'
 import { useEffect, useState } from 'react'
+import ImageWithLoader from '~/components/core/image'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { Card, CardContent } from '~/components/ui/card'
@@ -346,7 +347,11 @@ export default function YoutubeNodeView({ node, editor, updateAttributes }: Node
               allowFullScreen
             />
           ) : thumbnailUrl ? (
-            <img src={thumbnailUrl} alt={resolvedTitle} className="h-full w-full object-cover" />
+            <ImageWithLoader
+              src={thumbnailUrl}
+              alt={resolvedTitle}
+              className="h-full w-full object-cover"
+            />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-sm text-white/80">
               Invalid YouTube URL

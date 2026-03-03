@@ -1,12 +1,13 @@
 import { Link } from '@adonisjs/inertia/react'
 import { router } from '@inertiajs/core'
-import { Image, Tooltip, useMantineColorScheme } from '@mantine/core'
+import { Tooltip, useMantineColorScheme } from '@mantine/core'
 import dayjs from 'dayjs'
 import { ArrowLeft, ArrowUp, CalendarDays, Pin } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import TiptapEditor from '~/components/RTE'
 import GiscusComments from '~/components/core/giscus-comments'
 import HorizontalDragScroll from '~/components/core/horizontal-drag-scroll'
+import ImageWithLoader from '~/components/core/image'
 import AppMeta from '~/components/core/meta'
 import BlogContributors from '~/components/page-components/blog/blog-contributors'
 import BlogHeadingTOC from '~/components/page-components/blog/blog-heading-toc'
@@ -228,7 +229,8 @@ export default function BlogPostPage(props: PageProps) {
         >
           {data.thumbnail?.url ? (
             <div className="overflow-hidden border-b-2 border-border">
-              <Image
+              <ImageWithLoader
+                height={250}
                 src={data.thumbnail.url}
                 alt={data.title}
                 className="max-h-[450px] w-full object-cover"

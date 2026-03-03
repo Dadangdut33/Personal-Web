@@ -1,8 +1,8 @@
 import { Link } from '@adonisjs/inertia/react'
-import { Image } from '@mantine/core'
 import dayjs from 'dayjs'
 import { ArrowRight, CalendarDays, Clock3, Pin } from 'lucide-react'
 import HorizontalDragScroll from '~/components/core/horizontal-drag-scroll'
+import ImageWithLoader from '~/components/core/image'
 import { Badge } from '~/components/ui/badge'
 import { Button } from '~/components/ui/button'
 import { cn } from '~/lib/utils'
@@ -24,7 +24,8 @@ export default function BlogCard({ blog, variant = 'default' }: BlogCardProps) {
         className={`relative overflow-hidden border-b-2 border-border ${isCompact ? 'h-36' : 'h-48'}`}
       >
         {blog.thumbnail?.url ? (
-          <Image
+          <ImageWithLoader
+            height={200}
             src={blog.thumbnail.url}
             alt={blog.title}
             className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"

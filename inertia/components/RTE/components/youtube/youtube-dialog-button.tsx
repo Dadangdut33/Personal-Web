@@ -1,5 +1,6 @@
 import { Editor } from '@tiptap/react'
 import { Loader2, RefreshCw, Youtube } from 'lucide-react'
+import ImageWithLoader from '~/components/core/image'
 import { Button } from '~/components/ui/button'
 import {
   Dialog,
@@ -98,7 +99,7 @@ export default function YoutubeDialogButton({
           {(youtubeMetadata?.thumbnailUrl || youtubeMetadata?.title) && (
             <div className="rounded-base overflow-hidden border-2 border-border">
               {youtubeMetadata?.thumbnailUrl ? (
-                <img
+                <ImageWithLoader
                   src={youtubeMetadata.thumbnailUrl}
                   alt={youtubeMetadata.title || 'YouTube thumbnail'}
                   className="aspect-video w-full object-cover"
@@ -125,4 +126,3 @@ export default function YoutubeDialogButton({
     </Dialog>
   )
 }
-
