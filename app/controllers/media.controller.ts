@@ -93,17 +93,7 @@ export default class MediaController {
       const { id } = params
       if (!id) return response.abort(404)
 
-      const url = await cache.getOrSet({
-        key: 'media-' + id,
-        ttl: '1h',
-        factory: async () => {
-          return await this.mediaSvc.getMediaURLById(id)
-        },
-        onFactoryError(error) {
-          logger.error(error, 'MEDIA_PROXY_FACTORY_ERROR ' + id)
-        },
-      })
-
+      const url = await this.mediaSvc.getMediaURLById(id)
       if (!url) return response.abort(404)
 
       return response.redirect(url)

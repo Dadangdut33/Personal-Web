@@ -3,11 +3,11 @@ import Tag from '#models/tag'
 import TagRepository from '#repositories/tag.repository'
 import env from '#start/env'
 
-import { MultipartFile } from '@adonisjs/core/bodyparser'
-import { Disk } from '@adonisjs/drive'
+import type { MultipartFile } from '@adonisjs/core/bodyparser'
+import type { Disk } from '@adonisjs/drive'
 import drive from '@adonisjs/drive/services/main'
 import db from '@adonisjs/lucid/services/db'
-import { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 import crypto from 'node:crypto'
 import { readFile, unlink } from 'node:fs/promises'
 
@@ -238,18 +238,18 @@ export default class MediaRepository extends BaseRepository<typeof Media> {
    * We use signed url for temporary access
    */
   async getMediaURLPrivate(media: Media) {
-    return this.disk.getSignedUrl(media.drive_key)
+    return this.disk.getSignedUrl(media.drive_key, { expiresIn: '1h' })
   }
 
   async getMediaURLPrivateById(id: string) {
     const media = await this.findById(id)
     if (!media) return null
 
-    return this.disk.getSignedUrl(media.drive_key)
+    return this.disk.getSignedUrl(media.drive_key, { expiresIn: '1h' })
   }
 
   async getMediaURLPrivateByKey(key: string) {
-    return this.disk.getSignedUrl(key)
+    return this.disk.getSignedUrl(key, { expiresIn: '1h' })
   }
 
   /**
