@@ -20,6 +20,7 @@ export default function ProjectCard({ project }: { project: Data.Project }) {
             src={project.thumbnail.url}
             alt={project.title}
             className="h-full w-full object-cover"
+            height={'100%'}
           />
         ) : (
           <div className="grid h-full place-items-center bg-background text-sm text-foreground/70">
