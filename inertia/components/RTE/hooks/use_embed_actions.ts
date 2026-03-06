@@ -19,12 +19,27 @@ type YoutubeMetadata = {
   thumbnailUrl?: string | null
 }
 
-const normalizeExternalUrl = (rawUrl: string) => {
+const normalizeLinkUrl = (rawUrl: string) => {
   const trimmed = rawUrl.trim()
   if (!trimmed) return ''
+  if (trimmed.startsWith('#')) return trimmed
   if (/^https?:\/\//i.test(trimmed)) return trimmed
   return `https://${trimmed}`
 }
+
+const isAnchorLink = (value: string) => value.startsWith('#')
+const getLinkAttrs = (url: string) =>
+  isAnchorLink(url)
+    ? {
+        href: url,
+        target: null,
+        rel: null,
+      }
+    : {
+        href: url,
+        target: '_blank',
+        rel: 'noopener noreferrer nofollow',
+      }
 
 const extractYoutubeVideoId = (input: string) => {
   const trimmed = input.trim()
@@ -59,14 +74,33 @@ export default function useEmbedActions(editor: Editor | null) {
   const setLink = useCallback(() => {
     if (!editor || !editor.isEditable) return
 
-    const normalizedUrl = normalizeExternalUrl(linkUrl)
+    const normalizedUrl = normalizeLinkUrl(linkUrl)
     if (!normalizedUrl) return
 
     const selection = editor.state.selection
     const hasTextSelection = !selection.empty && !(selection instanceof NodeSelection)
+    const linkAttrs = getLinkAttrs(normalizedUrl)
 
     if (hasTextSelection) {
-      editor.chain().focus().extendMarkRange('link').setLink({ href: normalizedUrl }).run()
+      editor.chain().focus().extendMarkRange('link').setLink(linkAttrs).run()
+    } else if (isAnchorLink(normalizedUrl)) {
+      editor
+        .chain()
+        .focus()
+        .insertContent([
+          {
+            type: 'text',
+            text: normalizedUrl,
+            marks: [
+              {
+                type: 'link',
+                attrs: linkAttrs,
+              },
+            ],
+          },
+          { type: 'paragraph' },
+        ])
+        .run()
     } else {
       const isMetadataForCurrentUrl = linkMetadata?.url === normalizedUrl
       editor
@@ -98,8 +132,13 @@ export default function useEmbedActions(editor: Editor | null) {
   const fetchLinkMetadata = useCallback(async () => {
     if (!editor || !editor.isEditable) return
 
-    const normalizedUrl = normalizeExternalUrl(linkUrl)
+    const normalizedUrl = normalizeLinkUrl(linkUrl)
     if (!normalizedUrl) return
+    if (isAnchorLink(normalizedUrl)) {
+      setLinkMetadata(null)
+      setLinkMetadataError('Anchor links do not use metadata preview')
+      return
+    }
 
     setIsFetchingLinkMetadata(true)
     setLinkMetadataError(null)
@@ -133,7 +172,7 @@ export default function useEmbedActions(editor: Editor | null) {
   const fetchYoutubeMetadata = useCallback(async () => {
     if (!editor || !editor.isEditable) return
 
-    const normalizedUrl = normalizeExternalUrl(youtubeUrl)
+    const normalizedUrl = normalizeLinkUrl(youtubeUrl)
     const videoId = extractYoutubeVideoId(normalizedUrl)
     if (!normalizedUrl || !videoId) {
       setYoutubeMetadataError('Invalid YouTube URL')
@@ -173,7 +212,7 @@ export default function useEmbedActions(editor: Editor | null) {
   const addYoutubeEmbed = useCallback(() => {
     if (!editor || !editor.isEditable) return
 
-    const normalizedUrl = normalizeExternalUrl(youtubeUrl)
+    const normalizedUrl = normalizeLinkUrl(youtubeUrl)
     const videoId = extractYoutubeVideoId(normalizedUrl)
     if (!normalizedUrl || !videoId) {
       setYoutubeMetadataError('Invalid YouTube URL')
@@ -214,7 +253,7 @@ export default function useEmbedActions(editor: Editor | null) {
       return
     }
 
-    const normalized = normalizeExternalUrl(linkUrl)
+    const normalized = normalizeLinkUrl(linkUrl)
     if (linkMetadata?.url && linkMetadata.url !== normalized) {
       setLinkMetadata(null)
       setLinkMetadataError(null)
@@ -228,7 +267,7 @@ export default function useEmbedActions(editor: Editor | null) {
       return
     }
 
-    const normalized = normalizeExternalUrl(youtubeUrl)
+    const normalized = normalizeLinkUrl(youtubeUrl)
     if (youtubeMetadata?.url && youtubeMetadata.url !== normalized) {
       setYoutubeMetadata(null)
       setYoutubeMetadataError(null)

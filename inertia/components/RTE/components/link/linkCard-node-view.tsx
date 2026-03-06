@@ -116,8 +116,12 @@ export default function LinkCardNodeView({ node, editor, updateAttributes }: Nod
   const resolvedSize = isEditing ? form.size : attrs.size || 'md'
   const resolvedPosition = isEditing ? form.position : attrs.position || 'center'
 
-  const wrapperPositionClass =
-    resolvedPosition === 'left' ? 'mr-auto' : resolvedPosition === 'right' ? 'ml-auto' : 'mx-auto'
+  const alignmentClass =
+    resolvedPosition === 'left'
+      ? 'justify-start'
+      : resolvedPosition === 'right'
+        ? 'justify-end'
+        : 'justify-center'
 
   const widthClass =
     resolvedSize === 'sm'
@@ -125,6 +129,8 @@ export default function LinkCardNodeView({ node, editor, updateAttributes }: Nod
       : resolvedSize === 'lg'
         ? 'w-full'
         : 'w-[34rem] max-w-full'
+
+  const cardBoxClass = cn('max-w-full', widthClass)
 
   const updateField = (key: keyof FormState, value: string) => {
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -196,7 +202,7 @@ export default function LinkCardNodeView({ node, editor, updateAttributes }: Nod
   }
 
   const cardContent = (
-    <Card className={cn('group gap-0 overflow-hidden', widthClass, wrapperPositionClass)}>
+    <Card className={cn('group gap-0 overflow-hidden', cardBoxClass)}>
       {resolvedImageUrl ? (
         <div className="h-40 overflow-hidden border-b-2 border-border bg-muted">
           <ImageWithLoader
@@ -230,65 +236,69 @@ export default function LinkCardNodeView({ node, editor, updateAttributes }: Nod
     <NodeViewWrapper className="not-prose my-3">
       {isEditable && (
         <div
-          className={cn('mb-2 flex flex-wrap items-center gap-2', widthClass, wrapperPositionClass)}
+          className={cn('mb-2 flex w-full flex-wrap items-center gap-2', alignmentClass)}
         >
-          <Button
-            size="sm"
-            variant="outline"
-            type="button"
-            onClick={refetchMetadata}
-            disabled={isFetching || !normalizeExternalUrl(form.url || attrs.url || '')}
-          >
-            {isFetching ? (
-              <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Refetching...
-              </>
+          <div className={cn('flex flex-wrap items-center gap-2', cardBoxClass)}>
+            <Button
+              size="sm"
+              variant="outline"
+              type="button"
+              onClick={refetchMetadata}
+              disabled={isFetching || !normalizeExternalUrl(form.url || attrs.url || '')}
+            >
+              {isFetching ? (
+                <>
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Refetching...
+                </>
+              ) : (
+                <>
+                  <RefreshCw className="h-4 w-4" />
+                  Refetch
+                </>
+              )}
+            </Button>
+
+            {!isEditing ? (
+              <Button size="sm" variant="outline" type="button" onClick={() => setIsEditing(true)}>
+                <Pencil className="h-4 w-4" />
+                Edit
+              </Button>
             ) : (
               <>
-                <RefreshCw className="h-4 w-4" />
-                Refetch
+                <Button size="sm" type="button" onClick={saveManualEdit}>
+                  <Save className="h-4 w-4" />
+                  Save
+                </Button>
+                <Button size="sm" variant="outline" type="button" onClick={cancelManualEdit}>
+                  <X className="h-4 w-4" />
+                  Cancel
+                </Button>
               </>
             )}
-          </Button>
 
-          {!isEditing ? (
-            <Button size="sm" variant="outline" type="button" onClick={() => setIsEditing(true)}>
-              <Pencil className="h-4 w-4" />
-              Edit
-            </Button>
-          ) : (
-            <>
-              <Button size="sm" type="button" onClick={saveManualEdit}>
-                <Save className="h-4 w-4" />
-                Save
-              </Button>
-              <Button size="sm" variant="outline" type="button" onClick={cancelManualEdit}>
-                <X className="h-4 w-4" />
-                Cancel
-              </Button>
-            </>
-          )}
+            <select
+              value={form.size}
+              onChange={(e) => updateLayoutField('size', e.target.value as FormState['size'])}
+              className="h-9 rounded-base border-2 border-border bg-secondary-background px-3 text-sm"
+            >
+              <option value="sm">Small</option>
+              <option value="md">Medium</option>
+              <option value="lg">Large</option>
+            </select>
 
-          <select
-            value={form.size}
-            onChange={(e) => updateLayoutField('size', e.target.value as FormState['size'])}
-            className="h-9 rounded-base border-2 border-border bg-secondary-background px-3 text-sm"
-          >
-            <option value="sm">Small</option>
-            <option value="md">Medium</option>
-            <option value="lg">Large</option>
-          </select>
-
-          <select
-            value={form.position}
-            onChange={(e) => updateLayoutField('position', e.target.value as FormState['position'])}
-            className="h-9 rounded-base border-2 border-border bg-secondary-background px-3 text-sm"
-          >
-            <option value="left">Left</option>
-            <option value="center">Center</option>
-            <option value="right">Right</option>
-          </select>
+            <select
+              value={form.position}
+              onChange={(e) =>
+                updateLayoutField('position', e.target.value as FormState['position'])
+              }
+              className="h-9 rounded-base border-2 border-border bg-secondary-background px-3 text-sm"
+            >
+              <option value="left">Left</option>
+              <option value="center">Center</option>
+              <option value="right">Right</option>
+            </select>
+          </div>
         </div>
       )}
 
@@ -325,18 +335,20 @@ export default function LinkCardNodeView({ node, editor, updateAttributes }: Nod
         </div>
       )}
 
-      {!isEditable && resolvedUrl ? (
-        <a
-          href={resolvedUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          className={cn('block max-w-full', widthClass, wrapperPositionClass)}
-        >
-          {cardContent}
-        </a>
-      ) : (
-        cardContent
-      )}
+      <div className={cn('flex w-full', alignmentClass)}>
+        {!isEditable && resolvedUrl ? (
+          <a
+            href={resolvedUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={cn('inline-block max-w-full align-top', cardBoxClass)}
+          >
+            {cardContent}
+          </a>
+        ) : (
+          cardContent
+        )}
+      </div>
     </NodeViewWrapper>
   )
 }

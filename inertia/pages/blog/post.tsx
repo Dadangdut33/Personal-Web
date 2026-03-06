@@ -36,7 +36,20 @@ type HeadingItem = {
   level: number
 }
 
-const slugifyHeading = (text: string, index: number) => {
+const TOC_EXCLUDED_HEADING_CONTAINERS = [
+  '.not-prose',
+  '[data-node-view-wrapper]',
+  '[data-link-card]',
+  '[data-alert-block]',
+  '[data-grid-block]',
+  '[data-youtube-embed]',
+  '[data-file-attachment]',
+  '[data-audio-attachment]',
+  '[data-video-attachment]',
+  '[data-excalidraw-block]',
+].join(', ')
+
+const slugifyHeading = (text: string) => {
   const safe = text
     .toLowerCase()
     .trim()
@@ -45,7 +58,7 @@ const slugifyHeading = (text: string, index: number) => {
     .replace(/-+/g, '-')
     .replace(/^-+|-+$/g, '')
 
-  return safe ? `${safe}-${index}` : `section-${index}`
+  return safe
 }
 
 const getHeadingAnchorClassName = (level: number) => {
@@ -120,20 +133,26 @@ export default function BlogPostPage(props: PageProps) {
     const container = contentRef.current
     if (!container) return
 
-    const headingElements = Array.from(
+    const allHeadingElements = Array.from(
       container.querySelectorAll<HTMLHeadingElement>('h1, h2, h3, h4, h5, h6')
     )
 
-    const mapped: HeadingItem[] = headingElements
-      .map((element, index) => {
-        const oldAnchor = element.querySelector<HTMLElement>('.blog-heading-anchor-link')
-        oldAnchor?.remove()
+    allHeadingElements.forEach((element) => {
+      const oldAnchor = element.querySelector<HTMLElement>('.blog-heading-anchor-link')
+      oldAnchor?.remove()
+    })
 
+    const headingElements = allHeadingElements.filter(
+      (element) => !element.closest(TOC_EXCLUDED_HEADING_CONTAINERS)
+    )
+
+    const mapped: HeadingItem[] = headingElements
+      .map((element) => {
         const text = element.textContent?.trim() || ''
         if (!text) return null
 
         const level = Number(element.tagName.replace('H', '')) || 2
-        const id = element.id || slugifyHeading(text, index + 1)
+        const id = element.id || slugifyHeading(text)
 
         element.id = id
         element.classList.add('group/heading', 'scroll-mt-24')

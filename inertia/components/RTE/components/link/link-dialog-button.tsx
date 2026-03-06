@@ -59,6 +59,7 @@ export default function LinkDialogButton({
   const hasTextSelection = selection
     ? !selection.empty && !(selection instanceof NodeSelection)
     : false
+  const isAnchorLink = linkUrl.trim().startsWith('#')
 
   return (
     <Dialog>
@@ -86,7 +87,7 @@ export default function LinkDialogButton({
             <Label htmlFor="url">URL</Label>
             <Input
               id="url"
-              placeholder="https://example.com"
+              placeholder="https://example.com or #section-id"
               value={linkUrl}
               onChange={(e) => setLinkUrl(e.target.value)}
               disabled={!isEditable}
@@ -94,7 +95,7 @@ export default function LinkDialogButton({
             />
           </div>
 
-          {!hasTextSelection && (
+          {!hasTextSelection && !isAnchorLink && (
             <div className="flex items-center justify-end">
               <Button
                 variant="outline"
@@ -121,7 +122,7 @@ export default function LinkDialogButton({
             <p className="text-sm text-destructive">{linkMetadataError}</p>
           ) : null}
 
-          {(linkMetadata || linkUrl.trim()) && !hasTextSelection && (
+          {(linkMetadata || linkUrl.trim()) && !hasTextSelection && !isAnchorLink && (
             <LinkCardPreview
               url={linkMetadata?.url || linkUrl}
               title={linkMetadata?.title}
@@ -137,7 +138,7 @@ export default function LinkDialogButton({
           </DialogClose>
           <DialogClose asChild>
             <Button onClick={onAddLink} disabled={!isEditable || !linkUrl.trim()}>
-              {hasTextSelection ? 'Add Link' : 'Add Link Card'}
+              {hasTextSelection || isAnchorLink ? 'Add Link' : 'Add Link Card'}
             </Button>
           </DialogClose>
         </div>
