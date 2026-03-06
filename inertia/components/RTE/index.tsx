@@ -22,6 +22,7 @@ import { Toolbar, ToolbarGroup } from '~/components/tiptap-ui-primitive/toolbar'
 import { Alert, AlertDescription } from '~/components/ui/alert'
 import { Button } from '~/components/ui/button'
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
+import { sanitizeTiptapContent } from '~/lib/rte_content'
 import { cn } from '~/lib/utils'
 
 import { lowlight } from './code_languages'
@@ -504,14 +505,14 @@ export default function TiptapEditor({
           // Try to parse as JSON
           try {
             const parsedContent = JSON.parse(content)
-            editor.commands.setContent(parsedContent)
+            editor.commands.setContent(sanitizeTiptapContent(parsedContent))
           } catch (e) {
             // If not valid JSON, set as HTML
             editor.commands.setContent(content)
           }
         } else {
           // If object, set directly
-          editor.commands.setContent(content)
+          editor.commands.setContent(sanitizeTiptapContent(content))
         }
       } catch (err) {
         const errorMessage = 'Failed to load content into the editor'
@@ -544,7 +545,7 @@ export default function TiptapEditor({
 
     setIsSaving(true)
     try {
-      const json = editor.getJSON()
+      const json = sanitizeTiptapContent(editor.getJSON())
       if (onSave) onSave(json)
       setError(null)
     } catch (err) {
