@@ -19,7 +19,7 @@ function ImageWithLoader({
   alt,
   width,
   height = 100,
-  radius = 'md',
+  radius = 'xs',
   className,
   styles,
   fallbackSrc,
