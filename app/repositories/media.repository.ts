@@ -103,6 +103,7 @@ export default class MediaRepository extends BaseRepository<typeof Media> {
     const key = keyPrefix + '/' + `${now}-${crypto.randomUUID()}.${file.extname}`
     await file.moveToDisk(key, {
       name: file.clientName,
+      CacheControl: 'public, max-age=31536000, immutable',
     })
 
     const media = (await this.createGeneric(
