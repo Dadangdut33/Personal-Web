@@ -15,26 +15,20 @@ import {
   Textarea,
 } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import {
-  IconArrowLeft,
-  IconCancel,
-  IconDeviceFloppy,
-  IconPhoto,
-  IconPhotoPlus,
-  IconPlus,
-  IconTrash,
-  IconUpload,
-} from '@tabler/icons-react'
+import { IconPhoto, IconPhotoPlus, IconPlus, IconTrash, IconUpload } from '@tabler/icons-react'
 import type React from 'react'
 import { useRef, useState } from 'react'
 import MediaLibraryDialog from '~/components/RTE/media-library-dialog'
 import { uploadImage } from '~/components/RTE/upload-service'
+import DashboardFormActionBar from '~/components/core/dashboard/form-action-bar'
+import LeavePageAfterSaveCheckbox from '~/components/core/form/leave-page-after-save-checkbox'
 import ImageWithLoader from '~/components/core/image'
 import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyInfo } from '~/components/core/notify'
 import { IconPicker } from '~/components/page-components/project/icon-picker'
 import { Data } from '~/generated/data'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
+import { useLeavePageAfterSave } from '~/hooks/use_leave_page_after_save'
 import DashboardLayout from '~/layouts/dashboard'
 import { urlFor } from '~/lib/client'
 import { type ProjectLinkIconValue } from '~/lib/project_link_icons'
@@ -63,6 +57,7 @@ type PageProps = InertiaProps<{
 
 export default function Page(props: PageProps) {
   const { data } = props
+  const [leavePageAfterSave, setLeavePageAfterSave] = useLeavePageAfterSave(title)
   const [thumbnailPreviewUrl, setThumbnailPreviewUrl] = useState<string>(data?.thumbnail?.url || '')
   const [thumbnailUploadError, setThumbnailUploadError] = useState<string | null>(null)
   const [isUploadingThumbnail, setIsUploadingThumbnail] = useState(false)
@@ -114,6 +109,7 @@ export default function Page(props: PageProps) {
         'Content-Type': 'application/json',
         'X-Requested-With': 'XMLHttpRequest',
       },
+      doRedirect: data ? leavePageAfterSave : true,
       onSuccess: () => {
         if (!data) {
           form.reset()
@@ -224,38 +220,24 @@ export default function Page(props: PageProps) {
     <DashboardLayout breadcrumbs={breadcrumbs}>
       <Head title={`${title} ${data ? 'Edit' : 'Create'}`} />
       <div className="space-y-4">
-        <Group>
-          <Button
-            variant="outline"
-            style={{ width: 'fit-content' }}
-            loading={mutation.isPending}
-            leftSection={<IconArrowLeft size={16} />}
-            color="gray"
-            onClick={onBack}
-          >
-            Back
-          </Button>
-          <Group ms={'auto'} justify="flex-end">
-            <Button
-              variant="outline"
-              style={{ width: 'fit-content' }}
-              loading={mutation.isPending}
-              leftSection={<IconCancel size={16} />}
-              color="red"
-              onClick={onReset}
-            >
-              {data ? 'Cancel Changes' : 'Reset'}
-            </Button>
-            <Button
-              style={{ width: 'fit-content' }}
-              loading={mutation.isPending}
-              leftSection={<IconDeviceFloppy size={16} />}
-              onClick={onSave}
-            >
-              {data ? 'Save Changes' : 'Create'}
-            </Button>
-          </Group>
-        </Group>
+        <DashboardFormActionBar
+          onBack={onBack}
+          backLoading={mutation.isPending}
+          beforeSecondaryActions={
+            <LeavePageAfterSaveCheckbox
+              checked={leavePageAfterSave}
+              onChange={setLeavePageAfterSave}
+              visible={!!data}
+              disabled={mutation.isPending}
+            />
+          }
+          secondaryActionLabel={data ? 'Cancel Changes' : 'Reset'}
+          onSecondaryAction={onReset}
+          secondaryActionLoading={mutation.isPending}
+          primaryActionLabel={data ? 'Save Changes' : 'Create'}
+          onPrimaryAction={onSave}
+          primaryActionLoading={mutation.isPending}
+        />
 
         <Paper p="md" shadow="md" radius="md" withBorder>
           <Stack>

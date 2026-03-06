@@ -2,11 +2,13 @@ import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
 import { Button, Group, Paper, Tabs } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { IconArrowLeft, IconCancel, IconDeviceFloppy, IconExternalLink } from '@tabler/icons-react'
+import { IconExternalLink } from '@tabler/icons-react'
 import type React from 'react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import MediaLibraryDialog from '~/components/RTE/media-library-dialog'
 import { uploadImage } from '~/components/RTE/upload-service'
+import DashboardFormActionBar from '~/components/core/dashboard/form-action-bar'
+import LeavePageAfterSaveCheckbox from '~/components/core/form/leave-page-after-save-checkbox'
 import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyInfo } from '~/components/core/notify'
 import DraftRestoreModal from '~/components/page-components/blog/draft-restore-modal'
@@ -14,6 +16,7 @@ import BlogEditorTab from '~/components/page-components/blog/editor-tab'
 import BlogRollbackTab from '~/components/page-components/blog/rollback-tab'
 import { Data } from '~/generated/data'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
+import { useLeavePageAfterSave } from '~/hooks/use_leave_page_after_save'
 import DashboardLayout from '~/layouts/dashboard'
 import { getBlogDraftStorageKey, useBlogEditorDraftStore } from '~/lib/blog_editor_draft'
 import { urlFor } from '~/lib/client'
@@ -115,6 +118,7 @@ type PageProps = InertiaProps<{
 
 export default function Page(props: PageProps) {
   const { data, projects, availableTags } = props
+  const [leavePageAfterSave, setLeavePageAfterSave] = useLeavePageAfterSave(title)
   const defaultContent = { type: 'doc', content: [] }
   const [content, setContent] = useState<Record<string, any>>(data?.content || defaultContent)
   const [thumbnailPreviewUrl, setThumbnailPreviewUrl] = useState<string>(data?.thumbnail?.url || '')
@@ -194,6 +198,7 @@ export default function Page(props: PageProps) {
         setIsDirty(false)
         form.reset()
       },
+      doRedirect: data ? leavePageAfterSave : true,
     }
   )
 
@@ -478,83 +483,75 @@ export default function Page(props: PageProps) {
     <DashboardLayout breadcrumbs={breadcrumbs}>
       <Head title={`${title} ` + (data ? 'Edit' : 'Create')} />
       <div className="space-y-4">
-        <Group>
-          <Button
-            variant="outline"
-            style={{ width: 'fit-content' }}
-            loading={
-              mutation.isPending || rollbackMutation.isPending || rollbackFieldsMutation.isPending
-            }
-            leftSection={<IconArrowLeft size={16} />}
-            color="gray"
-            onClick={onBack}
-          >
-            Back
-          </Button>
-          <Group ms={'auto'} justify="flex-end">
-            {data?.url_path && (
-              <Group justify="flex-end">
-                <Button
-                  variant="outline"
-                  color="teal"
-                  component="a"
-                  href={data.url_path}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  leftSection={<IconExternalLink size={16} />}
-                >
-                  Open Post Preview
-                </Button>
-              </Group>
-            )}
-            {activeTab === 'editor' ? (
-              <>
-                <Button
-                  variant="outline"
-                  style={{ width: 'fit-content' }}
-                  loading={mutation.isPending}
-                  leftSection={<IconCancel size={16} />}
-                  color="red"
-                  onClick={onReset}
-                >
-                  {data ? 'Cancel Changes' : 'Reset'}
-                </Button>
-                <Button
-                  style={{ width: 'fit-content' }}
-                  loading={mutation.isPending}
-                  leftSection={<IconDeviceFloppy size={16} />}
-                  onClick={onSave}
-                >
-                  {data ? 'Save Changes' : 'Create'}
-                </Button>
-              </>
-            ) : (
-              <>
-                <Button
-                  color="yellow"
-                  variant="outline"
-                  loading={rollbackMutation.isPending}
-                  disabled={!selectedRevisionId || rollbackFieldsMutation.isPending}
-                  onClick={onRollbackFull}
-                >
-                  Rollback Full Revision
-                </Button>
-                <Button
-                  color="orange"
-                  loading={rollbackFieldsMutation.isPending}
-                  disabled={
-                    !selectedRevisionId ||
-                    selectedRollbackFields.length === 0 ||
-                    rollbackMutation.isPending
-                  }
-                  onClick={onRollbackFields}
-                >
-                  Rollback Selected Fields
-                </Button>
-              </>
-            )}
-          </Group>
-        </Group>
+        <DashboardFormActionBar
+          onBack={onBack}
+          backLoading={
+            mutation.isPending || rollbackMutation.isPending || rollbackFieldsMutation.isPending
+          }
+          beforeSecondaryActions={
+            <>
+              {activeTab === 'editor' && (
+                <LeavePageAfterSaveCheckbox
+                  checked={leavePageAfterSave}
+                  onChange={setLeavePageAfterSave}
+                  visible={!!data}
+                  disabled={mutation.isPending}
+                />
+              )}
+              {data?.url_path && (
+                <Group justify="flex-end">
+                  <Button
+                    variant="outline"
+                    color="teal"
+                    component="a"
+                    href={data.url_path}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    leftSection={<IconExternalLink size={16} />}
+                  >
+                    Open Post Preview
+                  </Button>
+                </Group>
+              )}
+
+              {activeTab !== 'editor' && (
+                <>
+                  <Button
+                    color="yellow"
+                    variant="outline"
+                    loading={rollbackMutation.isPending}
+                    disabled={!selectedRevisionId || rollbackFieldsMutation.isPending}
+                    onClick={onRollbackFull}
+                  >
+                    Rollback Full Revision
+                  </Button>
+                  <Button
+                    color="orange"
+                    loading={rollbackFieldsMutation.isPending}
+                    disabled={
+                      !selectedRevisionId ||
+                      selectedRollbackFields.length === 0 ||
+                      rollbackMutation.isPending
+                    }
+                    onClick={onRollbackFields}
+                  >
+                    Rollback Selected Fields
+                  </Button>
+                </>
+              )}
+            </>
+          }
+          secondaryActionLabel={
+            activeTab === 'editor' ? (data ? 'Cancel Changes' : 'Reset') : undefined
+          }
+          onSecondaryAction={activeTab === 'editor' ? onReset : undefined}
+          secondaryActionLoading={mutation.isPending}
+          primaryActionLabel={
+            activeTab === 'editor' ? (data ? 'Save Changes' : 'Create') : undefined
+          }
+          onPrimaryAction={activeTab === 'editor' ? onSave : undefined}
+          primaryActionLoading={mutation.isPending}
+        />
 
         <Paper p="md" shadow="md" radius="md" withBorder>
           <Tabs value={activeTab} onChange={(value) => setActiveTab((value as any) || 'editor')}>

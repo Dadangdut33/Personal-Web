@@ -90,7 +90,7 @@ export default function page(props: PageProps) {
       onClose()
       searchFilter.doSearch()
     },
-    deleteParam: { id: selected?.id },
+    deleteParam: { id: selected?.id ?? '' },
     routeName: `${baseRoute}.destroy`,
     title: (
       <div className="flex items-center gap-2">

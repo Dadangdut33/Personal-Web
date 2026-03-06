@@ -1,12 +1,14 @@
 import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
-import { Button, Grid, Group, Paper, Stack, TextInput } from '@mantine/core'
+import { Grid, Paper, Stack, TextInput } from '@mantine/core'
 import { useForm } from '@mantine/form'
-import { IconArrowLeft, IconCancel, IconDeviceFloppy } from '@tabler/icons-react'
+import DashboardFormActionBar from '~/components/core/dashboard/form-action-bar'
+import LeavePageAfterSaveCheckbox from '~/components/core/form/leave-page-after-save-checkbox'
 import { useModals } from '~/components/core/modal/modal-hooks'
 import { NotifyInfo } from '~/components/core/notify'
 import { Data } from '~/generated/data'
 import { useGenericMutation } from '~/hooks/use_generic_mutation'
+import { useLeavePageAfterSave } from '~/hooks/use_leave_page_after_save'
 import DashboardLayout from '~/layouts/dashboard'
 import { urlFor } from '~/lib/client'
 import { checkForm } from '~/lib/utils'
@@ -21,6 +23,7 @@ type PageProps = InertiaProps<{
 
 export default function Page(props: PageProps) {
   const { data } = props
+  const [leavePageAfterSave, setLeavePageAfterSave] = useLeavePageAfterSave(title)
   const breadcrumbs = [
     {
       title: 'Dashboard',
@@ -64,6 +67,7 @@ export default function Page(props: PageProps) {
       onSuccess: () => {
         form.reset()
       },
+      doRedirect: data ? leavePageAfterSave : true,
     }
   )
 
@@ -95,38 +99,24 @@ export default function Page(props: PageProps) {
     <DashboardLayout breadcrumbs={breadcrumbs}>
       <Head title={`${title} ` + (data ? 'Edit' : 'Create')} />
       <div className="space-y-4">
-        <Group>
-          <Button
-            variant="outline"
-            style={{ width: 'fit-content' }}
-            loading={mutation.isPending}
-            leftSection={<IconArrowLeft size={16} />}
-            color="gray"
-            onClick={onBack}
-          >
-            Back
-          </Button>
-          <Group ms={'auto'} justify="flex-end">
-            <Button
-              variant="outline"
-              style={{ width: 'fit-content' }}
-              loading={mutation.isPending}
-              leftSection={<IconCancel size={16} />}
-              color="red"
-              onClick={onReset}
-            >
-              {data ? 'Cancel Changes' : 'Reset'}
-            </Button>
-            <Button
-              style={{ width: 'fit-content' }}
-              loading={mutation.isPending}
-              leftSection={<IconDeviceFloppy size={16} />}
-              onClick={onSave}
-            >
-              {data ? 'Save Changes' : 'Create'}
-            </Button>
-          </Group>
-        </Group>
+        <DashboardFormActionBar
+          onBack={onBack}
+          backLoading={mutation.isPending}
+          beforeSecondaryActions={
+            <LeavePageAfterSaveCheckbox
+              checked={leavePageAfterSave}
+              onChange={setLeavePageAfterSave}
+              visible={!!data}
+              disabled={mutation.isPending}
+            />
+          }
+          secondaryActionLabel={data ? 'Cancel Changes' : 'Reset'}
+          onSecondaryAction={onReset}
+          secondaryActionLoading={mutation.isPending}
+          primaryActionLabel={data ? 'Save Changes' : 'Create'}
+          onPrimaryAction={onSave}
+          primaryActionLoading={mutation.isPending}
+        />
 
         <Grid gutter={{ base: 'lg', lg: 'xl' }}>
           <Grid.Col span={{ base: 12 }}>
