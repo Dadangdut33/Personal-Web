@@ -383,7 +383,7 @@ export default function Page(props: PageProps) {
 
         {overview.visibility.umami ? (
           <StatCard
-            label="Umami Page Views"
+            label="Page Views"
             value={overview.umami.pageviews}
             sub={`${overview.umami.visitors || 0} visitors • ${overview.umami.visits || 0} visits`}
             icon={<IconChartBar size={18} />}

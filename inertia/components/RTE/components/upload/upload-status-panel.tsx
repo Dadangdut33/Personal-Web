@@ -32,7 +32,7 @@ export default function UploadStatusPanel({ tasks }: { tasks: UploadTask[] }) {
   if (tasks.length === 0) return null
 
   return (
-    <div className="pointer-events-none fixed top-3 right-3 z-40 w-[18rem] space-y-2">
+    <div className="pointer-events-none fixed top-25 right-3 z-40 w-[18rem] space-y-2">
       {tasks.map((task) => {
         const meta = TASK_META[task.id]
         const progress = Math.min(100, Math.max(0, task.progress || 0))

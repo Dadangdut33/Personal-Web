@@ -48,6 +48,22 @@ const slugifyHeading = (text: string, index: number) => {
   return safe ? `${safe}-${index}` : `section-${index}`
 }
 
+const getHeadingAnchorClassName = (level: number) => {
+  if (level <= 1) {
+    return 'text-[1.5rem]'
+  }
+  if (level === 2) {
+    return 'text-[1.25rem]'
+  }
+  if (level === 3) {
+    return 'text-[1rem]'
+  }
+  if (level === 4) {
+    return 'text-[0.875rem]'
+  }
+  return 'text-xs'
+}
+
 export default function BlogPostPage(props: PageProps) {
   const { data } = props
   const articleRef = useRef<HTMLElement | null>(null)
@@ -124,12 +140,15 @@ export default function BlogPostPage(props: PageProps) {
 
         const anchor = document.createElement('a')
         anchor.type = 'button'
-        anchor.className =
-          'blog-heading-anchor-link ml-2 align-middle text-foreground/40 no-underline opacity-0 transition hover:text-foreground group-hover/heading:opacity-100 focus-visible:opacity-100'
+        anchor.style.marginLeft = '0.3rem'
+        anchor.className = `blog-heading-anchor-link align-middle text-foreground/40 no-underline opacity-0 transition hover:text-foreground group-hover/heading:opacity-100 focus-visible:opacity-100 ${getHeadingAnchorClassName(level)}`
         anchor.setAttribute('aria-label', `Go to section link: ${text}`)
         anchor.href = `#${id}`
         anchor.textContent = '#'
-        anchor.onclick = () => scrollToHeading(id)
+        anchor.onclick = (event) => {
+          event.preventDefault()
+          scrollToHeading(id)
+        }
         element.appendChild(anchor)
 
         return { id, text, level }
