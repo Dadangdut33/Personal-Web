@@ -3,6 +3,34 @@ type JsonRecord = Record<string, unknown>
 const isRecord = (value: unknown): value is JsonRecord =>
   typeof value === 'object' && value !== null && !Array.isArray(value)
 
+const isWordLikeChar = (value: string) => /[\p{L}\p{N}]/u.test(value)
+const isOpeningPunctuation = (value: string) => /[([{]/.test(value)
+const isEmojiChar = (value: string) => /\p{Extended_Pictographic}/u.test(value)
+const needsLeadingSpace = (value: string) =>
+  !/\s/u.test(value) && (isWordLikeChar(value) || isOpeningPunctuation(value) || isEmojiChar(value))
+const createWhitespaceTextNode = (): JsonRecord => ({ type: 'text', text: ' ' })
+
+const joinTextFragments = (fragments: string[]) => {
+  return fragments.reduce((result, fragment) => {
+    if (!fragment) return result
+    if (!result) return fragment
+
+    const previousChar = result[result.length - 1]
+    const nextChar = fragment[0]
+    const hasWhitespaceBoundary = /\s$/.test(result) || /^\s/.test(fragment)
+
+    if (
+      !hasWhitespaceBoundary &&
+      isWordLikeChar(previousChar) &&
+      (isWordLikeChar(nextChar) || needsLeadingSpace(nextChar))
+    ) {
+      return `${result} ${fragment}`
+    }
+
+    return `${result}${fragment}`
+  }, '')
+}
+
 const sanitizeMarks = (value: unknown) => {
   if (!Array.isArray(value)) return undefined
 
@@ -26,7 +54,7 @@ const sanitizeMarks = (value: unknown) => {
 const extractTextContent = (value: unknown): string => {
   if (typeof value === 'string') return value
   if (Array.isArray(value)) {
-    return value.map((item) => extractTextContent(item)).join('')
+    return joinTextFragments(value.map((item) => extractTextContent(item)).filter(Boolean))
   }
   if (!isRecord(value)) return ''
 
@@ -66,6 +94,30 @@ const sanitizeNode = (value: unknown): JsonRecord | null => {
     const content = value.content
       .map((item) => sanitizeNode(item))
       .filter((item): item is JsonRecord => item !== null)
+
+    for (let index = 0; index < content.length - 1; index++) {
+      const current = content[index]
+      const next = content[index + 1]
+
+      if (current.type !== 'text' || next.type !== 'text') continue
+
+      const currentText = typeof current.text === 'string' ? current.text : ''
+      const nextText = typeof next.text === 'string' ? next.text : ''
+      if (!currentText || !nextText) continue
+
+      const currentLastChar = currentText[currentText.length - 1]
+      const nextFirstChar = nextText[0]
+      const hasWhitespaceBoundary = /\s$/.test(currentText) || /^\s/.test(nextText)
+
+      if (
+        !hasWhitespaceBoundary &&
+        isWordLikeChar(currentLastChar) &&
+        (isWordLikeChar(nextFirstChar) || needsLeadingSpace(nextFirstChar))
+      ) {
+        content.splice(index + 1, 0, createWhitespaceTextNode())
+        index++
+      }
+    }
 
     if (content.length > 0) {
       nextNode.content = content

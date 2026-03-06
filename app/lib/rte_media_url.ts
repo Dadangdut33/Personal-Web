@@ -42,7 +42,12 @@ const cloneValue = <T>(value: T): T => {
   }
 }
 
-const isWordLikeChar = (value: string) => /[A-Za-z0-9]/.test(value)
+const isWordLikeChar = (value: string) => /[\p{L}\p{N}]/u.test(value)
+const isOpeningPunctuation = (value: string) => /[([{]/.test(value)
+const isEmojiChar = (value: string) => /\p{Extended_Pictographic}/u.test(value)
+const needsLeadingSpace = (value: string) =>
+  !/\s/u.test(value) && (isWordLikeChar(value) || isOpeningPunctuation(value) || isEmojiChar(value))
+const createWhitespaceTextNode = () => ({ type: 'text', text: ' ' })
 
 /**
  * ProseMirror stores marks by splitting text into adjacent text nodes.
@@ -50,8 +55,9 @@ const isWordLikeChar = (value: string) => /[A-Za-z0-9]/.test(value)
  *   "after" + {strong}"procrastinating"
  * which serialize without a space in HTML output.
  *
- * This pass inserts a single space at text-node boundaries when both sides
- * look like word characters and no whitespace already exists.
+ * This pass inserts an unmarked whitespace text node at text-node boundaries
+ * when both sides look like word characters and no whitespace already exists.
+ * Using a dedicated text node avoids inheriting marks from either side.
  */
 const normalizeInlineTextSpacing = (value: unknown): unknown => {
   if (Array.isArray(value)) {
@@ -75,9 +81,10 @@ const normalizeInlineTextSpacing = (value: unknown): unknown => {
       if (
         !hasWhitespaceBoundary &&
         isWordLikeChar(currentLastChar) &&
-        isWordLikeChar(nextFirstChar)
+        (isWordLikeChar(nextFirstChar) || needsLeadingSpace(nextFirstChar))
       ) {
-        next.text = ` ${nextText}`
+        normalizedChildren.splice(index + 1, 0, createWhitespaceTextNode())
+        index++
       }
     }
 
