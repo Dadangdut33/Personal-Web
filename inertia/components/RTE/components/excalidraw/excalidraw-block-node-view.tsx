@@ -1,3 +1,4 @@
+import { useComputedColorScheme } from '@mantine/core'
 import type {
   BinaryFiles,
   ExcalidrawInitialDataState,
@@ -91,6 +92,7 @@ const serializeSceneData = (
 
 export default function ExcalidrawBlockNodeView({ node, editor, updateAttributes }: NodeViewProps) {
   const attrs = node.attrs as ExcalidrawAttrs
+  const colorScheme = useComputedColorScheme('light', { getInitialValueInEffect: false })
   const [isEditable, setIsEditable] = useState(!!editor?.isEditable)
   const [isEditingCanvas, setIsEditingCanvas] = useState(true)
   const [isClient, setIsClient] = useState(false)
@@ -139,7 +141,17 @@ export default function ExcalidrawBlockNodeView({ node, editor, updateAttributes
     }
   }, [])
 
-  const scene = useMemo(() => parseSceneData(attrs.sceneData), [attrs.sceneData])
+  const excalidrawTheme = colorScheme === 'dark' ? 'dark' : 'light'
+  const scene = useMemo(() => {
+    const parsedScene = parseSceneData(attrs.sceneData)
+    return {
+      ...parsedScene,
+      appState: {
+        ...parsedScene.appState,
+        theme: excalidrawTheme,
+      },
+    }
+  }, [attrs.sceneData, excalidrawTheme])
   const hasElements = (scene.elements?.length || 0) > 0
 
   const cardSize = attrs.cardSize || 'lg'
@@ -249,6 +261,7 @@ export default function ExcalidrawBlockNodeView({ node, editor, updateAttributes
                 >
                   <ExcalidrawCanvas
                     initialData={scene}
+                    theme={excalidrawTheme}
                     viewModeEnabled={!canEditCanvas}
                     onChange={persistScene}
                     UIOptions={{
@@ -257,7 +270,7 @@ export default function ExcalidrawBlockNodeView({ node, editor, updateAttributes
                         clearCanvas: canEditCanvas,
                         loadScene: canEditCanvas,
                         saveToActiveFile: false,
-                        toggleTheme: canEditCanvas,
+                        toggleTheme: false,
                       },
                     }}
                   />
