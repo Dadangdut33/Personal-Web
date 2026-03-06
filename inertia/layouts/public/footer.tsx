@@ -1,6 +1,5 @@
 'use client'
 
-import { Link } from '@adonisjs/inertia/react'
 import { SharedProps } from '@adonisjs/inertia/types'
 import { usePage } from '@inertiajs/react'
 import { Container, Group, Text, Tooltip } from '@mantine/core'
@@ -56,7 +55,7 @@ export default function Footer() {
             transitionProps={{ transition: 'skew-down' }}
             withArrow
           >
-            <a href={`mailto:dadang.contact@gmail.com`}>
+            <a href={`mailto:contact@dadangdut33.my.id`}>
               <Button size="icon">
                 <IconMail stroke={1.5} />
               </Button>
@@ -95,7 +94,7 @@ export default function Footer() {
           <span style={{ marginTop: '1rem' }}>
             <Text
               href={'https://github.com/Dadangdut33/Personal-Web'}
-              component={Link}
+              component={'a'}
               target="_blank"
               rel="noopener noreferrer"
               style={{ textDecoration: 'none' }}
