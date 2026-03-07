@@ -73,6 +73,7 @@ export interface ApiDefinition {
   }
   activityLog: {
     index: typeof routes['activity_log.index']
+    clearRange: typeof routes['activity_log.clearRange']
   }
   home: typeof routes['home']
   projects: typeof routes['projects']

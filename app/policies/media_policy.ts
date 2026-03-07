@@ -1,7 +1,7 @@
 import Media from '#models/media'
-import User from '#models/user'
+import type User from '#models/user'
 
-import { HttpContext } from '@adonisjs/core/http'
+import type { HttpContext } from '@adonisjs/core/http'
 
 import CustomBasePolicy from './custom_base_policy.js'
 

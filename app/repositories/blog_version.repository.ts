@@ -1,6 +1,6 @@
 import BlogVersion from '#models/blog_version'
 
-import { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 import BaseRepository from './_base_repository.js'
 

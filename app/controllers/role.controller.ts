@@ -10,6 +10,7 @@ import Tag from '#models/tag'
 import ActivityLogService from '#services/activity_log.service'
 import PermissionService from '#services/permission.service'
 import RoleService from '#services/role.service'
+import UserRolesPermissionsCacheService from '#services/user_roles_permissions_cache.service'
 import { RoleTransformer } from '#transformers/role.transformer'
 import { TagTransformer } from '#transformers/tag.transformer'
 import { PaginationMeta } from '#types/app'
@@ -26,7 +27,8 @@ export default class RoleController {
   constructor(
     protected roleSvc: RoleService,
     protected permSvc: PermissionService,
-    protected activityLogSvc: ActivityLogService
+    protected activityLogSvc: ActivityLogService,
+    protected userRolesPermissionsCacheSvc: UserRolesPermissionsCacheService
   ) {}
 
   async viewCreate({ bouncer, inertia }: HttpContext) {
@@ -99,6 +101,7 @@ export default class RoleController {
         const role = await this.roleSvc.findOrFail(payload.id!)
 
         await this.roleSvc.update(role, payload)
+        await this.userRolesPermissionsCacheSvc.invalidateForRoleIds([role.id])
         await this.activityLogSvc.log(
           auth.user!.id,
           'update_role',
@@ -125,6 +128,7 @@ export default class RoleController {
       const role = await this.roleSvc.findOrFail(id)
       await bouncer.with('RolePolicy').authorize('delete', role)
 
+      await this.userRolesPermissionsCacheSvc.invalidateForRoleIds([role.id])
       await this.roleSvc.deleteRole(id)
       await this.activityLogSvc.log(
         auth.user!.id,
@@ -151,6 +155,7 @@ export default class RoleController {
       await bouncer.with('RolePolicy').authorize('deleteBulk', roles)
 
       const namesIds = roles.map((r) => `- ${r.name} [${r.id}]`).join('\n')
+      await this.userRolesPermissionsCacheSvc.invalidateForRoleIds(roles.map((role) => role.id))
       await this.roleSvc.deleteRoles(ids)
       await this.activityLogSvc.log(
         auth.user!.id,

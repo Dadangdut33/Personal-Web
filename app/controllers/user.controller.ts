@@ -12,6 +12,7 @@ import MediaService from '#services/media.service'
 import ProfileService from '#services/profile.service'
 import RoleService from '#services/role.service'
 import UserService from '#services/user.service'
+import UserRolesPermissionsCacheService from '#services/user_roles_permissions_cache.service'
 import { UserTransformer } from '#transformers/user.transformer'
 import { PaginationMeta } from '#types/app'
 import { createEditUserValidator } from '#validators/user'
@@ -27,7 +28,8 @@ export default class UserController {
     protected roleSvc: RoleService,
     protected mediaSvc: MediaService,
     protected profileSvc: ProfileService,
-    protected activityLogSvc: ActivityLogService
+    protected activityLogSvc: ActivityLogService,
+    protected userRolesPermissionsCacheSvc: UserRolesPermissionsCacheService
   ) {}
 
   async viewCreate({ bouncer, inertia, auth }: HttpContext) {
@@ -92,6 +94,7 @@ export default class UserController {
         await bouncer.with('UserPolicy').authorize('update', payload, request)
 
         const updated = await this.userSvc.update(payload)
+        await this.userRolesPermissionsCacheSvc.invalidateForUserIds([updated.id])
         await this.activityLogSvc.log(
           auth.user!.id,
           'update_user',
@@ -122,6 +125,7 @@ export default class UserController {
       await user.load('profile')
       const profile = user.profile
 
+      await this.userRolesPermissionsCacheSvc.invalidateForUserIds([user.id])
       await this.userSvc.deleteUser(id)
       await this.activityLogSvc.log(
         auth.user!.id,
@@ -153,6 +157,7 @@ export default class UserController {
       const users = await this.userSvc.findByIds(ids)
       const emailsIds = users.map((u) => `- ${u.email} [${u.id}]`).join('\n')
 
+      await this.userRolesPermissionsCacheSvc.invalidateForUserIds(users.map((user) => user.id))
       await this.userSvc.deleteUsers(ids)
       await this.activityLogSvc.log(
         auth.user!.id,

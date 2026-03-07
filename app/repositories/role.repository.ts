@@ -1,6 +1,6 @@
 import Role from '#models/role'
 import TagRepository from '#repositories/tag.repository'
-import { RolePayload } from '#types/inferred'
+import type { RolePayload } from '#types/inferred'
 
 import BaseRepository from './_base_repository.js'
 

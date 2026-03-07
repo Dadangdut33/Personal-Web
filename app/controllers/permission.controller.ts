@@ -9,6 +9,7 @@ import {
 import ActivityLogService from '#services/activity_log.service'
 import PermissionService from '#services/permission.service'
 import PermissionCheckService from '#services/permission_check.service'
+import UserRolesPermissionsCacheService from '#services/user_roles_permissions_cache.service'
 import { PermissionTransformer } from '#transformers/permission.transformer'
 import { PaginationMeta } from '#types/app'
 import { createEditPermissionValidator } from '#validators/auth/permission'
@@ -22,7 +23,8 @@ export default class PermissionController {
   constructor(
     protected permSvc: PermissionService,
     protected permChecker: PermissionCheckService,
-    protected activityLogSvc: ActivityLogService
+    protected activityLogSvc: ActivityLogService,
+    protected userRolesPermissionsCacheSvc: UserRolesPermissionsCacheService
   ) {}
 
   async viewCreate({ bouncer, inertia }: HttpContext) {
@@ -77,6 +79,7 @@ export default class PermissionController {
         await bouncer.with('PermissionPolicy').authorize('update', permission, request)
 
         await this.permSvc.update(permission, payload)
+        await this.userRolesPermissionsCacheSvc.invalidateForPermissionIds([permission.id])
         await this.activityLogSvc.log(
           auth.user!.id,
           'update_permission',
@@ -103,6 +106,7 @@ export default class PermissionController {
       const permission = await this.permSvc.findOrFail(id)
       await bouncer.with('PermissionPolicy').authorize('delete', permission)
 
+      await this.userRolesPermissionsCacheSvc.invalidateForPermissionIds([permission.id])
       await this.permSvc.deletePermission(id)
       await this.activityLogSvc.log(
         auth.user!.id,
@@ -129,6 +133,9 @@ export default class PermissionController {
       await bouncer.with('PermissionPolicy').authorize('deleteBulk', permissions)
 
       const namesIds = permissions.map((p) => `- ${p.name} [${p.id}]`).join('\n')
+      await this.userRolesPermissionsCacheSvc.invalidateForPermissionIds(
+        permissions.map((permission) => permission.id)
+      )
       await this.permSvc.deletePermissions(ids)
       await this.activityLogSvc.log(
         auth.user!.id,

@@ -300,6 +300,12 @@ const routes = {
     tokens: [{"old":"/dashboard/activity-log","type":0,"val":"dashboard","end":""},{"old":"/dashboard/activity-log","type":0,"val":"activity-log","end":""}],
     types: placeholder as Registry['activity_log.index']['types'],
   },
+  'activity_log.clearRange': {
+    methods: ["DELETE"],
+    pattern: '/dashboard/activity-log/clear-range',
+    tokens: [{"old":"/dashboard/activity-log/clear-range","type":0,"val":"dashboard","end":""},{"old":"/dashboard/activity-log/clear-range","type":0,"val":"activity-log","end":""},{"old":"/dashboard/activity-log/clear-range","type":0,"val":"clear-range","end":""}],
+    types: placeholder as Registry['activity_log.clearRange']['types'],
+  },
   'home': {
     methods: ["GET","HEAD"],
     pattern: '/',

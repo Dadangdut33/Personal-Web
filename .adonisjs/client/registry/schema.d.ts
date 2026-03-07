@@ -546,6 +546,17 @@ export interface Registry {
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/activity_log.controller').default['viewList']>>>
     }
   }
+  'activity_log.clearRange': {
+    methods: ["DELETE"]
+    pattern: '/dashboard/activity-log/clear-range'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/activity_log').clearActivityLogRangeValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/activity_log').clearActivityLogRangeValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/activity_log.controller').default['clearRange']>>>
+    }
+  }
   'home': {
     methods: ["GET","HEAD"]
     pattern: '/'

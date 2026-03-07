@@ -59,6 +59,9 @@ router
       .as('blog.rollbackFields')
 
     router.get('/activity-log', [ActivityLogController, 'viewList']).as('activity_log.index')
+    router
+      .delete('/activity-log/clear-range', [ActivityLogController, 'clearRange'])
+      .as('activity_log.clearRange')
   })
   .use([middleware.auth(), middleware.verify_email()])
   .prefix('/dashboard')

@@ -53,6 +53,7 @@ export type ScannedRoutes = {
     'blog.rollback': { paramsTuple?: []; params?: {} }
     'blog.rollbackFields': { paramsTuple?: []; params?: {} }
     'activity_log.index': { paramsTuple?: []; params?: {} }
+    'activity_log.clearRange': { paramsTuple?: []; params?: {} }
     'home': { paramsTuple?: []; params?: {} }
     'blog': { paramsTuple?: []; params?: {} }
     'blog.post': { paramsTuple: [ParamValue]; params: {'segment': ParamValue} }
@@ -200,6 +201,7 @@ export type ScannedRoutes = {
     'blog.bulkDestroy': { paramsTuple?: []; params?: {} }
     'project.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'project.bulkDestroy': { paramsTuple?: []; params?: {} }
+    'activity_log.clearRange': { paramsTuple?: []; params?: {} }
     'api.v1.media.destroy': { paramsTuple?: []; params?: {} }
   }
 }

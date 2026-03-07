@@ -1,7 +1,7 @@
 import Tables from '#enums/tables'
 import Tag from '#models/tag'
 
-import { TransactionClientContract } from '@adonisjs/lucid/types/database'
+import type { TransactionClientContract } from '@adonisjs/lucid/types/database'
 
 import BaseRepository from './_base_repository.js'
 
