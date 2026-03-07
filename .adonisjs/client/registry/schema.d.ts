@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 /// <reference path="../manifest.d.ts" />
 
-import type { ExtractBody, ExtractQuery, ExtractQueryForGet, ExtractResponse } from '@tuyau/core/types'
-import type { InferInput } from '@vinejs/vine/types'
+import type { ExtractBody, ExtractErrorResponse, ExtractQuery, ExtractQueryForGet, ExtractResponse } from '@tuyau/core/types'
+import type { InferInput, SimpleError } from '@vinejs/vine/types'
 
 export type ParamValue = string | number | bigint | boolean
 
@@ -12,10 +12,11 @@ export interface Registry {
     pattern: '/uploads/*'
     types: {
       body: {}
-      paramsTuple: []
-      params: {}
+      paramsTuple: [ParamValue]
+      params: { '*': ParamValue[] }
       query: {}
       response: unknown
+      errorResponse: unknown
     }
   }
   'dashboard.view': {
@@ -27,6 +28,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/dashboard.controller').default['view']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/dashboard.controller').default['view']>>>
     }
   }
   'profile.view': {
@@ -38,6 +40,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/profile.controller').default['view']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile.controller').default['view']>>>
     }
   }
   'profile.update': {
@@ -49,6 +52,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/profile').updateProfileValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/profile.controller').default['update']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile.controller').default['update']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'user.index': {
@@ -60,6 +64,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/user.controller').default['viewList']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/user.controller').default['viewList']>>>
     }
   }
   'user.create': {
@@ -71,6 +76,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/user.controller').default['viewCreate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/user.controller').default['viewCreate']>>>
     }
   }
   'user.edit': {
@@ -82,6 +88,7 @@ export interface Registry {
       params: { id: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/user.controller').default['viewEdit']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/user.controller').default['viewEdit']>>>
     }
   }
   'user.store': {
@@ -93,6 +100,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/user').createEditUserValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/user.controller').default['storeOrUpdate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/user.controller').default['storeOrUpdate']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'user.update': {
@@ -104,6 +112,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/user').createEditUserValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/user.controller').default['storeOrUpdate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/user.controller').default['storeOrUpdate']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'user.destroy': {
@@ -115,6 +124,7 @@ export interface Registry {
       params: { id: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/user.controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/user.controller').default['destroy']>>>
     }
   }
   'user.bulkDestroy': {
@@ -126,6 +136,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/user.controller').default['bulkDestroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/user.controller').default['bulkDestroy']>>>
     }
   }
   'permission.index': {
@@ -137,6 +148,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/permission.controller').default['viewList']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/permission.controller').default['viewList']>>>
     }
   }
   'permission.create': {
@@ -148,6 +160,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/permission.controller').default['viewCreate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/permission.controller').default['viewCreate']>>>
     }
   }
   'permission.edit': {
@@ -159,6 +172,7 @@ export interface Registry {
       params: { id: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/permission.controller').default['viewEdit']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/permission.controller').default['viewEdit']>>>
     }
   }
   'permission.store': {
@@ -170,6 +184,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/auth/permission').createEditPermissionValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/permission.controller').default['storeOrUpdate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/permission.controller').default['storeOrUpdate']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'permission.update': {
@@ -181,6 +196,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/auth/permission').createEditPermissionValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/permission.controller').default['storeOrUpdate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/permission.controller').default['storeOrUpdate']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'permission.destroy': {
@@ -192,6 +208,7 @@ export interface Registry {
       params: { id: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/permission.controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/permission.controller').default['destroy']>>>
     }
   }
   'permission.bulkDestroy': {
@@ -203,6 +220,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/permission.controller').default['bulkDestroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/permission.controller').default['bulkDestroy']>>>
     }
   }
   'role.index': {
@@ -214,6 +232,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/role.controller').default['viewList']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/role.controller').default['viewList']>>>
     }
   }
   'role.create': {
@@ -225,6 +244,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/role.controller').default['viewCreate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/role.controller').default['viewCreate']>>>
     }
   }
   'role.edit': {
@@ -236,6 +256,7 @@ export interface Registry {
       params: { id: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/role.controller').default['viewEdit']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/role.controller').default['viewEdit']>>>
     }
   }
   'role.store': {
@@ -247,6 +268,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/auth/role').createEditRoleValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/role.controller').default['storeOrUpdate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/role.controller').default['storeOrUpdate']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'role.update': {
@@ -258,6 +280,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/auth/role').createEditRoleValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/role.controller').default['storeOrUpdate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/role.controller').default['storeOrUpdate']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'role.destroy': {
@@ -269,6 +292,7 @@ export interface Registry {
       params: { id: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/role.controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/role.controller').default['destroy']>>>
     }
   }
   'role.bulkDestroy': {
@@ -280,6 +304,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/role.controller').default['bulkDestroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/role.controller').default['bulkDestroy']>>>
     }
   }
   'media.index': {
@@ -291,6 +316,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/media.controller').default['viewList']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/media.controller').default['viewList']>>>
     }
   }
   'media.create': {
@@ -302,6 +328,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/media.controller').default['viewCreate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/media.controller').default['viewCreate']>>>
     }
   }
   'media.edit': {
@@ -313,6 +340,7 @@ export interface Registry {
       params: { id: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/media.controller').default['viewEdit']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/media.controller').default['viewEdit']>>>
     }
   }
   'media.store': {
@@ -324,6 +352,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/media.controller').default['storeOrUpdate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/media.controller').default['storeOrUpdate']>>>
     }
   }
   'media.update': {
@@ -335,6 +364,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/media.controller').default['storeOrUpdate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/media.controller').default['storeOrUpdate']>>>
     }
   }
   'media.destroy': {
@@ -346,6 +376,7 @@ export interface Registry {
       params: { id: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/media.controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/media.controller').default['destroy']>>>
     }
   }
   'media.bulkDestroy': {
@@ -357,6 +388,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/media.controller').default['bulkDestroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/media.controller').default['bulkDestroy']>>>
     }
   }
   'blog.index': {
@@ -368,6 +400,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['viewList']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['viewList']>>>
     }
   }
   'blog.create': {
@@ -379,6 +412,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['viewCreate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['viewCreate']>>>
     }
   }
   'blog.edit': {
@@ -390,6 +424,7 @@ export interface Registry {
       params: { id: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['viewEdit']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['viewEdit']>>>
     }
   }
   'blog.store': {
@@ -401,6 +436,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/blog').createEditBlogValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['storeOrUpdate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['storeOrUpdate']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'blog.update': {
@@ -412,6 +448,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/blog').createEditBlogValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['storeOrUpdate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['storeOrUpdate']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'blog.destroy': {
@@ -423,6 +460,7 @@ export interface Registry {
       params: { id: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['destroy']>>>
     }
   }
   'blog.bulkDestroy': {
@@ -434,6 +472,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['bulkDestroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['bulkDestroy']>>>
     }
   }
   'project.index': {
@@ -445,6 +484,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/project.controller').default['viewList']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/project.controller').default['viewList']>>>
     }
   }
   'project.create': {
@@ -456,6 +496,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/project.controller').default['viewCreate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/project.controller').default['viewCreate']>>>
     }
   }
   'project.edit': {
@@ -467,6 +508,7 @@ export interface Registry {
       params: { id: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/project.controller').default['viewEdit']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/project.controller').default['viewEdit']>>>
     }
   }
   'project.store': {
@@ -478,6 +520,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/project').createEditProjectValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/project.controller').default['storeOrUpdate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/project.controller').default['storeOrUpdate']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'project.update': {
@@ -489,6 +532,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/project').createEditProjectValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/project.controller').default['storeOrUpdate']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/project.controller').default['storeOrUpdate']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'project.destroy': {
@@ -500,6 +544,7 @@ export interface Registry {
       params: { id: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/project.controller').default['destroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/project.controller').default['destroy']>>>
     }
   }
   'project.bulkDestroy': {
@@ -511,6 +556,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/project.controller').default['bulkDestroy']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/project.controller').default['bulkDestroy']>>>
     }
   }
   'blog.rollback': {
@@ -522,6 +568,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['rollbackRevision']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['rollbackRevision']>>>
     }
   }
   'blog.rollbackFields': {
@@ -533,6 +580,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['rollbackRevisionFields']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog.controller').default['rollbackRevisionFields']>>>
     }
   }
   'activity_log.index': {
@@ -544,6 +592,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/activity_log.controller').default['viewList']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/activity_log.controller').default['viewList']>>>
     }
   }
   'activity_log.clearRange': {
@@ -555,6 +604,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/activity_log').clearActivityLogRangeValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/activity_log.controller').default['clearRange']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/activity_log.controller').default['clearRange']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'home': {
@@ -566,6 +616,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/home.controller').default['view']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/home.controller').default['view']>>>
     }
   }
   'blog': {
@@ -577,6 +628,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog_public.controller').default['view']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog_public.controller').default['view']>>>
     }
   }
   'blog.post': {
@@ -588,6 +640,7 @@ export interface Registry {
       params: { segment: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog_public.controller').default['viewPost']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog_public.controller').default['viewPost']>>>
     }
   }
   'projects': {
@@ -599,6 +652,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/project_public.controller').default['view']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/project_public.controller').default['view']>>>
     }
   }
   'api.v1.media.redirect': {
@@ -610,6 +664,7 @@ export interface Registry {
       params: { id: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/media.controller').default['redirectMediaAPI']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/media.controller').default['redirectMediaAPI']>>>
     }
   }
   'api.v1.public.blog.search': {
@@ -621,6 +676,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog_public.controller').default['searchAPI']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog_public.controller').default['searchAPI']>>>
     }
   }
   'api.v1.me.avatar': {
@@ -632,6 +688,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/profile.controller').default['getAvatarAPI']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/profile.controller').default['getAvatarAPI']>>>
     }
   }
   'api.v1.media.list': {
@@ -643,6 +700,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/media.controller').default['getMediaListAPI']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/media.controller').default['getMediaListAPI']>>>
     }
   }
   'api.v1.media.upload': {
@@ -654,6 +712,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/media').mediaUploadAPIValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/media.controller').default['uploadMediaAPI']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/media.controller').default['uploadMediaAPI']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'api.v1.media.destroy': {
@@ -665,6 +724,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/media.controller').default['deleteMediaAPI']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/media.controller').default['deleteMediaAPI']>>>
     }
   }
   'api.v1.blog.viewCount': {
@@ -676,6 +736,7 @@ export interface Registry {
       params: { slugId: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog_public.controller').default['viewCount']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog_public.controller').default['viewCount']>>>
     }
   }
   'api.v1.utils.random-password': {
@@ -687,6 +748,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/utils.controller').default['generateRandomPassword']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/utils.controller').default['generateRandomPassword']>>>
     }
   }
   'api.v1.utils.link-metadata': {
@@ -698,6 +760,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/utils.controller').default['getLinkMetadata']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/utils.controller').default['getLinkMetadata']>>>
     }
   }
   'auth.logout': {
@@ -709,6 +772,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['logout']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['logout']>>>
     }
   }
   'auth.login': {
@@ -720,6 +784,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['viewLogin']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['viewLogin']>>>
     }
   }
   'auth.login.post': {
@@ -731,6 +796,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/auth/auth').loginValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['login']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['login']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'auth.register': {
@@ -742,6 +808,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['viewRegister']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['viewRegister']>>>
     }
   }
   'auth.register.post': {
@@ -753,6 +820,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/auth/auth').registerValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['register']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['register']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'auth.requestResetPassword': {
@@ -764,6 +832,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['viewRequestResetPassword']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['viewRequestResetPassword']>>>
     }
   }
   'auth.requestResetPassword.post': {
@@ -775,6 +844,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/auth/auth').askResetPasswordValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['requestResetPassword']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['requestResetPassword']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'auth.resetPassword': {
@@ -786,6 +856,7 @@ export interface Registry {
       params: { token: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['viewResetPassword']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['viewResetPassword']>>>
     }
   }
   'auth.resetPassword.post': {
@@ -797,6 +868,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/auth/auth').resetPasswordValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['resetPassword']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['resetPassword']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
   'auth.verifyEmail': {
@@ -808,6 +880,7 @@ export interface Registry {
       params: {}
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['viewVerifyEmail']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['viewVerifyEmail']>>>
     }
   }
   'auth.verifyEmail.verify': {
@@ -819,6 +892,7 @@ export interface Registry {
       params: { token: ParamValue }
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['verifyEmail']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['verifyEmail']>>>
     }
   }
   'auth.verifyEmail.request': {
@@ -830,6 +904,7 @@ export interface Registry {
       params: {}
       query: ExtractQuery<InferInput<(typeof import('#validators/auth/auth').askEmailVerifyValidator)>>
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['requestVerifyEmail']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth.controller').default['requestVerifyEmail']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
 }
