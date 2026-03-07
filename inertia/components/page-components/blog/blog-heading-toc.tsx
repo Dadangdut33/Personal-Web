@@ -187,7 +187,7 @@ export default function BlogHeadingTOC({
 
   return (
     <>
-      <div className="fixed right-4 top-24 z-40 hidden w-64 lg:block">
+      <div className="fixed right-4 top-24 z-40 hidden w-64 xl:block">
         <div className="rounded-base border-2 border-border bg-secondary-background py-3 shadow-shadow">
           <p className="px-3 mb-2 text-xs font-heading uppercase tracking-wide text-foreground/70">
             On this page
@@ -202,7 +202,7 @@ export default function BlogHeadingTOC({
             type="button"
             variant="noShadow"
             size="3xl"
-            className="fixed right-0 top-1/2 z-50 w-[40px] -translate-y-1/2 rounded-r-none border-r-0 px-2.5 shadow-shadow lg:hidden"
+            className="fixed right-0 top-1/2 z-50 w-[40px] -translate-y-1/2 rounded-r-none border-r-0 px-2.5 shadow-shadow xl:hidden"
             aria-label="Open page sections"
           >
             <ListTree className="size-5" />
