@@ -202,14 +202,15 @@ export default function LinkCardNodeView({ node, editor, updateAttributes }: Nod
   }
 
   const cardContent = (
-    <Card className={cn('group gap-0 overflow-hidden', cardBoxClass)}>
+    <Card className={cn('group gap-0 overflow-hidden pt-0', cardBoxClass)}>
       {resolvedImageUrl ? (
-        <div className="h-40 overflow-hidden border-b-2 border-border bg-muted">
+        <div className="h-45 overflow-hidden border-b-2 border-border bg-muted">
           <ImageWithLoader
             src={resolvedImageUrl}
             alt={resolvedTitle}
-            className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-[1.02]"
+            className="rounded-none h-full w-full object-cover transition-transform duration-300 scale-[1.02]"
             loading="lazy"
+            height={'100%'}
           />
         </div>
       ) : (
@@ -235,9 +236,7 @@ export default function LinkCardNodeView({ node, editor, updateAttributes }: Nod
   return (
     <NodeViewWrapper className="not-prose my-3">
       {isEditable && (
-        <div
-          className={cn('mb-2 flex w-full flex-wrap items-center gap-2', alignmentClass)}
-        >
+        <div className={cn('mb-2 flex w-full flex-wrap items-center gap-2', alignmentClass)}>
           <div className={cn('flex flex-wrap items-center gap-2', cardBoxClass)}>
             <Button
               size="sm"
