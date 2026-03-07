@@ -41,6 +41,7 @@ export const loginValidator = vine.create(
   vine.object({
     email: vine.string().email().normalizeEmail().trim(),
     password: vine.string().minLength(8).maxLength(255).regex(passwordRegex),
+    remember_me: vine.boolean(),
     cf_token,
   })
 )

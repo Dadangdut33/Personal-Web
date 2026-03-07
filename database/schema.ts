@@ -247,6 +247,23 @@ export class RateLimitSchema extends BaseModel {
   declare expire: bigint | number | null
 }
 
+export class RememberMeTokenSchema extends BaseModel {
+  static $columns = ['id', 'tokenableId', 'hash', 'createdAt', 'updatedAt', 'expiresAt'] as const
+  $columns = RememberMeTokenSchema.$columns
+  @column({ isPrimary: true })
+  declare id: number
+  @column()
+  declare tokenableId: string
+  @column()
+  declare hash: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column.dateTime()
+  declare expiresAt: DateTime
+}
+
 export class RoleMediaTagSchema extends BaseModel {
   static $columns = ['roleId', 'tagId', 'createdAt', 'updatedAt'] as const
   $columns = RoleMediaTagSchema.$columns

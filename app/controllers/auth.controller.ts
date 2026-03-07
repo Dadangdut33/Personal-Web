@@ -76,7 +76,7 @@ export default class AuthController {
       const { user } = await this.service.login(payload)
 
       // *important: set the current login user to web
-      await auth.use('web').login(user)
+      await auth.use('web').login(user, payload.remember_me)
 
       // if user is not verified, redirect to verify email page
       if (!user.is_email_verified)

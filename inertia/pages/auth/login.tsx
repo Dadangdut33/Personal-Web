@@ -1,7 +1,7 @@
 import { Link } from '@adonisjs/inertia/react'
 import { router } from '@inertiajs/core'
 import { Head } from '@inertiajs/react'
-import { Box, Loader, Text } from '@mantine/core'
+import { Box, Checkbox, Loader, Text } from '@mantine/core'
 import { useForm } from '@mantine/form'
 import { Turnstile, type TurnstileInstance } from '@marsidev/react-turnstile'
 import { IconArrowLeft } from '@tabler/icons-react'
@@ -25,6 +25,7 @@ export default function Page(props: InertiaProps<AuthProps>) {
     initialValues: {
       email: '',
       password: '',
+      remember_me: true,
       cf_token: '',
     },
     validate: {
@@ -114,6 +115,13 @@ export default function Page(props: InertiaProps<AuthProps>) {
                   disabled={mutation.isPending}
                 />
               </div>
+
+              <Checkbox
+                label="Remember me"
+                checked={form.values.remember_me}
+                onChange={(event) => form.setFieldValue('remember_me', event.currentTarget.checked)}
+                disabled={mutation.isPending}
+              />
 
               {props.site_key && !props.bypass_captcha && (
                 <>

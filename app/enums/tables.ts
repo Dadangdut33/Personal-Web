@@ -11,6 +11,7 @@ enum Tables {
   // system
   TOKENS = 'tokens',
   ACCESS_TOKEN = 'auth_access_tokens',
+  REMEMBER_ME_TOKEN = 'remember_me_tokens',
   RATE_LIMITS = 'rate_limits',
   ACTIVITY_LOGS = 'activity_logs',
 
