@@ -89,15 +89,15 @@ export default function BlogCard({ blog, variant = 'default' }: BlogCardProps) {
         </div>
 
         {!isCompact && (
-          <div className={cn('flex justify-between', `${isCompact ? 'mt-3' : 'mt-4'}`)}>
-            <Button asChild size="sm" className="font-geistmono">
+          <div className={cn('mt-auto flex items-end justify-between gap-3 pt-4')}>
+            <Button asChild size="sm" className="font-geistmono shrink-0">
               <div>
                 Read post
                 <ArrowRight className="blog-read-arrow size-4" />
               </div>
             </Button>
-            <div className="ms-auto">
-              <BlogContributors author={blog.author} editor={blog.editor} className={'mt-3'} />
+            <div className="ms-auto min-w-0">
+              <BlogContributors author={blog.author} editor={blog.editor} />
             </div>
           </div>
         )}
