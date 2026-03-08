@@ -48,23 +48,31 @@ export default function PublicPageShell({
     >
       {breadcrumbs.length > 0 ? (
         <Breadcrumb className={cn('mb-3 font-geistmono', breadCrumbsClassName)}>
-          <BreadcrumbList>
+          <BreadcrumbList className="w-full flex-nowrap overflow-x-auto overflow-y-hidden whitespace-nowrap pb-1 scrollbar-thin">
             {breadcrumbs.map((item, index) => {
               const isLast = index === breadcrumbs.length - 1
               const shouldRenderAsCurrent = item.current || isLast || !item.href
 
               return (
                 <Fragment key={`${item.label}-${index}`}>
-                  <BreadcrumbItem>
+                  <BreadcrumbItem className="min-w-0 shrink-0">
                     {shouldRenderAsCurrent ? (
-                      <BreadcrumbPage className={item.className}>{item.label}</BreadcrumbPage>
+                      <BreadcrumbPage
+                        className={cn(
+                          'block max-w-[min(70vw,32rem)] truncate sm:max-w-none',
+                          item.className
+                        )}
+                        title={item.label}
+                      >
+                        {item.label}
+                      </BreadcrumbPage>
                     ) : (
-                      <BreadcrumbLink asChild className={item.className}>
+                      <BreadcrumbLink asChild className={cn('shrink-0', item.className)}>
                         <Link href={item.href!}>{item.label}</Link>
                       </BreadcrumbLink>
                     )}
                   </BreadcrumbItem>
-                  {!isLast ? <BreadcrumbSeparator /> : null}
+                  {!isLast ? <BreadcrumbSeparator className="shrink-0" /> : null}
                 </Fragment>
               )
             })}
