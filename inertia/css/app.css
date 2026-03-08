@@ -265,6 +265,59 @@ main,
          hover:before:origin-left;
 }
 
+.rte-excalidraw-read-image-shell .excalidraw .App-menu_top,
+.rte-excalidraw-read-image-shell .excalidraw .App-menu_bottom,
+.rte-excalidraw-read-image-shell .excalidraw .layer-ui__wrapper__top-right,
+.rte-excalidraw-read-image-shell .excalidraw .sidebar-trigger,
+.rte-excalidraw-read-image-shell .excalidraw .mobile-misc-tools-container {
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 160ms ease,
+    transform 160ms ease;
+}
+
+.rte-excalidraw-read-image-shell .excalidraw .App-menu_top,
+.rte-excalidraw-read-image-shell .excalidraw .layer-ui__wrapper__top-right {
+  transform: translateY(-6px);
+}
+
+.rte-excalidraw-read-image-shell .excalidraw .App-menu_bottom,
+.rte-excalidraw-read-image-shell .excalidraw .mobile-misc-tools-container {
+  transform: translateY(6px);
+}
+
+.rte-excalidraw-read-image-shell .excalidraw .help-icon {
+  display: none !important;
+}
+
+.rte-excalidraw-read-image-shell .excalidraw .mobile-misc-tools-container {
+  display: none !important;
+}
+
+.rte-excalidraw-read-image-shell[data-focused='true'] .excalidraw .App-menu_top,
+.rte-excalidraw-read-image-shell[data-focused='true'] .excalidraw .App-menu_bottom,
+.rte-excalidraw-read-image-shell[data-focused='true'] .excalidraw .layer-ui__wrapper__top-right,
+.rte-excalidraw-read-image-shell[data-focused='true'] .excalidraw .sidebar-trigger,
+.rte-excalidraw-read-image-shell[data-focused='true'] .excalidraw .mobile-misc-tools-container {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
+}
+
+@media (max-width: 1085px) {
+  .rte-excalidraw-read-shell .excalidraw .App-menu_top,
+  .rte-excalidraw-read-shell .excalidraw .App-menu_bottom,
+  .rte-excalidraw-read-shell .excalidraw .App-mobile-menu,
+  .rte-excalidraw-read-shell .excalidraw .App-toolbar,
+  .rte-excalidraw-read-shell .excalidraw .mobile-misc-tools-container,
+  .rte-excalidraw-read-shell .excalidraw .sidebar-trigger,
+  .rte-excalidraw-read-shell .excalidraw .layer-ui__wrapper__top-right,
+  .rte-excalidraw-read-shell .excalidraw .help-icon {
+    display: none !important;
+  }
+}
+
 .hr-error {
   width: 100%; /* Initial width */
   height: 2px; /* Height of the line */

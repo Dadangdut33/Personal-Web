@@ -45,8 +45,16 @@ const cloneValue = <T>(value: T): T => {
 const isWordLikeChar = (value: string) => /[\p{L}\p{N}]/u.test(value)
 const isOpeningPunctuation = (value: string) => /[([{]/.test(value)
 const isEmojiChar = (value: string) => /\p{Extended_Pictographic}/u.test(value)
-const needsLeadingSpace = (value: string) =>
-  !/\s/u.test(value) && (isWordLikeChar(value) || isOpeningPunctuation(value) || isEmojiChar(value))
+const isVisibleBoundaryChar = (value: string) =>
+  isWordLikeChar(value) || isOpeningPunctuation(value) || isEmojiChar(value)
+const needsLeadingSpace = (value: string) => !/\s/u.test(value) && isVisibleBoundaryChar(value)
+const punctuationNeedsFollowingSpace = (previousChar: string, nextChar: string) => {
+  if (!isVisibleBoundaryChar(nextChar) || /\p{N}/u.test(nextChar)) return false
+  return /[.!?:;,]/.test(previousChar)
+}
+const shouldInsertBoundarySpace = (previousChar: string, nextChar: string) =>
+  (isWordLikeChar(previousChar) && (isWordLikeChar(nextChar) || needsLeadingSpace(nextChar))) ||
+  punctuationNeedsFollowingSpace(previousChar, nextChar)
 const createWhitespaceTextNode = () => ({ type: 'text', text: ' ' })
 
 /**
@@ -78,11 +86,7 @@ const normalizeInlineTextSpacing = (value: unknown): unknown => {
       const nextFirstChar = nextText[0]
       const hasWhitespaceBoundary = /\s$/.test(currentText) || /^\s/.test(nextText)
 
-      if (
-        !hasWhitespaceBoundary &&
-        isWordLikeChar(currentLastChar) &&
-        (isWordLikeChar(nextFirstChar) || needsLeadingSpace(nextFirstChar))
-      ) {
+      if (!hasWhitespaceBoundary && shouldInsertBoundarySpace(currentLastChar, nextFirstChar)) {
         normalizedChildren.splice(index + 1, 0, createWhitespaceTextNode())
         index++
       }

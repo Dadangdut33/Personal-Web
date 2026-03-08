@@ -33,6 +33,20 @@ export const ExcalidrawBlock = Node.create<ExcalidrawBlockOptions>({
         parseHTML: (element) => element.getAttribute('data-card-size') || 'lg',
         renderHTML: (attributes) => ({ 'data-card-size': String(attributes.cardSize || 'lg') }),
       },
+      displayMode: {
+        default: 'canvas',
+        parseHTML: (element) => element.getAttribute('data-display-mode') || 'canvas',
+        renderHTML: (attributes) => ({
+          'data-display-mode': String(attributes.displayMode || 'canvas'),
+        }),
+      },
+      autoScaleOnNarrow: {
+        default: false,
+        parseHTML: (element) => element.getAttribute('data-auto-scale-on-narrow') === 'true',
+        renderHTML: (attributes) => ({
+          'data-auto-scale-on-narrow': String(Boolean(attributes.autoScaleOnNarrow)),
+        }),
+      },
       position: {
         default: 'center',
         parseHTML: (element) => element.getAttribute('data-position') || 'center',

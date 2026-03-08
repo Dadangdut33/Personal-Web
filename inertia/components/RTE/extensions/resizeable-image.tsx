@@ -1,8 +1,5 @@
 import { Node, mergeAttributes, nodeInputRule } from '@tiptap/core'
-import { ReactNodeViewRenderer } from '@tiptap/react'
 import { NodeSelection, Plugin, PluginKey } from 'prosemirror-state'
-
-import ResizableImageNodeView from '../components/image/resizable-image-node-view'
 
 export interface ResizableImageOptions {
   inline: boolean
@@ -238,10 +235,6 @@ export const ResizableImage = Node.create<ResizableImageOptions>({
         },
       }),
     ]
-  },
-
-  addNodeView() {
-    return ReactNodeViewRenderer(ResizableImageNodeView)
   },
 })
 

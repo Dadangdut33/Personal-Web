@@ -6,8 +6,16 @@ const isRecord = (value: unknown): value is JsonRecord =>
 const isWordLikeChar = (value: string) => /[\p{L}\p{N}]/u.test(value)
 const isOpeningPunctuation = (value: string) => /[([{]/.test(value)
 const isEmojiChar = (value: string) => /\p{Extended_Pictographic}/u.test(value)
-const needsLeadingSpace = (value: string) =>
-  !/\s/u.test(value) && (isWordLikeChar(value) || isOpeningPunctuation(value) || isEmojiChar(value))
+const isVisibleBoundaryChar = (value: string) =>
+  isWordLikeChar(value) || isOpeningPunctuation(value) || isEmojiChar(value)
+const needsLeadingSpace = (value: string) => !/\s/u.test(value) && isVisibleBoundaryChar(value)
+const punctuationNeedsFollowingSpace = (previousChar: string, nextChar: string) => {
+  if (!isVisibleBoundaryChar(nextChar) || /\p{N}/u.test(nextChar)) return false
+  return /[.!?:;,]/.test(previousChar)
+}
+const shouldInsertBoundarySpace = (previousChar: string, nextChar: string) =>
+  (isWordLikeChar(previousChar) && (isWordLikeChar(nextChar) || needsLeadingSpace(nextChar))) ||
+  punctuationNeedsFollowingSpace(previousChar, nextChar)
 const createWhitespaceTextNode = (): JsonRecord => ({ type: 'text', text: ' ' })
 
 const joinTextFragments = (fragments: string[]) => {
@@ -19,11 +27,7 @@ const joinTextFragments = (fragments: string[]) => {
     const nextChar = fragment[0]
     const hasWhitespaceBoundary = /\s$/.test(result) || /^\s/.test(fragment)
 
-    if (
-      !hasWhitespaceBoundary &&
-      isWordLikeChar(previousChar) &&
-      (isWordLikeChar(nextChar) || needsLeadingSpace(nextChar))
-    ) {
+    if (!hasWhitespaceBoundary && shouldInsertBoundarySpace(previousChar, nextChar)) {
       return `${result} ${fragment}`
     }
 
@@ -109,11 +113,7 @@ const sanitizeNode = (value: unknown): JsonRecord | null => {
       const nextFirstChar = nextText[0]
       const hasWhitespaceBoundary = /\s$/.test(currentText) || /^\s/.test(nextText)
 
-      if (
-        !hasWhitespaceBoundary &&
-        isWordLikeChar(currentLastChar) &&
-        (isWordLikeChar(nextFirstChar) || needsLeadingSpace(nextFirstChar))
-      ) {
+      if (!hasWhitespaceBoundary && shouldInsertBoundarySpace(currentLastChar, nextFirstChar)) {
         content.splice(index + 1, 0, createWhitespaceTextNode())
         index++
       }

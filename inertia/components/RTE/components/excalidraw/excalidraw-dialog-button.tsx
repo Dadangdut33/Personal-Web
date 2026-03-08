@@ -15,6 +15,7 @@ import { Label } from '~/components/ui/label'
 import { Tooltip, TooltipContent, TooltipTrigger } from '~/components/ui/tooltip'
 
 type CardSize = 'sm' | 'md' | 'lg'
+type DisplayMode = 'canvas' | 'image'
 type Position = 'left' | 'center' | 'right'
 
 const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value))
@@ -24,6 +25,8 @@ export default function ExcalidrawDialogButton({ editor }: { editor: Editor | nu
   const isEditable = !!editor.isEditable
   const [open, setOpen] = useState(false)
   const [cardSize, setCardSize] = useState<CardSize>('lg')
+  const [displayMode, setDisplayMode] = useState<DisplayMode>('canvas')
+  const [autoScaleOnNarrow, setAutoScaleOnNarrow] = useState(false)
   const [position, setPosition] = useState<Position>('center')
   const [height, setHeight] = useState('460')
 
@@ -35,6 +38,8 @@ export default function ExcalidrawDialogButton({ editor }: { editor: Editor | nu
         type: 'excalidrawBlock',
         attrs: {
           cardSize,
+          displayMode,
+          autoScaleOnNarrow,
           position,
           height: clamp(Number.parseInt(height, 10) || 460, 280, 900),
           sceneData: JSON.stringify({ elements: [], appState: {}, files: {} }),
@@ -99,6 +104,20 @@ export default function ExcalidrawDialogButton({ editor }: { editor: Editor | nu
             </div>
 
             <div className="grid gap-1.5">
+              <Label>Mode</Label>
+              <select
+                value={displayMode}
+                onChange={(e) => setDisplayMode(e.target.value as DisplayMode)}
+                className="h-9 rounded-base border-2 border-border bg-secondary-background px-3 text-sm"
+              >
+                <option value="canvas">Canvas</option>
+                <option value="image">Image-like</option>
+              </select>
+            </div>
+          </div>
+
+          <div className="grid gap-2 sm:grid-cols-2">
+            <div className="grid gap-1.5">
               <Label>Position</Label>
               <select
                 value={position}
@@ -108,6 +127,17 @@ export default function ExcalidrawDialogButton({ editor }: { editor: Editor | nu
                 <option value="left">Left</option>
                 <option value="center">Center</option>
                 <option value="right">Right</option>
+              </select>
+            </div>
+            <div className="grid gap-1.5">
+              <Label>Small Width</Label>
+              <select
+                value={autoScaleOnNarrow ? 'auto-scale' : 'overflow'}
+                onChange={(e) => setAutoScaleOnNarrow(e.target.value === 'auto-scale')}
+                className="h-9 rounded-base border-2 border-border bg-secondary-background px-3 text-sm"
+              >
+                <option value="overflow">Allow Overflow</option>
+                <option value="auto-scale">Auto Scale</option>
               </select>
             </div>
           </div>
