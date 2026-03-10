@@ -679,6 +679,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog_public.controller').default['searchAPI']>>>
     }
   }
+  'api.v1.blog.viewCount': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/public/blog/views/:slugId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { slugId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog_public.controller').default['viewCount']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog_public.controller').default['viewCount']>>>
+    }
+  }
   'api.v1.me.avatar': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/me/avatar'
@@ -725,18 +737,6 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/media.controller').default['deleteMediaAPI']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/media.controller').default['deleteMediaAPI']>>>
-    }
-  }
-  'api.v1.blog.viewCount': {
-    methods: ["GET","HEAD"]
-    pattern: '/api/v1/blog/api/v1/blog/views/:slugId'
-    types: {
-      body: {}
-      paramsTuple: [ParamValue]
-      params: { slugId: ParamValue }
-      query: {}
-      response: ExtractResponse<Awaited<ReturnType<import('#controllers/blog_public.controller').default['viewCount']>>>
-      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/blog_public.controller').default['viewCount']>>>
     }
   }
   'api.v1.utils.random-password': {

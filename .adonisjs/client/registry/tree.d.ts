@@ -90,11 +90,11 @@ export interface ApiDefinition {
           search: typeof routes['api.v1.public.blog.search']
         }
       }
-      me: {
-        avatar: typeof routes['api.v1.me.avatar']
-      }
       blog: {
         viewCount: typeof routes['api.v1.blog.viewCount']
+      }
+      me: {
+        avatar: typeof routes['api.v1.me.avatar']
       }
       utils: {
         randomPassword: typeof routes['api.v1.utils.random-password']

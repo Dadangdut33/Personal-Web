@@ -60,11 +60,11 @@ export type ScannedRoutes = {
     'projects': { paramsTuple?: []; params?: {} }
     'api.v1.media.redirect': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'api.v1.public.blog.search': { paramsTuple?: []; params?: {} }
+    'api.v1.blog.viewCount': { paramsTuple: [ParamValue]; params: {'slugId': ParamValue} }
     'api.v1.me.avatar': { paramsTuple?: []; params?: {} }
     'api.v1.media.list': { paramsTuple?: []; params?: {} }
     'api.v1.media.upload': { paramsTuple?: []; params?: {} }
     'api.v1.media.destroy': { paramsTuple?: []; params?: {} }
-    'api.v1.blog.viewCount': { paramsTuple: [ParamValue]; params: {'slugId': ParamValue} }
     'api.v1.utils.random-password': { paramsTuple?: []; params?: {} }
     'api.v1.utils.link-metadata': { paramsTuple?: []; params?: {} }
     'auth.logout': { paramsTuple?: []; params?: {} }
@@ -109,9 +109,9 @@ export type ScannedRoutes = {
     'projects': { paramsTuple?: []; params?: {} }
     'api.v1.media.redirect': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'api.v1.public.blog.search': { paramsTuple?: []; params?: {} }
+    'api.v1.blog.viewCount': { paramsTuple: [ParamValue]; params: {'slugId': ParamValue} }
     'api.v1.me.avatar': { paramsTuple?: []; params?: {} }
     'api.v1.media.list': { paramsTuple?: []; params?: {} }
-    'api.v1.blog.viewCount': { paramsTuple: [ParamValue]; params: {'slugId': ParamValue} }
     'api.v1.utils.random-password': { paramsTuple?: []; params?: {} }
     'api.v1.utils.link-metadata': { paramsTuple?: []; params?: {} }
     'auth.login': { paramsTuple?: []; params?: {} }
@@ -150,9 +150,9 @@ export type ScannedRoutes = {
     'projects': { paramsTuple?: []; params?: {} }
     'api.v1.media.redirect': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'api.v1.public.blog.search': { paramsTuple?: []; params?: {} }
+    'api.v1.blog.viewCount': { paramsTuple: [ParamValue]; params: {'slugId': ParamValue} }
     'api.v1.me.avatar': { paramsTuple?: []; params?: {} }
     'api.v1.media.list': { paramsTuple?: []; params?: {} }
-    'api.v1.blog.viewCount': { paramsTuple: [ParamValue]; params: {'slugId': ParamValue} }
     'api.v1.utils.random-password': { paramsTuple?: []; params?: {} }
     'api.v1.utils.link-metadata': { paramsTuple?: []; params?: {} }
     'auth.login': { paramsTuple?: []; params?: {} }

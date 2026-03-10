@@ -29,6 +29,9 @@ router
                 router
                   .get('/search', [BlogPublicController, 'searchAPI'])
                   .as('api.v1.public.blog.search')
+                router
+                  .get('/views/:slugId', [BlogPublicController, 'viewCount'])
+                  .as('api.v1.blog.viewCount')
               })
               .prefix('/blog')
           })
@@ -57,14 +60,6 @@ router
                 })
               })
               .prefix('/media')
-
-            router
-              .group(() => {
-                router
-                  .get('/api/v1/blog/views/:slugId', [BlogPublicController, 'viewCount'])
-                  .as('api.v1.blog.viewCount')
-              })
-              .prefix('/blog')
 
             router
               .group(() => {

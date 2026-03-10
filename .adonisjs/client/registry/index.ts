@@ -342,6 +342,12 @@ const routes = {
     tokens: [{"old":"/api/v1/public/blog/search","type":0,"val":"api","end":""},{"old":"/api/v1/public/blog/search","type":0,"val":"v1","end":""},{"old":"/api/v1/public/blog/search","type":0,"val":"public","end":""},{"old":"/api/v1/public/blog/search","type":0,"val":"blog","end":""},{"old":"/api/v1/public/blog/search","type":0,"val":"search","end":""}],
     types: placeholder as Registry['api.v1.public.blog.search']['types'],
   },
+  'api.v1.blog.viewCount': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/public/blog/views/:slugId',
+    tokens: [{"old":"/api/v1/public/blog/views/:slugId","type":0,"val":"api","end":""},{"old":"/api/v1/public/blog/views/:slugId","type":0,"val":"v1","end":""},{"old":"/api/v1/public/blog/views/:slugId","type":0,"val":"public","end":""},{"old":"/api/v1/public/blog/views/:slugId","type":0,"val":"blog","end":""},{"old":"/api/v1/public/blog/views/:slugId","type":0,"val":"views","end":""},{"old":"/api/v1/public/blog/views/:slugId","type":1,"val":"slugId","end":""}],
+    types: placeholder as Registry['api.v1.blog.viewCount']['types'],
+  },
   'api.v1.me.avatar': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/me/avatar',
@@ -365,12 +371,6 @@ const routes = {
     pattern: '/api/v1/media',
     tokens: [{"old":"/api/v1/media","type":0,"val":"api","end":""},{"old":"/api/v1/media","type":0,"val":"v1","end":""},{"old":"/api/v1/media","type":0,"val":"media","end":""}],
     types: placeholder as Registry['api.v1.media.destroy']['types'],
-  },
-  'api.v1.blog.viewCount': {
-    methods: ["GET","HEAD"],
-    pattern: '/api/v1/blog/api/v1/blog/views/:slugId',
-    tokens: [{"old":"/api/v1/blog/api/v1/blog/views/:slugId","type":0,"val":"api","end":""},{"old":"/api/v1/blog/api/v1/blog/views/:slugId","type":0,"val":"v1","end":""},{"old":"/api/v1/blog/api/v1/blog/views/:slugId","type":0,"val":"blog","end":""},{"old":"/api/v1/blog/api/v1/blog/views/:slugId","type":0,"val":"api","end":""},{"old":"/api/v1/blog/api/v1/blog/views/:slugId","type":0,"val":"v1","end":""},{"old":"/api/v1/blog/api/v1/blog/views/:slugId","type":0,"val":"blog","end":""},{"old":"/api/v1/blog/api/v1/blog/views/:slugId","type":0,"val":"views","end":""},{"old":"/api/v1/blog/api/v1/blog/views/:slugId","type":1,"val":"slugId","end":""}],
-    types: placeholder as Registry['api.v1.blog.viewCount']['types'],
   },
   'api.v1.utils.random-password': {
     methods: ["GET","HEAD"],
